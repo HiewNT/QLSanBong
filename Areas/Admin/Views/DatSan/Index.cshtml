@@ -1,0 +1,1795 @@
+﻿@using PagedList;
+@using QLSanBong.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayOut.cshtml";
+    var ds = ViewBag.pagedall as PagedList<YCDSViewModel>;
+    var dscho = ViewBag.pagedcho as PagedList<YCDSViewModel>;
+    var dsxn = ViewBag.pagedxn as PagedList<YCDSViewModel>;
+    var dsht = ViewBag.pagedht as PagedList<YCDSViewModel>;
+    var dshuy = ViewBag.pagedhuy as PagedList<YCDSViewModel>;
+}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quản lý yêu cầu đặt sân</h3>
+                    </div>
+
+                    @using (Html.BeginForm("Index", "DatSan", FormMethod.Get, new { id = "searchForm", @class = "d-flex" }))
+                    {
+                        <div class="form-group mr-4">
+                            <label for="searchname">Nhập tên khách hàng</label>
+                            @Html.TextBox("searchname", null, new { @class = "form-control" })
+                        </div>
+                        <div class="form-group mr-4">
+                            <label for="searchphone">Nhập số điện thoại</label>
+                            @Html.TextBox("searchphone", null, new { @class = "form-control" })
+                        </div>
+                        <div class="form-group mr-4">
+                            <label for="searchdatedat">Thời gian đặt sân</label>
+                            @Html.TextBox("searchdatedat", null, new { @class = "form-control", type = "date" })
+                        </div>
+                        <div class="form-group mr-4">
+                            <label for="searchdatesd">Ngày sử dụng sân</label>
+                            @Html.TextBox("searchdatesd", null, new { @class = "form-control", type = "date" })
+                        </div>
+                        <div style="margin-top:30px">
+                            <button type="submit" class="btn btn-primary ml-2">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    }
+
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class=" nav-item active"><a id="AdminTab" class="nav-link" data-toggle="tab" href="#Admin">Tất cả yêu cầu(@ViewBag.totalItemCountall)</a></li>
+                        <li class="nav-item"><a id="menu1Tab" class="nav-link" data-toggle="tab" href="#menu1">Chờ xác nhận (@ViewBag.totalItemCountcho)</a></li>
+                        <li class="nav-item"><a id="menu2Tab" class="nav-link" data-toggle="tab" href="#menu2">Đã xác nhận (@ViewBag.totalItemCountxn)</a></li>
+                        <li class="nav-item"><a id="menu4Tab" class="nav-link" data-toggle="tab" href="#menu4">Đã hoàn thành (@ViewBag.totalItemCountht)</a></li>
+                        <li class="nav-item"><a id="menu3Tab" class="nav-link" data-toggle="tab" href="#menu3">Đã hủy (@ViewBag.totalItemCounthuy)</a></li>
+                    </ul>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div id="Admin" class="tab-pane fade">
+                                <table id="showtable" class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên người đặt</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Thời gian đặt</th>
+                                            <th>Ngày sử dụng</th>
+                                            <th>Giờ bắt đầu</th>
+                                            <th>Giờ kết thúc</th>
+                                            <th>Mã sân bóng</th>
+                                            <th>Phương thức tt</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ds != null)
+                                        {
+                                            @foreach (var item in ds)
+                                            {
+                                                <tr>
+                                                    <td>@item.Tennguoidat</td>
+                                                    <td>@item.Sdt</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy HH:mm:ss}",item.Thoigiandat)</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy}", item.Ngaysudung)</td>
+                                                    <td>@item.Giobatdau</td>
+                                                    <td>@item.Gioketthuc</td>
+                                                    <td>@item.MaSb</td>
+                                                    <td>@item.Phuongthuctt</td>
+                                                    <td>@item.TrangThai</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <!-- Hiển thị thanh phân trang -->
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-5">
+                                        <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
+                                            Showing @ViewBag.PageStartItemall to @ViewBag.PageEndItemall of @ViewBag.TotalItemCountall entries
+                                        </div>
+                                    </div>
+
+                                    @if (ds != null && ds.PageCount > 1)
+                                    {
+                                        <nav style="float: right; margin-right: 29px;" aria-label="Page navigation example">
+                                            <ul class="pagination justify-content-end">
+                                                @if (ds.HasPreviousPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePageall(@ds.PageNumber - 1)">Previous</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Previous</span>
+                                                    </li>
+                                                }
+
+                                                @if (ds.PageCount > 5)
+                                                {
+                                                    @if (ds.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == ds.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageall(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageall(@ds.PageCount)">@ds.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (ds.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 4; i++)
+                                                        {
+                                                            if (i == ds.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageall(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageall(@ds.PageCount)">@ds.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (ds.PageNumber >= ds.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageall(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = ds.PageCount - 2; i <= ds.PageCount; i++)
+                                                        {
+                                                            if (i == ds.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageall(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else if (ds.PageNumber == ds.PageCount - 2)
+                                                    {
+
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageall(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = ds.PageCount - 3; i <= ds.PageCount; i++)
+                                                        {
+                                                            if (i == ds.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageall(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageall(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        @for (var i = Math.Max(1, ds.PageNumber - 1); i <= Math.Min(ds.PageCount, ds.PageNumber + 1); i++)
+                                                        {
+                                                            if (i == ds.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageall(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageall(@ds.PageCount)">@ds.PageCount</button>
+                                                        </li>
+                                                    }
+                                                }
+                                                else if (ds.PageCount == 5)
+                                                {
+                                                    @if (ds.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == ds.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageall(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageall(@ds.PageCount)">@ds.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (ds.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 5; i++)
+                                                        {
+                                                            if (i == ds.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageall(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (ds.PageNumber >= ds.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageall(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = ds.PageCount - 2; i <= ds.PageCount; i++)
+                                                        {
+                                                            if (i == ds.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageall(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    for (var i = 1; i <= ds.PageCount; i++)
+                                                    {
+                                                        if (i == ds.PageNumber)
+                                                        {
+                                                            <li class="page-item active">
+                                                                <span class="page-link">@i</span>
+                                                            </li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li class="page-item">
+                                                                <button class="page-link" onclick="changePageall(@i)">@i</button>
+                                                            </li>
+                                                        }
+                                                    }
+                                                }
+                                                @if (ds.HasNextPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePageall(@ds.PageNumber + 1)">Next</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Next</span>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </nav>
+                                    }
+                                </div>
+
+                            </div>
+                            <div id="menu1" class="tab-pane fade">
+
+                                <table id="showtable1" class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên người đặt</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Thời gian đặt</th>
+                                            <th>Ngày sử dụng</th>
+                                            <th>Giờ bắt đầu</th>
+                                            <th>Giờ kết thúc</th>
+                                            <th>Mã sân bóng</th>
+                                            <th>Phương thức tt</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (dscho != null)
+                                        {
+                                            @foreach (var item in dscho)
+                                            {
+                                                <tr>
+                                                    <td>@item.Tennguoidat</td>
+                                                    <td>@item.Sdt</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy HH:mm:ss}",item.Thoigiandat)</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy}", item.Ngaysudung)</td>
+                                                    <td>@item.Giobatdau</td>
+                                                    <td>@item.Gioketthuc</td>
+                                                    <td>@item.MaSb</td>
+                                                    <td>@item.Phuongthuctt</td>
+                                                    <td>@item.TrangThai</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <!-- Hiển thị thanh phân trang -->
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-5">
+                                        <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
+                                            Showing @ViewBag.PageStartItemcho to @ViewBag.PageEndItemcho of @ViewBag.TotalItemCountcho entries
+                                        </div>
+                                    </div>
+
+                                    @if (dscho != null && dscho.PageCount > 1)
+                                    {
+                                        <nav style="float: right; margin-right: 29px;" aria-label="Page navigation example">
+                                            <ul class="pagination justify-content-end">
+                                                @if (dscho.HasPreviousPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePagecho(@dscho.PageNumber - 1)">Previous</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Previous</span>
+                                                    </li>
+                                                }
+
+                                                @if (dscho.PageCount > 5)
+                                                {
+                                                    @if (dscho.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == dscho.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagecho(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagecho(@dscho.PageCount)">@dscho.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dscho.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 4; i++)
+                                                        {
+                                                            if (i == dscho.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagecho(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagecho(@dscho.PageCount)">@dscho.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dscho.PageNumber >= dscho.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagecho(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dscho.PageCount - 2; i <= dscho.PageCount; i++)
+                                                        {
+                                                            if (i == dscho.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagecho(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else if (dscho.PageNumber == dscho.PageCount - 2)
+                                                    {
+
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagecho(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dscho.PageCount - 3; i <= dscho.PageCount; i++)
+                                                        {
+                                                            if (i == dscho.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagecho(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagecho(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        @for (var i = Math.Max(1, dscho.PageNumber - 1); i <= Math.Min(dscho.PageCount, dscho.PageNumber + 1); i++)
+                                                        {
+                                                            if (i == dscho.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagecho(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagecho(@dscho.PageCount)">@dscho.PageCount</button>
+                                                        </li>
+                                                    }
+                                                }
+                                                else if (dscho.PageCount == 5)
+                                                {
+                                                    @if (dscho.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == dscho.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagecho(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagecho(@dscho.PageCount)">@dscho.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dscho.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 5; i++)
+                                                        {
+                                                            if (i == dscho.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagecho(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (dscho.PageNumber >= dscho.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagecho(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dscho.PageCount - 2; i <= dscho.PageCount; i++)
+                                                        {
+                                                            if (i == dscho.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagecho(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    for (var i = 1; i <= dscho.PageCount; i++)
+                                                    {
+                                                        if (i == dscho.PageNumber)
+                                                        {
+                                                            <li class="page-item active">
+                                                                <span class="page-link">@i</span>
+                                                            </li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li class="page-item">
+                                                                <button class="page-link" onclick="changePagecho(@i)">@i</button>
+                                                            </li>
+                                                        }
+                                                    }
+                                                }
+                                                @if (dscho.HasNextPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePagecho(@dscho.PageNumber + 1)">Next</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Next</span>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </nav>
+                                    }
+                                </div>
+                            </div>
+
+                            <div id="menu2" class="tab-pane fade">
+
+                                <table id="showtable2" class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên người đặt</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Thời gian đặt</th>
+                                            <th>Ngày sử dụng</th>
+                                            <th>Giờ bắt đầu</th>
+                                            <th>Giờ kết thúc</th>
+                                            <th>Mã sân bóng</th>
+                                            <th>Phương thức tt</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (dsxn != null)
+                                        {
+                                            @foreach (var item in dsxn)
+                                            {
+                                                <tr>
+                                                    <td>@item.Tennguoidat</td>
+                                                    <td>@item.Sdt</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy HH:mm:ss}",item.Thoigiandat)</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy}", item.Ngaysudung)</td>
+                                                    <td>@item.Giobatdau</td>
+                                                    <td>@item.Gioketthuc</td>
+                                                    <td>@item.MaSb</td>
+                                                    <td>@item.Phuongthuctt</td>
+                                                    <td>@item.TrangThai</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <!-- Hiển thị thanh phân trang -->
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-5">
+                                        <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
+                                            Showing @ViewBag.PageStartItemxn to @ViewBag.PageEndItemxn of @ViewBag.TotalItemCountxn entries
+                                        </div>
+                                    </div>
+
+                                    @if (dsxn != null && dsxn.PageCount > 1)
+                                    {
+                                        <nav style="float: right; margin-right: 29px;" aria-label="Page navigation example">
+                                            <ul class="pagination justify-content-end">
+                                                @if (dsxn.HasPreviousPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePagexn(@dsxn.PageNumber - 1)">Previous</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Previous</span>
+                                                    </li>
+                                                }
+
+                                                @if (dsxn.PageCount > 5)
+                                                {
+                                                    @if (dsxn.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == dsxn.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagexn(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagexn(@dsxn.PageCount)">@dsxn.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dsxn.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 4; i++)
+                                                        {
+                                                            if (i == dsxn.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagexn(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagexn(@dsxn.PageCount)">@dsxn.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dsxn.PageNumber >= dsxn.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagexn(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dsxn.PageCount - 2; i <= dsxn.PageCount; i++)
+                                                        {
+                                                            if (i == dsxn.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagexn(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else if (dsxn.PageNumber == dsxn.PageCount - 2)
+                                                    {
+
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagexn(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dsxn.PageCount - 3; i <= dsxn.PageCount; i++)
+                                                        {
+                                                            if (i == dsxn.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagexn(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagexn(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        @for (var i = Math.Max(1, dsxn.PageNumber - 1); i <= Math.Min(dsxn.PageCount, dsxn.PageNumber + 1); i++)
+                                                        {
+                                                            if (i == dsxn.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagexn(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagexn(@dsxn.PageCount)">@dsxn.PageCount</button>
+                                                        </li>
+                                                    }
+                                                }
+                                                else if (dsxn.PageCount == 5)
+                                                {
+                                                    @if (dsxn.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == dsxn.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagexn(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagexn(@dsxn.PageCount)">@dsxn.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dsxn.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 5; i++)
+                                                        {
+                                                            if (i == dsxn.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagexn(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (dsxn.PageNumber >= dsxn.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePagexn(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dsxn.PageCount - 2; i <= dsxn.PageCount; i++)
+                                                        {
+                                                            if (i == dsxn.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePagexn(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    for (var i = 1; i <= dsxn.PageCount; i++)
+                                                    {
+                                                        if (i == dsxn.PageNumber)
+                                                        {
+                                                            <li class="page-item active">
+                                                                <span class="page-link">@i</span>
+                                                            </li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li class="page-item">
+                                                                <button class="page-link" onclick="changePagexn(@i)">@i</button>
+                                                            </li>
+                                                        }
+                                                    }
+                                                }
+                                                @if (dsxn.HasNextPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePagexn(@dsxn.PageNumber + 1)">Next</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Next</span>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </nav>
+                                    }
+                                </div>
+                            </div>
+
+                            <div id="menu4" class="tab-pane fade">
+
+                                <table id="showtable2" class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên người đặt</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Thời gian đặt</th>
+                                            <th>Ngày sử dụng</th>
+                                            <th>Giờ bắt đầu</th>
+                                            <th>Giờ kết thúc</th>
+                                            <th>Mã sân bóng</th>
+                                            <th>Phương thức tt</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (dsht != null)
+                                        {
+                                            @foreach (var item in dsht)
+                                            {
+                                                <tr>
+                                                    <td>@item.Tennguoidat</td>
+                                                    <td>@item.Sdt</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy HH:mm:ss}",item.Thoigiandat)</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy}", item.Ngaysudung)</td>
+                                                    <td>@item.Giobatdau</td>
+                                                    <td>@item.Gioketthuc</td>
+                                                    <td>@item.MaSb</td>
+                                                    <td>@item.Phuongthuctt</td>
+                                                    <td>@item.TrangThai</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <!-- Hiển thị thanh phân trang -->
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-5">
+                                        <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
+                                            Showing @ViewBag.PageStartItemht to @ViewBag.PageEndItemht of @ViewBag.TotalItemCountht entries
+                                        </div>
+                                    </div>
+
+                                    @if (dsht != null && dsht.PageCount > 1)
+                                    {
+                                        <nav style="float: right; margin-right: 29px;" aria-label="Page navigation example">
+                                            <ul class="pagination justify-content-end">
+                                                @if (dsht.HasPreviousPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePageht(@dsht.PageNumber - 1)">Previous</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Previous</span>
+                                                    </li>
+                                                }
+
+                                                @if (dsht.PageCount > 5)
+                                                {
+                                                    @if (dsht.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == dsht.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageht(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageht(@dsht.PageCount)">@dsht.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dsht.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 4; i++)
+                                                        {
+                                                            if (i == dsht.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageht(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageht(@dsht.PageCount)">@dsht.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dsht.PageNumber >= dsht.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageht(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dsht.PageCount - 2; i <= dsht.PageCount; i++)
+                                                        {
+                                                            if (i == dsht.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageht(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else if (dsht.PageNumber == dsht.PageCount - 2)
+                                                    {
+
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageht(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dsht.PageCount - 3; i <= dsht.PageCount; i++)
+                                                        {
+                                                            if (i == dsht.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageht(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageht(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        @for (var i = Math.Max(1, dsht.PageNumber - 1); i <= Math.Min(dsht.PageCount, dsht.PageNumber + 1); i++)
+                                                        {
+                                                            if (i == dsht.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageht(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageht(@dsht.PageCount)">@dsht.PageCount</button>
+                                                        </li>
+                                                    }
+                                                }
+                                                else if (dsht.PageCount == 5)
+                                                {
+                                                    @if (dsht.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == dsht.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageht(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageht(@dsht.PageCount)">@dsht.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dsht.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 5; i++)
+                                                        {
+                                                            if (i == dsht.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageht(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (dsht.PageNumber >= dsht.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePageht(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dsht.PageCount - 2; i <= dsht.PageCount; i++)
+                                                        {
+                                                            if (i == dsht.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePageht(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    for (var i = 1; i <= dsht.PageCount; i++)
+                                                    {
+                                                        if (i == dsht.PageNumber)
+                                                        {
+                                                            <li class="page-item active">
+                                                                <span class="page-link">@i</span>
+                                                            </li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li class="page-item">
+                                                                <button class="page-link" onclick="changePageht(@i)">@i</button>
+                                                            </li>
+                                                        }
+                                                    }
+                                                }
+                                                @if (dsht.HasNextPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePageht(@dsht.PageNumber + 1)">Next</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Next</span>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </nav>
+                                    }
+                                </div>
+                            </div>
+
+                            <div id="menu3" class="tab-pane fade">
+
+                                <table id="showtable3" class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên người đặt</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Thời gian đặt</th>
+                                            <th>Ngày sử dụng</th>
+                                            <th>Giờ bắt đầu</th>
+                                            <th>Giờ kết thúc</th>
+                                            <th>Mã sân bóng</th>
+                                            <th>Phương thức tt</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (dshuy != null)
+                                        {
+                                            @foreach (var item in dshuy)
+                                            {
+                                                <tr>
+                                                    <td>@item.Tennguoidat</td>
+                                                    <td>@item.Sdt</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy HH:mm:ss}",item.Thoigiandat)</td>
+                                                    <td>@String.Format("{0:dd/MM/yyyy}", item.Ngaysudung)</td>
+                                                    <td>@item.Giobatdau</td>
+                                                    <td>@item.Gioketthuc</td>
+                                                    <td>@item.MaSb</td>
+                                                    <td>@item.Phuongthuctt</td>
+                                                    <td>@item.TrangThai</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <!-- Hiển thị thanh phân trang -->
+                                <!-- Hiển thị thanh phân trang -->
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-5">
+                                        <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
+                                            Showing @ViewBag.PageStartItemhuy to @ViewBag.PageEndItemhuy of @ViewBag.TotalItemCounthuy entries
+                                        </div>
+                                    </div>
+
+                                    @if (dshuy != null && dshuy.PageCount > 1)
+                                    {
+                                        <nav style="float: right; margin-right: 29px;" aria-label="Page navigation example">
+                                            <ul class="pagination justify-content-end">
+                                                @if (dshuy.HasPreviousPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePage(@dshuy.PageNumber - 1)">Previous</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Previous</span>
+                                                    </li>
+                                                }
+
+                                                @if (dshuy.PageCount > 5)
+                                                {
+                                                    @if (dshuy.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == dshuy.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePage(@dshuy.PageCount)">@dshuy.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dshuy.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 4; i++)
+                                                        {
+                                                            if (i == dshuy.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePage(@dshuy.PageCount)">@dshuy.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dshuy.PageNumber >= dshuy.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePage(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dshuy.PageCount - 2; i <= dshuy.PageCount; i++)
+                                                        {
+                                                            if (i == dshuy.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else if (dshuy.PageNumber == dshuy.PageCount - 2)
+                                                    {
+
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePage(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dshuy.PageCount - 3; i <= dshuy.PageCount; i++)
+                                                        {
+                                                            if (i == dshuy.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePage(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        @for (var i = Math.Max(1, dshuy.PageNumber - 1); i <= Math.Min(dshuy.PageCount, dshuy.PageNumber + 1); i++)
+                                                        {
+                                                            if (i == dshuy.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePage(@dshuy.PageCount)">@dshuy.PageCount</button>
+                                                        </li>
+                                                    }
+                                                }
+                                                else if (dshuy.PageCount == 5)
+                                                {
+                                                    @if (dshuy.PageNumber <= 2)
+                                                    {
+                                                        for (var i = 1; i <= 3; i++)
+                                                        {
+                                                            if (i == dshuy.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePage(@dshuy.PageCount)">@dshuy.PageCount</button>
+                                                        </li>
+                                                    }
+                                                    else if (dshuy.PageNumber == 3)
+                                                    {
+                                                        for (var i = 1; i <= 5; i++)
+                                                        {
+                                                            if (i == dshuy.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (dshuy.PageNumber >= dshuy.PageCount - 1)
+                                                    {
+                                                        <li class="page-item">
+                                                            <button class="page-link" onclick="changePage(1)">1</button>
+                                                        </li>
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        for (var i = dshuy.PageCount - 2; i <= dshuy.PageCount; i++)
+                                                        {
+                                                            if (i == dshuy.PageNumber)
+                                                            {
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">@i</span>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li class="page-item">
+                                                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                                                </li>
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    for (var i = 1; i <= dshuy.PageCount; i++)
+                                                    {
+                                                        if (i == dshuy.PageNumber)
+                                                        {
+                                                            <li class="page-item active">
+                                                                <span class="page-link">@i</span>
+                                                            </li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li class="page-item">
+                                                                <button class="page-link" onclick="changePage(@i)">@i</button>
+                                                            </li>
+                                                        }
+                                                    }
+                                                }
+                                                @if (dshuy.HasNextPage)
+                                                {
+                                                    <li class="page-item">
+                                                        <button class="page-link" onclick="changePage(@dshuy.PageNumber + 1)">Next</button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li class="page-item disabled">
+                                                        <span class="page-link">Next</span>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </nav>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+        </div>
+
+
+        <!-- /.container-fluid -->
+    </section>
+
+    <!-- /.content -->
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            // Lưu trạng thái tab hiện tại
+            $('#AdminTab').on('shown.bs.tab', function (e) {
+                localStorage.setItem('activeTab', 'Admin');
+            });
+
+            $('#menu1Tab').on('shown.bs.tab', function (e) {
+                localStorage.setItem('activeTab', 'menu1');
+            });
+            $('#menu2Tab').on('shown.bs.tab', function (e) {
+                localStorage.setItem('activeTab', 'menu2');
+            });
+
+            // Lưu trạng thái tab hiện tại cho trang menu1
+            $('#menu3Tab').on('shown.bs.tab', function (e) {
+                localStorage.setItem('activeTab', 'menu3');
+            });
+
+            $('#menu4Tab').on('shown.bs.tab', function (e) {
+                localStorage.setItem('activeTab', 'menu4');
+            });
+            if (!activeTab || (activeTab !== 'Admin' && activeTab !== 'menu1' && activeTab !== 'menu4' && activeTab !== 'menu2' && activeTab !== 'menu3')) {
+                activeTab = 'Admin';
+            }
+
+            // Lấy trạng thái từ localStorage
+            var activeTab = localStorage.getItem('activeTab') || 'Admin';
+
+
+
+            if (activeTab) {
+                $('a[href="#' + activeTab + '"]').tab('show');
+            }
+
+        });
+    </script>
+    <script>
+        function changePageall(pageNumber) {
+            // Lấy giá trị từ các trường input
+            var searchName = $("#searchname").val();
+            var searchPhone = $("#searchphone").val();
+            var searchDateDat = $("#searchdatedat").val();
+
+            // Gửi yêu cầu tìm kiếm và chuyển trang đến server
+            $.ajax({
+                url: '@Url.Action("Index", "DatSan")',
+                type: 'GET',
+                data: {
+                    searchname: searchName,
+                    searchphone: searchPhone,
+                    searchdatedat: searchDateDat,
+                    page: pageNumber
+                },
+                success: function (res) {
+
+                    // Cập nhật URL với các tham số tìm kiếm
+                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
+                        '&searchphone=' + encodeURIComponent(searchPhone) +
+                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                        '&pageall=' + pageNumber;
+
+                    // Thay đổi URL trình duyệt mà không làm tải lại trang
+                    window.history.replaceState({}, '', newUrl);
+                    window.location.reload();
+                },
+                error: function () {
+                    console.log('Error');
+                }
+            });
+        }
+    </script>
+    <script>
+        function changePagexn(pageNumber) {
+            // Lấy giá trị từ các trường input
+            var searchName = $("#searchname").val();
+            var searchPhone = $("#searchphone").val();
+            var searchDateDat = $("#searchdatedat").val();
+
+            // Gửi yêu cầu tìm kiếm và chuyển trang đến server
+            $.ajax({
+                url: '@Url.Action("Index", "DatSan")',
+                type: 'GET',
+                data: {
+                    searchname: searchName,
+                    searchphone: searchPhone,
+                    searchdatedat: searchDateDat,
+                    page: pageNumber
+                },
+                success: function (res) {
+
+                    // Cập nhật URL với các tham số tìm kiếm
+                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
+                        '&searchphone=' + encodeURIComponent(searchPhone) +
+                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                        '&pagexn=' + pageNumber;
+
+                    // Thay đổi URL trình duyệt mà không làm tải lại trang
+                    window.history.replaceState({}, '', newUrl);
+                    window.location.reload();
+                },
+                error: function () {
+                    console.log('Error');
+                }
+            });
+        }
+    </script>
+    <script>
+        function changePagehuy(pageNumber) {
+            // Lấy giá trị từ các trường input
+            var searchName = $("#searchname").val();
+            var searchPhone = $("#searchphone").val();
+            var searchDateDat = $("#searchdatedat").val();
+
+            // Gửi yêu cầu tìm kiếm và chuyển trang đến server
+            $.ajax({
+                url: '@Url.Action("Index", "DatSan")',
+                type: 'GET',
+                data: {
+                    searchname: searchName,
+                    searchphone: searchPhone,
+                    searchdatedat: searchDateDat,
+                    page: pageNumber
+                },
+                success: function (res) {
+
+                    // Cập nhật URL với các tham số tìm kiếm
+                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
+                        '&searchphone=' + encodeURIComponent(searchPhone) +
+                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                        '&pagehuy=' + pageNumber;
+
+                    // Thay đổi URL trình duyệt mà không làm tải lại trang
+                    window.history.replaceState({}, '', newUrl);
+                    window.location.reload();
+                },
+                error: function () {
+                    console.log('Error');
+                }
+            });
+        }
+    </script>
+    <script>
+        function changePageht(pageNumber) {
+            // Lấy giá trị từ các trường input
+            var searchName = $("#searchname").val();
+            var searchPhone = $("#searchphone").val();
+            var searchDateDat = $("#searchdatedat").val();
+
+            // Gửi yêu cầu tìm kiếm và chuyển trang đến server
+            $.ajax({
+                url: '@Url.Action("Index", "DatSan")',
+                type: 'GET',
+                data: {
+                    searchname: searchName,
+                    searchphone: searchPhone,
+                    searchdatedat: searchDateDat,
+                    page: pageNumber
+                },
+                success: function (res) {
+
+                    // Cập nhật URL với các tham số tìm kiếm
+                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
+                        '&searchphone=' + encodeURIComponent(searchPhone) +
+                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                        '&pageht=' + pageNumber;
+
+                    // Thay đổi URL trình duyệt mà không làm tải lại trang
+                    window.history.replaceState({}, '', newUrl);
+                    window.location.reload();
+                },
+                error: function () {
+                    console.log('Error');
+                }
+            });
+        }
+    </script>
+    <script>
+        function changePagecho(pageNumber) {
+            // Lấy giá trị từ các trường input
+            var searchName = $("#searchname").val();
+            var searchPhone = $("#searchphone").val();
+            var searchDateDat = $("#searchdatedat").val();
+
+            // Gửi yêu cầu tìm kiếm và chuyển trang đến server
+            $.ajax({
+                url: '@Url.Action("Index", "DatSan")',
+                type: 'GET',
+                data: {
+                    searchname: searchName,
+                    searchphone: searchPhone,
+                    searchdatedat: searchDateDat,
+                    page: pageNumber
+                },
+                success: function (res) {
+
+                    // Cập nhật URL với các tham số tìm kiếm
+                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
+                        '&searchphone=' + encodeURIComponent(searchPhone) +
+                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                        '&pagecho=' + pageNumber;
+
+                    // Thay đổi URL trình duyệt mà không làm tải lại trang
+                    window.history.replaceState({}, '', newUrl);
+                    window.location.reload();
+                },
+                error: function () {
+                    console.log('Error');
+                }
+            });
+        }
+    </script>
+}

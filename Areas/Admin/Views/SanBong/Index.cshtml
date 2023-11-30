@@ -1,0 +1,49 @@
+﻿@model IEnumerable<QLSanBong.Models.SanBong>
+@using QLSanBong.Models;
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayOut.cshtml";
+}
+
+<div class="table">
+    <div class="container">
+        <h5>Danh sách sân bóng</h5>
+    </div>
+    <div id="allSB"></div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#allSB').load('/Admin/SanBong/AllSB');
+        });
+
+    </script>
+
+    <script>
+        // Bắt sự kiện khi bấm vào nút phân trang
+        $(document).on("click", ".pagination a", function (e) {
+            e.preventDefault();
+            var page = $(this).text();
+
+            // Gửi yêu cầu AJAX để lấy danh sách sân bóng trang mới
+            $.ajax({
+                url: '@Url.Action("AllSB", "SanBong")',
+                type: 'GET',
+                data: {
+                    page: page
+                },
+                success: function (result) {
+                    // Cập nhật nội dung của phần danh sách sân bóng
+                    $("#allSB").html(result);
+                },
+                error: function () {
+                    console.log('Error');
+                }
+            });
+        });
+
+    </script>
+}
+
+

@@ -1,0 +1,96 @@
+﻿@model IEnumerable<QLSanBong.Models.NhanVien>
+
+@{
+    int count = 1;
+}
+
+<div class="row">
+    <div class="col-md-8"></div>
+    <div class="col-md-4">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addNVModal" id="themnv">
+            <i class="fa fa-user-plus"></i>
+            Thêm nhân viên mới
+        </button>
+    </div>
+</div>
+<div class="container" style="margin:20px">
+    <table class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    STT
+                </th>
+                <th>
+                    Mã nhân viên
+                </th>
+                <th>
+                    Họ tên
+                </th>
+                <th>
+                    Giới tính
+                </th>
+                <th>
+                    Ngày sinh
+                </th>
+                <th>
+                    Chức vụ
+                </th>
+                <th>
+                    Số điện thoại
+                </th>
+                <th>
+                    Tên đăng nhập
+                </th>
+                <th>
+                    Mật khẩu
+                </th>
+                <th>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                if (item.MaNv != "NV000") // Kiểm tra nếu MaNv khác "nv000"
+                {
+                    <tr>
+                        <td>
+                            @count
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MaNv)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TenNv)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Gioitinh)
+                        </td>
+                        <td>
+                            @String.Format("{0:dd/MM/yyyy}", item.Ngaysinh)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Chucvu)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Sdt)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Tendangnhap)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TendangnhapNavigation.Password)
+                        </td>
+                        <td>
+                            <button class="btn btn-warning" name="view" data-ma-nv="@item.MaNv" data-user-nv="@item.Tendangnhap"><i class="fas fa-info"></i></button>
+                            <button class="btn btn-success" name="edit" data-ma-nv="@item.MaNv" data-user-nv="@item.Tendangnhap"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger" name="delete" data-ma-nv="@item.MaNv" data-user-nv="@item.Tendangnhap"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    count++;
+                }
+            }
+
+        </tbody>
+    </table>
+</div>

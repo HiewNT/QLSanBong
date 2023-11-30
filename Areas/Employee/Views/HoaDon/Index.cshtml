@@ -1,0 +1,373 @@
+﻿@model PagedList.IPagedList<QLSanBong.Models.PhieuDatSan>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Employee/Views/Shared/_NVLayOut.cshtml";
+    int currentCount = ViewBag.CurrentCount;
+}
+<div class="container">
+    @using (Html.BeginForm("Index", "HoaDon", FormMethod.Get, new { id = "searchForm", @class = "d-flex" }))
+    {
+        <div class="form-group mr-4">
+            <label for="searchname">Nhập tên khách hàng</label>
+            @Html.TextBox("timname", null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label for="searchdatedat">Ngày lập hóa đơn</label>
+            @Html.TextBox("timdate", null, new { @class = "form-control", type = "date" })
+        </div>
+        <div style="margin-top:30px;margin-left:20px">
+            <button type="submit" class="btn btn-primary ml-2">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    }
+</div>
+<div class="container" style="background-color:aliceblue">
+@if (Model.Count() != 0)
+{
+    <div class="container-fluid pt-5">
+        @foreach (var item in Model)
+        {
+            <div style="display:flex">
+                <div>
+                    <h3 style="margin-top:80px">@(currentCount++)</h3>
+                </div>
+                <div class="row" style="padding: 0px;margin-left:30px">
+                    <div class="pl-2">
+                        <h5>Hóa đơn số: @item.MaPds</h5>
+                        <p>Người đặt: @item.TenKh</p>
+                        <p>Nhân viên xác nhận: @ViewBag.ten</p>
+                        <p>Tông tiền: @item.TongTien VND</p>
+                        <p class="m-0">Ngày lập hóa đơn: @String.Format("{0:dd/MM/yyyy}",item.Ngaylap)</p>
+                    </div>
+                </div>
+                <div style="margin-left:20px">
+                    <input type="hidden" class="soPhieu" value="@item.MaPds" />
+                    <button class="btn btn-outline-info xemCT">Chi tiết hóa đơn</button>
+                    <div style="margin:5px"></div>
+                    <div class="ctPhieuDat"></div>
+                </div>
+            </div>
+            <hr />
+        }
+    </div>
+}
+else
+{
+    <div class="container center-block">
+        <h2> Chưa có hóa đơn nào được xác nhận</h2>
+        <div class="clearfix"></div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-sm-12 col-md-5">
+        <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
+            Showing @ViewBag.PageStartItem to @ViewBag.PageEndItem of @ViewBag.TotalItemCount entries
+        </div>
+    </div>
+    @if (Model != null && Model.PageCount > 1)
+    {
+        <nav style="float: right; margin-right: 29px;" aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <button class="page-link" onclick="changePagehd(@Model.PageNumber - 1)">Previous</button>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                }
+
+                @if (Model.PageCount > 5)
+                {
+                    @if (Model.PageNumber <= 2)
+                    {
+                        for (var i = 1; i <= 3; i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePagehd(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePagehd(@Model.PageCount)">@Model.PageCount</button>
+                        </li>
+                    }
+                    else if (Model.PageNumber == 3)
+                    {
+                        for (var i = 1; i <= 4; i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePagehd(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePagehd(@Model.PageCount)">@Model.PageCount</button>
+                        </li>
+                    }
+                    else if (Model.PageNumber >= Model.PageCount - 1)
+                    {
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePagehd(1)">1</button>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        for (var i = Model.PageCount - 2; i <= Model.PageCount; i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePagehd(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                    }
+                    else if (Model.PageNumber == Model.PageCount - 2)
+                    {
+
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePagehd(1)">1</button>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        for (var i = Model.PageCount - 3; i <= Model.PageCount; i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePagehd(@i)">@i</button>
+                                </li>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePagehd(1)">1</button>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        @for (var i = Math.Max(1, Model.PageNumber - 1); i <= Math.Min(Model.PageCount, Model.PageNumber + 1); i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                </li>
+                            }
+                        }
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePagehd(@Model.PageCount)">@Model.PageCount</button>
+                        </li>
+                    }
+                }
+                else if (Model.PageCount == 5)
+                {
+                    @if (Model.PageNumber <= 2)
+                    {
+                        for (var i = 1; i <= 3; i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePagehd(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePagehd(@Model.PageCount)">@Model.PageCount</button>
+                        </li>
+                    }
+                    else if (Model.PageNumber == 3)
+                    {
+                        for (var i = 1; i <= 5; i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePagehd(@i)">@i</button>
+                                </li>
+                            }
+                        }
+                    }
+                    else if (Model.PageNumber >= Model.PageCount - 1)
+                    {
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePagehd(1)">1</button>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        for (var i = Model.PageCount - 2; i <= Model.PageCount; i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePagehd(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                    }
+                }
+                else
+                {
+                    for (var i = 1; i <= Model.PageCount; i++)
+                    {
+                        if (i == Model.PageNumber)
+                        {
+                            <li class="page-item active">
+                                <span class="page-link">@i</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <button class="page-link" onclick="changePagehd(@i)">@i</button>
+                            </li>
+                        }
+                    }
+                }
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item">
+                        <button class="page-link" onclick="changePagehd(@Model.PageNumber + 1)">Next</button>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+
+</div>
+</div>
+@section scripts{
+    <script src="~/js/notify.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.xemCT').click(function () {
+                var soPhieu = $(this).siblings('.soPhieu').val();
+                var ctPhieuDat = $(this).siblings('.ctPhieuDat');
+
+                $.get('/Employee/HoaDon/ChiTiet', { soPhieu: soPhieu }, function (data) {
+                    ctPhieuDat.html(data);
+                });
+            });
+        });
+    </script>
+    <script>
+        function changePagehd(pageNumber) {
+            // Lấy giá trị từ các trường input
+            var timName = $("#timname").val();
+            var timDate = $("#timdate").val();
+
+            // Gửi yêu cầu tìm kiếm và chuyển trang đến server
+            $.ajax({
+                url: '@Url.Action("Index", "HoaDon")',
+                type: 'GET',
+                data: {
+                    timname: timName,
+                    timdate: timDate,
+                    page: pageNumber
+                },
+                success: function (res) {
+
+                    // Cập nhật URL với các tham số tìm kiếm
+                    var newUrl = window.location.pathname + '?timname=' + encodeURIComponent(timName) +
+                        '&timdate=' + encodeURIComponent(timDate) +
+                        '&page=' + pageNumber;
+
+                    // Thay đổi URL trình duyệt mà không làm tải lại trang
+                    window.history.replaceState({}, '', newUrl);
+                    window.location.reload();
+                },
+                error: function () {
+                    console.log('Error');
+                }
+            });
+        }
+    </script>
+}

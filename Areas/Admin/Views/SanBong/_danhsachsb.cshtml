@@ -1,0 +1,100 @@
+﻿@model PagedList.IPagedList<QLSanBong.Models.SanBong>
+
+<div class="container">
+    <div class="row" style="justify-content:center">
+        @foreach (var item in Model)
+        {
+            <div class="col-sm-12 col-md-6 col-lg-3" style="margin:20px; text-align:center">
+                <div class="card">
+                    <span style="color:black">
+                        <img src="@item.Hinhanh" style="height:200px; width:250px" />
+
+
+                    </span>
+
+                    <a href="@Url.Action("CapNhat", "SanBong", new { id = item.MaSb })" style="text-decoration:none; color:blue;font-size:medium">
+                        @item.TenSb
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<!-- Hiển thị thanh phân trang -->
+<div class="container">
+    <div class="col-sm-12 col-md-5">
+        <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
+            Showing @ViewBag.PageStartItem to @ViewBag.PageEndItem of @ViewBag.TotalItemCount entries
+        </div>
+    </div>
+    @if (Model != null)
+    {
+        @if (Model.PageCount > 1)
+        {
+            <nav style="float: right; margin-right: 50px;" aria-label="Page navigation example">
+                <ul class="pagination justify-content-end">
+                    @if (Model.PageCount > 4)
+                    {
+                        @if (Model.PageNumber > 3)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", "SanBong", new { page = 1})">1</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+
+                        @for (var i = Math.Max(1, Model.PageNumber - 2); i <= Math.Min(Model.PageCount, Model.PageNumber + 2); i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", "SanBong", new { page = i})">@i</a>
+                                </li>
+                            }
+                        }
+
+                        @if (Model.PageNumber < Model.PageCount - 2)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", "SanBong", new { page = Model.PageCount})">@Model.PageCount</a>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        for (var i = 1; i <= Model.PageCount; i++)
+                        {
+                            if (i == Model.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", "SanBong", new { page = i})">@i</a>
+                                </li>
+                            }
+                        }
+                    }
+                </ul>
+            </nav>
+
+
+        }
+    }
+</div>

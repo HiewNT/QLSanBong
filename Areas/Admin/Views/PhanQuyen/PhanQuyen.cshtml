@@ -1,0 +1,88 @@
+﻿@using QLSanBong.Models;
+@model NhomNguoiDung
+
+@{
+    ViewData["Title"] = "PhanQuyen";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayOut.cshtml";
+}
+
+
+
+@{
+    IEnumerable<Quyen> dsQuyen = (IEnumerable<Quyen>)ViewBag.MaQuyen;
+    IEnumerable<ChucNang> dsChucNang = (IEnumerable<ChucNang>)ViewBag.MaChucNang;
+    IEnumerable<NhomQuyenCn> dsNhomQuyenCN = (IEnumerable<NhomQuyenCn>)ViewBag.NhomNDQuyenCN;
+}
+<div class="container">
+    <h2>Phân quyền</h2>
+    <h3>Nhóm người dùng: @Model.TenNhom</h3>
+    <br />
+    @using (Html.BeginForm("PhanQuyen1", "PhanQuyen", FormMethod.Post))
+    {
+        @Html.Hidden("maNhom", Model.MaNhom)
+        if (dsNhomQuyenCN != null)
+        {
+            for (int j = 0; j < dsQuyen.Count(); j++)
+            {
+                <h5>@dsQuyen.ElementAt(j).TenQuyen</h5>
+                <div class="col-md-2 d-inline-block"></div>
+                for (int t = 0; t < dsChucNang.Count(); t++)
+                {
+                    int k = 0;
+                    for (int i = 0; i < dsNhomQuyenCN.Count(); i++)
+                    {
+                        if (dsQuyen.ElementAt(j).MaQuyen == dsNhomQuyenCN.ElementAt(i).MaQuyen)
+                        {
+                            if (dsChucNang.ElementAt(t).MaCn == dsNhomQuyenCN.ElementAt(i).MaCn)
+                            {
+                                k++;
+                                break;
+                            }
+                        }
+
+                    }
+                     if (k != 0)
+                        {
+                            <div class="col-md-2 d-inline-block">
+                            <input type="hidden" value="@Model.MaNhom" name="@Url.Content("["+j+"].MaNhom")" />
+                            <input type="hidden" value="@dsQuyen.ElementAt(j).MaQuyen" name="@Url.Content("["+j+"].MaQuyen")" />
+                            <input checked="checked" style="width:20px; height:20px;" type="checkbox" name="maCnValues" value="@dsChucNang.ElementAt(t).MaCn-@dsQuyen.ElementAt(j).MaQuyen" />
+                            <span>@dsChucNang.ElementAt(t).TenCn</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-2 d-inline-block">
+                                <input type="hidden" value="@Model.MaNhom" name="@Url.Content("["+j+"].MaNhom")" />
+                                <input type="hidden" value="@dsQuyen.ElementAt(j).MaQuyen" name="@Url.Content("["+j+"].MaQuyen")" />
+                            <input style="width:20px; height:20px;" type="checkbox" name="maCnValues" value="@dsChucNang.ElementAt(t).MaCn-@dsQuyen.ElementAt(j).MaQuyen" />
+                                <span>@dsChucNang.ElementAt(t).TenCn</span>
+                            </div>
+                        }
+
+                }
+                
+                <div style="margin:20px"></div>
+            }
+        }
+        else
+        {
+                @for (int i = 0; i < dsQuyen.Count(); i++)
+                {
+                    for (int t = 0; t < dsChucNang.Count(); t++)
+                    {
+                        <div class="col-md-2 d-inline-block">
+                            <input type="hidden" value="@Model.MaNhom" name="@Url.Content("["+i+"].MaNhom")" />
+                        <input type="hidden" value="@dsQuyen.ElementAt(i).MaQuyen" name="@Url.Content("["+i+"].MaQuyen")" />
+                        <input style="width:20px; height:20px;" type="checkbox" name="maCnValues" value="@dsChucNang.ElementAt(t).MaCn-@dsQuyen.ElementAt(i).MaQuyen" />
+                            <span>@dsChucNang.ElementAt(t).TenCn</span>
+                        </div>
+                    }
+                }
+        }
+        <div class="clearfix"></div>
+        <input type="submit" value="Xác nhận" class="btn btn-outline-success" />
+    }
+    <br />
+    @Html.ActionLink("Trở về", "Index", null, new {@class="btn btn-primary"})
+</div>

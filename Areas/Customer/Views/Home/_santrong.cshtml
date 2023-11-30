@@ -1,0 +1,45 @@
+﻿@model IEnumerable<QLSanBong.Models.Santrong>
+@{
+    int count = 1;
+}
+<script src="~/js/order.js"></script>
+<div class="container">
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Mã sân bóng</th>
+            <th>Ngày đặt sân</th>
+            <th>Giờ bắt đầu</th>
+            <th>Giờ kết thúc</th>
+            <th>Trạng thái</th>
+            <th></th>
+           <!--Thêm các cột khác tại đây-->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sb in Model)
+        {
+            <tr>
+                <td>@count</td>
+                <td>@sb.MaSb</td>
+                <td>@String.Format("{0:dd/MM/yyyy}", sb.Ngaydatsan)</td>
+                <td>@sb.Giobatdau</td>
+                <td>@sb.Gioketthuc</td>
+                <td>@sb.Trangthai</td>
+                    <td>
+                        <button class="btn add-to-cart"
+                                data-ma-san="@sb.MaSb"
+                                data-ngay-dat-san="@sb.Ngaydatsan"
+                                data-ma-gio="@sb.Magio" name="dscho">
+                            <i class="fas fa-calendar-alt"></i> + ds chờ
+                        </button>
+
+                    </td>
+            </tr>
+count++;
+            }
+            
+    </tbody>
+</table>
+</div>

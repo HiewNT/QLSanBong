@@ -1,0 +1,395 @@
+﻿@model IEnumerable<QLSanBong.Models.SanBong>
+@using QLSanBong.Models;
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Employee/Views/Shared/_NVLayOut.cshtml";
+}
+
+<div class="table">
+    <div class="container">
+        <div>
+            <form method="get">
+                <div class="row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="dayOrder" class="form-label">Ngày đặt</label>
+                                <input type="date" class="form-control border border-primary" id="dayOrder">
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="timeStart" class="form-label">Thời gian bắt đầu</label>
+                                <select id="timeStart" class="form-control">
+                                    <option value="05:00">05:00</option>
+                                    <option value="06:30">06:30</option>
+                                    <option value="08:00">08:00</option>
+                                    <option value="14:00">14:00</option>
+                                    <option value="15:30">15:30</option>
+                                    <option value="17:00">17:00</option>
+                                    <option value="18:30">18:30</option>
+                                    <option value="20:00">20:00</option>
+                                </select>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="timeEnd" class="form-label">Thời gian kết thúc</label>
+                                <select id="timeEnd" class="form-control">
+                                    <option value="06:30">06:30</option>
+                                    <option value="08:00">08:00</option>
+                                    <option value="09:30">09:30</option>
+                                    <option value="15:30">15:30</option>
+                                    <option value="17:00">17:00</option>
+                                    <option value="18:30">18:30</option>
+                                    <option value="20:00">20:00</option>
+                                    <option value="21:30">21:30</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2" style="margin-top:32px">
+                            <button class="btn btn-primary" id="searchButton" type="button">
+                                <i class="fas fa-search fa-sm">Tìm sân trống</i>
+                            </button>
+                        </div>
+                        <div class="col-md-offset-2 col-md-4" style="margin-top:32px">
+                            <a id="DSSB" class="btn btn-info">
+                                Danh sách sân
+                            </a>
+                        </div>
+                    </div>
+
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="allSB"></div>
+    <div id="allST"></div>
+</div>
+
+
+<div class="modal fade" id="addDS" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="Title">Đặt sân</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="ten" class="form-label">Tên người đặt</label>
+                        <input type="text" class="form-control" id="ten">
+                        <div id="tenError" class="text-danger"></div> <!-- Thêm phần này để hiển thị thông báo lỗi -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="sdt" class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" id="sdt">
+                        <div id="sdtError" class="text-danger"></div> <!-- Thêm phần này để hiển thị thông báo lỗi -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="manv" class="form-label">Mã nhân viên</label>
+                        <input type="text" class="form-control" id="manv" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="pttt" class="form-label">PT thanh toán</label>
+                        <select class="form-select" id="pttt" name="pttt">
+                            <option value="Chuyển khoản">Chuyển khoản</option>
+                            <option value="Tiền mặt">Tiền mặt</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ntao" class="form-label">Ngày lập</label>
+                        <input type="date" class="form-control" id="ntao" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ghichu" class="form-label">Ghi chú</label>
+                        <select class="form-select" id="ghichu" name="ghichu">
+                            <option value="Đã thanh toán">Đã thanh toán</option>
+                            <option value="Chưa thanh toán">Chưa thanh toán</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="tiepDS">Tiếp</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailDS" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="Title">Chi tiết</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="nsd" class="form-label">Ngày sử dụng</label>
+                        <input type="date" class="form-control" id="nsd" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="magio" class="form-label">Mã giờ</label>
+                        <input type="text" class="form-control" id="magio" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="giobd" class="form-label">Giờ bắt đầu</label>
+                        <input type="time" class="form-control" id="giobd" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="giokt" class="form-label">Giờ kết thúc</label>
+                        <input type="time" class="form-control" id="giokt" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="masb" class="form-label">Mã sân bóng</label>
+                        <input type="text" class="form-control" id="masb" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tien" class="form-label">Giá tiền</label>
+                        <input type="number" class="form-control" id="tien" readonly>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="add">Xác nhận</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#allSB').load('/Employee/SanBong/AllSB');
+        });
+        $(document).ready(function () {
+            // Ẩn #allST ban đầu
+            $('#allST').hide();
+
+            $('#DSSB').click(function () {
+                // Ẩn #allSB và hiển thị #allST
+                $('#allSB').show();
+                $('#allST').hide();
+            });
+            // Xử lý sự kiện khi click vào nút "Tìm sân trống"
+            $('#searchButton').click(function () {
+                // Ẩn #allSB và hiển thị #allST
+                $('#allSB').hide();
+                $('#allST').show();
+                handleTimeChange();
+                var dayOrder = $('#dayOrder').val();
+                var timeStart = $('#timeStart').val();
+                var timeEnd = $('#timeEnd').val();
+                $.get('/Employee/SanBong/AllST', { dayOrder: dayOrder, timeStart: timeStart, timeEnd: timeEnd }, function (data) {
+                    $('#allST').html(data);
+                });
+            });
+        });
+        // Lấy phần tử select cho timeStart và timeEnd
+        const timeStartSelect = document.getElementById("timeStart");
+        const timeEndSelect = document.getElementById("timeEnd");
+
+        initialTimeStartValue = timeStartSelect.value;
+        initialTimeEndValue = timeEndSelect.value;
+
+        // Hàm xử lý thay đổi thời gian
+        function handleTimeChange() {
+            // Lấy giá trị timeStart và timeEnd từ các select
+            const timeStartValue = timeStartSelect.value;
+            const timeEndValue = timeEndSelect.value;
+
+            // Chuyển đổi giá trị thành số để so sánh
+            const startTime = parseInt(timeStartValue.replace(":", ""));
+            const endTime = parseInt(timeEndValue.replace(":", ""));
+
+            // Kiểm tra điều kiện
+            if (startTime >= endTime) {
+                alert("Thời gian bắt đầu phải trước thời gian kết thúc.");
+
+                timeStartSelect.value = initialTimeStartValue;
+                timeEndSelect.value = initialTimeEndValue;
+                // Thực hiện xử lý khi điều kiện không đúng (nếu cần)
+            } else {
+                initialTimeStartValue = timeStartSelect.value;
+                initialTimeEndValue = timeEndSelect.value;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Lấy phần tử input có ID là "dayOrder"
+            const dayOrderInput = document.getElementById("dayOrder");
+
+            // Kiểm tra xem dayOrderInput có tồn tại và có giá trị là null không
+            if (dayOrderInput && dayOrderInput.value === "") {
+                // Nếu dayOrderInput tồn tại và giá trị là null (trống)
+                // Đặt giá trị của nó thành ngày hiện tại
+                const currentDate = new Date();
+                const year = currentDate.getFullYear();
+                const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+                const day = currentDate.getDate().toString().padStart(2, "0");
+                const formattedDate = `${year}-${month}-${day}`;
+
+                // Gán giá trị cho dayOrderInput
+                dayOrderInput.value = formattedDate;
+            }
+        });
+
+    </script>
+    <script>
+        // Bắt sự kiện khi bấm vào nút phân trang
+        $(document).on("click", ".pagination a", function (e) {
+            e.preventDefault();
+            var page = $(this).text();
+
+            // Gửi yêu cầu AJAX để lấy danh sách sân bóng trang mới
+            $.ajax({
+                url: '@Url.Action("AllSB", "SanBong")',
+                type: 'GET',
+                data: {
+                    page: page,
+                    timkh: $('#timkh').val() // Lấy giá trị từ ô tìm kiếm (nếu có)
+                },
+                success: function (result) {
+                    // Cập nhật nội dung của phần danh sách sân bóng
+                    $("#allSB").html(result);
+                },
+                error: function () {
+                    console.log('Error');
+                }
+            });
+        });
+
+    </script>
+    <script>
+        function Chitiet(magio) {
+            $.ajax({
+                url: '/Employee/SanBong/Chitiet',
+                type: 'GET',
+                data: {
+                    magio:magio
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        $('#manv').val(data.manv);
+                        $('#tien').val(data.giathue.dongia);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        $(document).on('click', '.open-error1', function () {
+            alert('Bạn không có quyền truy cập chức năng này');
+        });
+
+        $(document).on('click', '.open-modal', function () {
+            var magio = $(this).data('magio');
+            var masb = $(this).data('masan');
+            var nsd = $(this).data('ngaydatsan');
+            var giobd = $(this).data('giobatdau');
+            var giokt = $(this).data('gioketthuc');
+
+            Chitiet(magio);
+
+            // Lấy ngày hôm nay
+            var today = new Date();
+            var nsdDate=new Date(nsd)
+            var ntaoformattedDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+            var nsdformattedDate = nsdDate.getFullYear() + '-' + (nsdDate.getMonth() + 1) + '-' + nsdDate.getDate();
+
+            
+            $('#magio').val(magio);
+            $('#ntao').val(ntaoformattedDate);
+            $('#masb').val(masb);
+            $('#nsd').val(nsdformattedDate);
+            $('#giobd').val(giobd);
+            $('#giokt').val(giokt);
+
+            $('#addDS').modal('show');
+        });
+
+
+        $("#tiepDS").click(function (event) {
+            let ten1 = $('#ten').val();
+            let sdt1 = $('#sdt').val();
+
+            // Xóa thông báo lỗi cũ
+            $('#tenError').text('');
+            $('#sdtError').text('');
+
+            if (ten1.trim() === '') {
+                $('#tenError').text('Vui lòng nhập tên.');
+            }
+
+            if (sdt1.trim() === '') {
+                $('#sdtError').text('Vui lòng nhập số điện thoại.');
+            }
+
+            // Kiểm tra nếu không có thông báo lỗi, tiếp tục với logic của bạn
+            if ($('#tenError').text() === '' && $('#sdtError').text() === '') {
+                // Tiếp tục ẩn modal và hiển thị modal tiếp theo
+                $('#addDS').modal('hide');
+                $('#detailDS').modal('show');
+            }
+        });
+
+
+
+        $("#add").click(function () {
+            let ten = $('#ten').val();
+            let sdt = $('#sdt').val();
+            let masb = $('#masb').val();
+            let manv = $('#manv').val();
+            let ntao = $('#ntao').val();
+            let nsd = $('#nsd').val();
+            let magio = $('#magio').val();
+            let giobd = $('#giobd').val();
+            let giokt = $('#giokt').val();
+            let tien = $('#tien').val();
+            let pttt = $('#pttt').val();
+            let ghichu = $('#ghichu').val();
+
+            $.ajax({
+                url: '/Employee/SanBong/DatSan',
+                type: 'POST',
+                data: {
+                    ten: ten,
+                    sdt: sdt,
+                    masb: masb,
+                    manv: manv,
+                    ntao: ntao,
+                    nsd: nsd,
+                    magio: magio,
+                    giobd: giobd,
+                    giokt: giokt,
+                    tien: tien,
+                    pttt: pttt,
+                    ghichu: ghichu,
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert("Đã đặt sân thành công");
+                        $('#allST').load();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+
+            });
+        });
+    </script>
+}
+
+

@@ -1,0 +1,630 @@
+﻿@using Newtonsoft.Json;
+@using QLSanBong.Data;
+@using QLSanBong.Models;
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quản lý đặt sân bóng</title>
+
+    <!-- Favicon -->
+    <link href="~/img/favicon.ico" rel="icon" />
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&family=Nunito&display=swap"
+          rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+          rel="stylesheet" />
+
+    <!-- Flaticon Font -->
+    <link href="~/lib/flaticon/font/flaticon.css" rel="stylesheet" />
+
+    <!-- Libraries Stylesheet -->
+    <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+    <link href="~/lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="~/css/style.css" rel="stylesheet" />
+    <style>
+        h1, h2, h3, h4, h5, h6,
+        .h1, .h2, .h3, .h4, .h5, .h6 {
+            margin-bottom: 0.5rem;
+            font-family:Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            line-height: 1.2;
+            color: #00394f;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar Start -->
+    <div class="container-fluid bg-light position-relative shadow">
+        <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0 px-lg-5 fixed-top">
+            <a href="@Url.Action("Index","Login")" class="logo">
+                <img src="~/img/logo2.png" />
+            </a>
+            <button type="button"
+                    class="navbar-toggler"
+                    data-toggle="collapse"
+                    data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-right" id="navbarCollapse">
+                <div class="navbar-nav font-weight-bold mx-auto py-0">
+                    <a href="@Url.Action("Index","Login")" class="nav-item nav-link">Trang chủ</a>
+                    <a href="#services" class="nav-item nav-link" id="dv">Dịch vụ</a>
+                    <a href="#about" class="nav-item nav-link" id="lh">Liên hệ</a>
+                    <div style="margin-top: 30px;margin-left:20px;margin-right:20px">
+                        @{
+                            var httpContext = ViewContext.HttpContext;
+
+                            if (httpContext != null)
+                            {
+                                if (httpContext.Session.GetString("Cart") == null)
+                                {
+                                    var newCart = new List<Cart>();
+                                    var serializedCart = JsonConvert.SerializeObject(newCart);
+                                    httpContext.Session.SetString("Cart", serializedCart);
+                                }
+
+                                var cartData = httpContext.Session.GetString("Cart");
+                                var itemCarts = JsonConvert.DeserializeObject<List<Cart>>(cartData);
+
+                                int itemCount = 0;
+                                if (itemCarts != null && itemCarts.Count > 0)
+                                {
+                                    itemCount = itemCarts.Count;
+                                }
+                                <a href="@Url.Action("Cart", "Login")" style="text-decoration:none; color:sandybrown">
+                                    <i class="fa fa-cart-plus" aria-hidden="true"></i>
+                                    <span id="cartItemCount">@itemCount</span>
+                                </a>
+                            }
+                        }
+                        <script>
+                            // JavaScript để cập nhật số lượng mục trong giỏ hàng
+                            function updateCartItemCount() {
+                                $.get('@Url.Action("GetItemCount", "Login")', function (data) {
+                                    if (data.success) {
+                                        var cartItemCount = data.itemCount;
+                                        document.getElementById("cartItemCount").textContent = cartItemCount;
+                                    }
+                                });
+                            }
+
+                            // Gọi hàm cập nhật khi trang tải hoặc sau khi thêm một mục vào giỏ hàng
+                            window.addEventListener("load", updateCartItemCount);
+                        </script>
+                    </div>
+                    
+                    <a class="nav-item nav-link" data-bs-toggle="modal" href="#modalLogin">Đăng nhập</a>
+                    <a class="nav-item nav-link" data-bs-toggle="modal" href="#addKHModal">Đăng kí</a>
+                </div>
+               </div>
+        </nav>
+    </div>
+    <!-- Navbar End -->
+
+    <div>
+        @RenderBody()
+    </div>
+   
+    <!-- Modal Order-->
+    <div class="modal fade" id="modalOrder" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h2 class="text-center mb-1 text-primary">Đặt sân</h2>
+                    <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body mx-3">
+                    <form id="yeucaudatsan-form">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Tên người đặt</label>
+                            <input type="text" class="form-control border border-primary" id="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control border border-primary" id="phoneNumber">
+                        </div>
+                        <div class="mb-3">
+                            <label for="day" class="form-label">Ngày sử dụng</label>
+                            <input type="date" class="form-control border border-primary" id="day" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="start" class="form-label">Thời gian bắt đầu</label>
+                            <input type="datetime" class="form-control border border-primary" id="start" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end" class="form-label">Thời gian kết thúc</label>
+                            <input type="datetime" class="form-control border border-primary" id="end" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="idstadium" class="form-label">Mã sân</label>
+                            <input type="text" class="form-control border border-primary" id="idstadium" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pttt" class="form-label">Phương thức thanh toán</label>
+                            <select class="form-control border border-primary" id="pttt">
+                                <option value="Chuyển khoản">Chuyển khoản</option>
+                                <option value="Tiền mặt">Tiền mặt</option>
+                            </select>
+                        </div>
+                    </form>
+                    <div class="d-grid">
+                        <button class="btn btn-primary" type="button" id="addYC" name="addYC">Gửi</button>
+                    </div>
+                    <div class="mt-3">
+                        <p class="mb-0  text-center">
+                            Đăng kí tài khoản để nhận thêm nhiều ưu đãi!
+                            <button type="button" class="btn btn-link" data-bs-dismiss="modal" id="themKH1">Sign up</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Login -->
+    <div class="modal fade" id="modalLogin" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h2 class="text-center mb-4 text-primary">Login</h2>
+                    <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body mx-3">
+                    <form action="javascript:void(0);" id="loginForm" method="post">
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">User name</label>
+                            <input type="text" class="form-control border border-primary" id="userName" name="userName">
+                            <span id="userNameError" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control border border-primary" id="password" name="password">
+                            <span id="passwordError" class="text-danger"></span>
+                        </div>
+                        <div>
+                        <button class="btn btn-primary btn-block" onclick="submitLoginForm()">Login</button>
+                </div>
+                    </form>
+                    <div class="mt-3">
+                        <p class="mb-0  text-center">
+                            Đăng kí thành viên ngay để nhận thêm nhiều ưu đãi!
+                            <button type="button" class="btn btn-link" data-bs-dismiss="modal" id="themKH2">Sign up</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="addKHModal" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="Title">Đăng ký khách hàng mới</h2>
+                    <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="tenkh" class="form-label">Tên</label>
+                            <input type="text" class="form-control" id="tenkh">
+                        </div>
+                        <div class="mb-3">
+                            <label for="sdtkh" class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" id="sdtkh">
+                        </div>
+                        <div class="mb-3">
+                            <label for="gtkh" class="form-label">Giới tính</label>
+                            <select class="form-select" id="gtkh" name="gtkh">
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dckh" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="dckh">
+                        </div>
+                        <div class="mb-3">
+                            <label for="userkh" class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="userkh">
+                        </div>
+                        <div class="mb-3">
+                            <label for="passkh" class="form-label">Mật khẩu</label>
+                            <input type="text" class="form-control" id="passkh">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="addKH">Xác nhận đăng ký</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Start -->
+    <div class="container-fluid pt-5" id="about">
+        <div class="container">
+            <div class="text-center pb-2">
+                <p class="section-title px-5">
+                    <span class="px-2">Sân bóng mini Th</span>
+                </p>
+                <h1 class="mb-4">Liên hệ để biết thêm thông tin chi tiết</h1>
+            </div>
+            <div class="row">
+                <div class="col-lg-7 mb-5">
+                    <div class="contact-form">
+                        <div id="success"></div>
+                        <form name="sentMessage" id="contactForm" novalidate="novalidate">
+                            <div class="control-group">
+                                <input type="text"
+                                       class="form-control"
+                                       id="name"
+                                       placeholder="Your Name"
+                                       required="required"
+                                       data-validation-required-message="Please enter your name" />
+                                <p class="help-block text-danger"></p>
+                            </div>
+                            <div class="control-group">
+                                <input type="email"
+                                       class="form-control"
+                                       id="email"
+                                       placeholder="Your Email"
+                                       required="required"
+                                       data-validation-required-message="Please enter your email" />
+                                <p class="help-block text-danger"></p>
+                            </div>
+                            <div class="control-group">
+                                <input type="text"
+                                       class="form-control"
+                                       id="subject"
+                                       placeholder="Subject"
+                                       required="required"
+                                       data-validation-required-message="Please enter a subject" />
+                                <p class="help-block text-danger"></p>
+                            </div>
+                            <div class="control-group">
+                                <textarea class="form-control"
+                                          rows="6"
+                                          id="message"
+                                          placeholder="Message"
+                                          required="required"
+                                          data-validation-required-message="Please enter your message"></textarea>
+                                <p class="help-block text-danger"></p>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary py-2 px-4"
+                                        type="submit"
+                                        id="sendMessageButton">
+                                    Send Message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-5 mb-5">
+                    <p>
+                        hihi
+                    </p>
+                    <div class="d-flex">
+                        <i class="fa fa-map-marker-alt d-inline-flex align-items-center justify-content-center bg-primary text-secondary rounded-circle"
+                           style="width: 45px; height: 45px"></i>
+                        <div class="pl-3">
+                            <h5>Address</h5>
+                            <p>236 Hoàng Quốc Việt, Cổ Nhuế 1, Bắc Từ Liêm</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <i class="fa fa-envelope d-inline-flex align-items-center justify-content-center bg-primary text-secondary rounded-circle"
+                           style="width: 45px; height: 45px"></i>
+                        <div class="pl-3">
+                            <h5>Email</h5>
+                            <p>ThStadium@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <i class="fa fa-phone-alt d-inline-flex align-items-center justify-content-center bg-primary text-secondary rounded-circle"
+                           style="width: 45px; height: 45px"></i>
+                        <div class="pl-3">
+                            <h5>Phone</h5>
+                            <p>+012 345 67890</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <i class="far fa-clock d-inline-flex align-items-center justify-content-center bg-primary text-secondary rounded-circle"
+                           style="width: 45px; height: 45px"></i>
+                        <div class="pl-3">
+                            <h5>Opening Hours</h5>
+                            <strong>Phục vụ cả tuần:</strong>
+                            <p class="m-0">08:00 AM - 05:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer Start -->
+    <div id="contact" class="container-fluid bg-secondary text-white px-sm-3 px-md-5">
+        <div class="row pt-5">
+            <div class="col-lg-3 col-md-6 mb-5">
+                <a href=""
+                   class="navbar-brand font-weight-bold text-primary m-0 mb-4 p-0"
+                   style="font-size: 40px; line-height: 40px">
+                    <span class="text-white">QL Sân bóng</span>
+                </a>
+                <p>
+                    
+                </p>
+                <div class="d-flex justify-content-start mt-4">
+                    <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
+                       style="width: 38px; height: 38px"
+                       href="#">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
+                       style="width: 38px; height: 38px"
+                       href="#">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
+                       style="width: 38px; height: 38px"
+                       href="#">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
+                       style="width: 38px; height: 38px"
+                       href="#">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <h3 class="text-primary mb-4">Get In Touch</h3>
+                <div class="d-flex">
+                    <h4 class="fa fa-map-marker-alt text-primary"></h4>
+                    <div class="pl-3">
+                        <h5 class="text-white">Address</h5>
+                        <p>236 Hoàng Quốc Việt, Cổ Nhuế 1, Bắc Từ Liêm</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <h4 class="fa fa-envelope text-primary"></h4>
+                    <div class="pl-3">
+                        <h5 class="text-white">Email</h5>
+                        <p>ThStadium@gmail.com</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <h4 class="fa fa-phone-alt text-primary"></h4>
+                    <div class="pl-3">
+                        <h5 class="text-white">Phone</h5>
+                        <p>+012 345 67890</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+               
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <h3 class="text-primary mb-4">Newsletter</h3>
+                <form action="">
+                    <div class="form-group">
+                        <input type="text"
+                               class="form-control border-0 py-4"
+                               placeholder="Your Name"
+                               required="required" />
+                    </div>
+                    <div class="form-group">
+                        <input type="email"
+                               class="form-control border-0 py-4"
+                               placeholder="Your Email"
+                               required="required" />
+                    </div>
+                    <div>
+                        <button class="btn btn-primary btn-block border-0 py-3"
+                                type="submit">
+                            Submit Now
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+       @* <div class="container-fluid pt-5"
+             style="border-top: 1px solid rgba(23, 162, 184, 0.2) ;">
+            <p class="m-0 text-center text-white">
+                &copy;
+                <a class="text-primary font-weight-bold" href="#">Your Site Name</a>.
+                All Rights Reserved.
+
+                <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                Designed by
+                <a class="text-primary font-weight-bold" href="https://htmlcodex.com">HTML Codex</a>
+                <br />Distributed By:
+                <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
+            </p>
+        </div>*@
+    </div>
+    <!-- Footer End -->
+    <!-- Back to Top -->
+       <a href="#" class="btn btn-primary p-3 back-to-top">
+            <i class="fa fa-angle-double-up"></i>
+        </a>
+        <!-- Quảng cáo Xem Ngay với nền màu vàng -->
+      
+
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    @*<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>*@
+
+    @*<script src="~/lib/easing/easing.min.js"></script>*@
+   <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="~/lib/isotope/isotope.pkgd.min.js"></script>
+    @*<script src="~/lib/lightbox/js/lightbox.min.js"></script>*@
+
+    <!-- Template Javascript -->
+    <script src="~/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+
+        $('#modalLogin').on('hidden.bs.modal', function () {
+            // Xóa thông báo lỗi khi modal được ẩn
+            $('#userNameError').text('');
+            $('#passwordError').text('');
+        });
+
+        function submitLoginForm() {
+            // Lấy giá trị từ ô đăng nhập
+            let userName = $('#userName').val();
+            let password = $('#password').val();
+
+            // Xóa thông báo lỗi cũ
+            $('#userNameError').text('');
+            $('#passwordError').text('');
+
+            // Kiểm tra tên đăng nhập
+            if (userName.trim() === '' & password.trim() === '') {
+                $('#passwordError').text('Vui lòng nhập mật khẩu.');
+                $('#userNameError').text('Vui lòng nhập tên đăng nhập.');
+                return;
+
+
+            }// Kiểm tra tên đăng nhập
+            if (userName.trim() === '') {
+                $('#userNameError').text('Vui lòng nhập tên đăng nhập.');
+                return;
+            }
+
+            // Kiểm tra mật khẩu
+            if (password.trim() === '') {
+                $('#passwordError').text('Vui lòng nhập mật khẩu.');
+                return;
+            }
+
+            $.ajax({
+                url: '/Login/Login',
+                type: 'POST',
+                data: { userName: userName, password: password },
+                success: function (data) {
+                    if (data.success) {
+                        // Đăng nhập thành công, chuyển hướng dựa trên vai trò (role) của người dùng
+                        if (data.role === 'ADMIN') {
+                            window.location.href = '/Admin/Home';
+                        } else if (data.role === 'KHACHHANG') {
+                            window.location.href = '/Customer/Home';
+                        } else if (data.role === 'NHANVIEN') {
+                            window.location.href = '/Employee/Home';
+                        }
+                    } else {
+                        alert("Sai thông tin đăng nhập");
+                    }
+                },
+                error: function () {
+                    console.log('Đã xảy ra lỗi khi thực hiện yêu cầu đăng nhập.');
+                }
+            });
+        }
+
+        
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#order").click(function (event) {
+                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
+
+                // Lấy vị trí của phần "#orderstadium"
+                var targetOffset = $("#orderstadium").offset().top;
+
+                // Cuộn trang đến vị trí của phần "#orderstadium"
+                $("html, body").animate({
+                    scrollTop: targetOffset
+                }, 800); // 800 là thời gian cuộn (milliseconds), bạn có thể điều chỉnh theo ý muốn
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#ds").click(function (event) {
+                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
+
+                // Lấy vị trí của phần "#orderstadium"
+                var targetOffset = $("#dssan").offset().top;
+
+                // Cuộn trang đến vị trí của phần "#orderstadium"
+                $("html, body").animate({
+                    scrollTop: targetOffset
+                }, 800); // 800 là thời gian cuộn (milliseconds), bạn có thể điều chỉnh theo ý muốn
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#dv").click(function (event) {
+                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
+
+                // Lấy vị trí của phần "#orderstadium"
+                var targetOffset = $("#services").offset().top;
+
+                // Cuộn trang đến vị trí của phần "#orderstadium"
+                $("html, body").animate({
+                    scrollTop: targetOffset
+                }, 800); // 800 là thời gian cuộn (milliseconds), bạn có thể điều chỉnh theo ý muốn
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#lh").click(function (event) {
+                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
+
+                // Lấy vị trí của phần "#orderstadium"
+                var targetOffset = $("#about").offset().top;
+
+                // Cuộn trang đến vị trí của phần "#orderstadium"
+                $("html, body").animate({
+                    scrollTop: targetOffset
+                }, 800); // 800 là thời gian cuộn (milliseconds), bạn có thể điều chỉnh theo ý muốn
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var backToTopButton = $('.back-to-top');
+
+            backToTopButton.click(function () {
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 800, 'swing'); // Thử thay 'swing' bằng 'linear' để xem có giúp khắc phục lỗi không
+                return false;
+            });
+
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 100) {
+                    backToTopButton.fadeIn();
+                } else {
+                    backToTopButton.fadeOut();
+                }
+            });
+        });
+
+    </script>
+    @RenderSection("scripts",false)
+</body>
+</html>

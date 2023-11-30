@@ -1,0 +1,35 @@
+﻿@model IEnumerable<QLSanBong.Models.ChiTietPd>
+@{
+    int count = 1;
+}
+<div class="container">
+    <table class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Mã sân bóng</th>
+                <th>Ngày sử dụng</th>
+                <th>Giờ bắt đầu</th>
+                <th>Giờ kết thúc</th>
+                <th>Giá tiền (VND)</th>
+                <!--Thêm các cột khác tại đây-->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sb in Model)
+            {
+                <tr>
+                    <td>@count</td>
+                    <td>@sb.MaSb</td>
+                    <td>@String.Format("{0:dd/MM/yyyy}", sb.Ngaysudung)</td>
+                    <td>@sb.Giobatdau</td>
+                    <td>@sb.Gioketthuc</td>
+                    <td>@sb.Giatien</td>
+
+                </tr>
+                count++;
+            }
+
+        </tbody>
+    </table>
+</div>

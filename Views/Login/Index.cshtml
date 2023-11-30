@@ -1,0 +1,613 @@
+﻿@model IEnumerable<QLSanBong.Models.SanBong>
+
+@{
+    Layout = "_MyLayout2";
+}
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+<div class="container-fluid px-0 px-md-5 mb-5" style="margin-top:85px;background-color:aliceblue">
+    <div class="row align-items-center px-3">
+        <div class="col-lg-5 text-center text-lg-left">
+            <h2 class="display-4 font-weight-bold text-blue text-center">
+                Đem lại những trải nhiệm tốt nhất cho bạn
+            </h2>
+            <a href="#dssan" class="btn btn-success mt-1 ml-5 py-3 px-5" id="ds">Danh sách sân</a>
+            <a href="#stadium" class="btn btn-primary mt-1 ml-5 py-3 px-5" id="order">Đặt sân bóng</a>
+        </div>
+        <div class="col-lg-7 text-center text-lg-right">
+
+            <div id="khunggia"></div>
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+
+<div class="container-fluid pt-5" id="orderstadium">
+    <div class="container">
+        <div class="text-center pb-2">
+            <p class="section-title px-5">
+                <span class="px-2">Sân bóng mini</span>
+            </p>
+            <h1 class="mb-4">Đặt sân bóng</h1>
+        </div>
+        <div class="container">
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="idSan" class="form-label">Chọn sân</label>
+                            <input type="text" class="form-control border" id="idSan">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="loai" class="form-label">Loại sân</label>
+                            <select id="loai" class="form-control">
+                                <option value=""></option>
+                                <option value="5">Sân 5</option>
+                                <option value="7">Sân 7</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="dayOrder" class="form-label">Ngày đặt</label>
+                            <input type="date" class="form-control border border-primary" id="dayOrder">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="timeStart" class="form-label">Thời gian bắt đầu</label>
+                            <select id="timeStart" class="form-control">
+                                <option value="05:00">05:00</option>
+                                <option value="06:30">06:30</option>
+                                <option value="08:00">08:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:30">15:30</option>
+                                <option value="17:00">17:00</option>
+                                <option value="18:30">18:30</option>
+                                <option value="20:00">20:00</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="timeEnd" class="form-label">Thời gian kết thúc</label>
+                            <select id="timeEnd" class="form-control">
+                                <option value="06:30">06:30</option>
+                                <option value="08:00">08:00</option>
+                                <option value="09:30">09:30</option>
+                                <option value="15:30">15:30</option>
+                                <option value="17:00">17:00</option>
+                                <option value="18:30">18:30</option>
+                                <option value="20:00">20:00</option>
+                                <option value="21:30">21:30</option>
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="col-md-2" style="margin-top:32px">
+                        <button class="btn btn-primary" id="searchButton" type="button">
+                            <i class="fas fa-search fa-sm"></i>Tìm sân trống
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="allST"></div>
+<!-- Class Start -->
+<div class="container-fluid pt-5" id="dssan">
+    <div class="container">
+        <div class="text-center pb-2">
+            <p class="section-title px-5">
+                <span class="px-2">Sân bóng mini</span>
+            </p>
+            <h1 class="mb-4">Danh sách sân bóng</h1>
+        </div>
+        <div class="row" id="items-container">
+            @foreach(var item in Model.Take(3))
+            {
+                <div class="col-lg-4 mb-5">
+                    <div class="card border-0 bg-light shadow-sm pb-2">
+                        <img class="card-img-top mb-2" src="@item.Hinhanh" alt="" style="height:235px"/>
+                        <div class="card-body text-center">
+                            <h4 class="card-title">@item.TenSb</h4>
+                            <p class="card-text">
+                                @item.DiaChi
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent py-4 px-5">
+                            <div class="row border-bottom">
+                                <div class="col-5 py-1 text-right border-right">
+                                    <strong>Loại sân</strong>
+                                </div>
+                                <div class="col-7 py-1">Sân @item.LoaiSan người</div>
+                            </div>
+                            <div class="row border-bottom">
+                                <div class="col-5 py-1 text-right border-right">
+                                    <strong>Diện tích</strong>
+                                </div>
+                                <div class="col-7 py-1">@item.Dientich</div>
+                            </div>
+                            <div class="row border-bottom">
+                                <div class="col-5 py-1 text-right border-right">
+                                    <strong>Giá thuê </strong>
+                                </div>
+                                <div class="col-7 py-1">@item.GiaSan</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5 py-1 text-right border-right">
+                                    <strong>Trạng thái</strong>
+                                </div>
+                                <div class="col-7 py-1">@item.Trangthai</div>
+                            </div>
+                        </div>
+                        <a href="" class="btn btn-primary px-4 mx-auto mb-4" data-loaisan="@item.LoaiSan" data-masan="@item.MaSb" id="searchButtons">Tìm kiếm sân trống</a>
+                       
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<button id="load-more" class="btn btn-primary px-4 mx-auto d-block mb-4">Xem thêm</button>
+
+
+<!-- Class End -->
+
+
+<!-- Gallery Start -->
+<div class="container-fluid pt-5 pb-3" id="services">
+    <div class="container">
+        <div class="text-center pb-2">
+            <p class="section-title px-5">
+                <span class="px-2">Sân bóng mini</span>
+            </p>
+            <h1 class="mb-4">Dịch vụ của chúng tôi</h1>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center mb-2">
+                <ul class="list-inline mb-4" id="portfolio-flters">
+                    <li class="btn btn-outline-primary m-1 active" data-filter="*">
+                        Tất cả
+                    </li>
+                    <li class="btn btn-outline-primary m-1" data-filter=".first">
+                        Sân bóng
+                    </li>
+                    <li class="btn btn-outline-primary m-1" data-filter=".second">
+                        Dịch vụ
+                    </li>
+                    <li class="btn btn-outline-primary m-1" data-filter=".third">
+                        Khuyến mãi
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row portfolio-container">
+            <div class="col-lg-4 col-md-6 mb-4 portfolio-item first">
+                <div class="position-relative overflow-hidden mb-2">
+                    <img class="img-fluid w-100" src="~/img/sb.jpg" alt="" style="height:245px" />
+
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4 portfolio-item second">
+                <div class="position-relative overflow-hidden mb-2">
+                    <img class="img-fluid w-100" src="~/img/9880_softdrinks.jpg" alt="" style="height:245px" />
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4 portfolio-item third">
+                <div class="position-relative overflow-hidden mb-2">
+                    <img class="img-fluid w-100" src="~/img/chuong_trinh_khuyen_mai-800x560.png" alt="" />
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4 portfolio-item second">
+                <div class="position-relative overflow-hidden mb-2">
+                    <img class="img-fluid w-100" src="~/img/shop.jpg" alt="" style="height:245px" />
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4 portfolio-item second">
+                <div class="position-relative overflow-hidden mb-2">
+                    <img class="img-fluid w-100" src="~/img/giuxe.jpg" alt="" style="height:245px" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Gallery End -->
+
+@section scripts{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#khunggia').load('/Login/Khunggia');
+        });
+        $(document).ready(function () {
+            $('#allSB').load('/Login/AllSB');
+        });
+        $(document).ready(function () {
+            // Ẩn #allST ban đầu
+            $('#allST').hide();
+
+            // Xử lý sự kiện khi click vào nút "Tìm sân trống"
+            $('#searchButton').click(function () {
+                //var searchCriteria = {
+                //    idSan : $('#idSan').val();
+                //    loai : $('#loai').val();
+                //    dayOrder: $('#dayOrder').val(),
+                //    timeStart: $('#timeStart').val(),
+                //    timeEnd: $('#timeEnd').val()
+                //};
+                //loadAllST(searchCriteria);
+                $('#allST').show();
+                handleTimeChange();
+                var idSan = $('#idSan').val();
+                var loai = $('#loai').val();
+                var dayOrder = $('#dayOrder').val();
+                var timeStart = $('#timeStart').val();
+                var timeEnd = $('#timeEnd').val();
+                $.get('/Login/AllST', { idSan: idSan, loai: loai, dayOrder: dayOrder, timeStart: timeStart, timeEnd: timeEnd }, function (data) {
+                    $('#allST').html(data);
+                });
+            });
+        });
+        function loadAllST(searchCriteria) {
+            $('#allST').show();
+            handleTimeChange();
+            $.get('/Login/AllST', searchCriteria, function (data) {
+                $('#allST').html(data);
+            });
+        }
+        // Lấy phần tử select cho timeStart và timeEnd
+        const timeStartSelect = document.getElementById("timeStart");
+        const timeEndSelect = document.getElementById("timeEnd");
+
+            initialTimeStartValue = timeStartSelect.value;
+            initialTimeEndValue = timeEndSelect.value;
+        // Hàm xử lý thay đổi thời gian
+        function handleTimeChange() {
+            // Lấy giá trị timeStart và timeEnd từ các select
+            const timeStartValue = timeStartSelect.value;
+            const timeEndValue = timeEndSelect.value;
+
+            // Chuyển đổi giá trị thành số để so sánh
+            const startTime = parseInt(timeStartValue.replace(":", ""));
+            const endTime = parseInt(timeEndValue.replace(":", ""));
+
+            // Kiểm tra điều kiện
+            if (startTime >= endTime) {
+                alert("Thời gian bắt đầu phải trước thời gian kết thúc.");
+
+                timeStartSelect.value = initialTimeStartValue;
+                timeEndSelect.value = initialTimeEndValue;
+                // Thực hiện xử lý khi điều kiện không đúng (nếu cần)
+            } else {
+                initialTimeStartValue = timeStartSelect.value;
+                initialTimeEndValue = timeEndSelect.value;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Lấy phần tử input có ID là "dayOrder"
+            const dayOrderInput = document.getElementById("dayOrder");
+
+            // Kiểm tra xem dayOrderInput có tồn tại và có giá trị là null không
+            if (dayOrderInput && dayOrderInput.value === "") {
+                // Nếu dayOrderInput tồn tại và giá trị là null (trống)
+                // Đặt giá trị của nó thành ngày hiện tại
+                const currentDate = new Date();
+                const year = currentDate.getFullYear();
+                const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+                const day = currentDate.getDate().toString().padStart(2, "0");
+                const formattedDate = `${year}-${month}-${day}`;
+
+                // Gán giá trị cho dayOrderInput
+                dayOrderInput.value = formattedDate;
+            }
+        });
+        // Khi nút "Sign up" được nhấn
+        $("#themKH1").on("click", function () {
+            // Đóng modalLogin
+            $("#modalOrder").modal("hide");
+            // Mở addKHModal
+            $("#addKHModal").modal("show");
+        }); $("#themKH2").on("click", function () {
+            // Đóng modalLogin
+            $("#modalLogin").modal("hide");
+            // Mở addKHModal
+            $("#addKHModal").modal("show");
+        });
+
+        $(document).on('click', "button[name='order']", function () {
+            var maSan = this.getAttribute('data-ma-san');
+            var ngayDatSan = this.getAttribute('data-ngay-dat-san');
+            var gioBatDau = this.getAttribute('data-gio-bat-dau');
+            var gioKetThuc = this.getAttribute('data-gio-ket-thuc');
+
+            // Chuyển đổi giá trị ngày từ datetime sang date
+            var ngayDatSanDate = new Date(ngayDatSan);
+            var ngayDatSanFormatted = formatDate(ngayDatSanDate);
+            magiods = this.getAttribute('data-ma-gio');
+            $('#idstadium').val(maSan);
+            $('#day').val(ngayDatSanFormatted);
+            $('#start').val(gioBatDau);
+            $('#end').val(gioKetThuc);
+        });
+        // Sự kiện khi modal bị ẩn (đóng)
+        $('#modalOrder').on('hidden.bs.modal', function (e) {
+            // Đặt giá trị của các trường "userName" và "phoneNumber" về chuỗi rỗng
+            $('#name').val("");
+            $('#phoneNumber').val("");
+        });
+
+        // Hàm để định dạng ngày thành "yyyy-MM-dd" (định dạng của trường date)
+        function formatDate(date) {
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+
+            // Đảm bảo hiển thị "0" trước ngày và tháng nếu cần
+            if (day < 10) {
+                day = "0" + day;
+            }
+            if (month < 10) {
+                month = "0" + month;
+            }
+
+            return year + "-" + month + "-" + day;
+        }
+        </script>
+        <script>
+
+        $('#addKH').click(function () {
+            let tenkh = $('#tenkh').val();
+            let gtkh = $('#gtkh').val();
+            let dckh = $('#dckh').val();
+            let sdtkh = $('#sdtkh').val();
+            let userkh = $('#userkh').val();
+            let passkh = $('#passkh').val();
+
+            // thêm ràng buộc dữ liệu
+            if (tenkh.length == 0 || sdtkh.length == 0) {
+                alert("Vui lòng nhập đầy đủ dữ liệu");
+                return;
+            }
+
+            // dùng ajax
+            $.ajax({
+                url: '/Login/DangKy',
+                type: 'POST',
+                data: {
+                    tenkh: tenkh,
+                    gtkh: gtkh,
+                    dckh: dckh,
+                    sdtkh: sdtkh,
+                    userkh: userkh,
+                    passkh: passkh,
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert("Đăng ký khách hàng mới thành công");
+                        $('#addKHModal').modal('hide');
+                        $('#modalLogin').modal('show');
+                    } else {
+                        alert(data.mgs);
+
+                        $('#addKHModal').modal('show');
+                    }
+                }
+            });
+        });
+
+        $('#addKHModal').on('hidden.bs.modal', function () {
+            // Xóa giá trị của các ô input khi modal được đóng
+            $('#tenkh').val('');
+            $('#dckh').val('');
+            $('#sdtkh').val('');
+            $('#userkh').val('');
+            $('#passkh').val('');
+
+        });
+        var magiods;
+        let lastSearch = {}
+        $('#addYC').click(function () {
+            let name = $('#name').val();
+            let phoneNumber = $('#phoneNumber').val();
+            let day = $('#day').val();
+            let start = $('#start').val();
+            let end = $('#end').val();
+            let magio = magiods;
+            let idstadium = $('#idstadium').val();
+            let pttt = $('#pttt').val();
+            // thêm ràng buộc dữ liệu
+            if (name.length == 0 || phoneNumber.length == 0) {
+                alert("Vui lòng nhập đầy đủ dữ liệu");
+                return;
+            }
+
+            lastSearch = {
+                dayOrder: $('#dayOrder').val(),
+                timeStart: $('#timeStart').val(),
+                timeEnd: $('#timeEnd').val(),
+                idSan: $('#idSan').val(),
+                loai: $('#loai').val(),
+            };
+
+            // dùng ajax
+            $.ajax({
+                url: '/Login/ThemMoi',
+                type: 'POST',
+                data: {
+                    name: name,
+                    day: day,
+                    start: start,
+                    end: end,
+                    magio: magio,
+                    phoneNumber: phoneNumber,
+                    idstadium: idstadium,
+                    trangthai: 'Đang chờ',
+                    pttt: pttt,
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert("Yêu cầu đặt sân thành công");
+                        $('#modalOrder').modal('hide');
+                        loadAllST(lastSearch);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            var loginModal = document.querySelector("#modalLogin");
+            var usernameInput = document.querySelector("#userName");
+            var passwordInput = document.querySelector("#password");
+
+            loginModal.addEventListener("hidden.bs.modal", function () {
+                // Xóa giá trị trường nhập liệu khi modal đóng
+                usernameInput.value = "";
+                passwordInput.value = "";
+            });
+        });
+        </script>
+        <script>
+        // Đợi cho tài liệu HTML được tải hoàn toàn
+        document.addEventListener("DOMContentLoaded", function () {
+            // Lấy thẻ input idSan
+            const idSanInput = document.getElementById("idSan");
+            const loaiInput = document.getElementById("loai");
+
+            // Lấy tất cả các nút "Tìm kiếm sân trống"
+            const searchButtons = document.querySelectorAll(".btn-primary[data-masan]");
+
+            // Thêm sự kiện khi nút được nhấn
+            searchButtons.forEach(function (button) {
+                button.addEventListener("click", function (event) {
+                    // Ngăn chặn hành vi mặc định của nút (để tránh điều hướng trang)
+                    event.preventDefault();
+
+                    // Lấy mã sân từ thuộc tính data-masan
+                    const masan = button.getAttribute("data-masan");
+                    const loaisan = button.getAttribute("data-loaisan");
+
+                    // Đặt giá trị mã sân vào trường nhập liệu idSan
+                    idSanInput.value = masan;
+                    loaiInput.value = loaisan;
+                    $('html, body').animate({
+                        scrollTop: $('#orderstadium').offset().top
+                    }, 1000);
+                });
+            });
+        });
+
+
+
+        var modelData = @Html.Raw(Json.Serialize(Model));
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const itemsContainer = document.getElementById("items-container");
+            const loadMoreButton = document.getElementById("load-more");
+
+            let showAllItems = false;
+            let itemsToShow = 3; // Số lượng đối tượng ban đầu để hiển thị
+
+            // Xử lý khi nút "Xem thêm" được nhấn
+            loadMoreButton.addEventListener("click", function () {
+                if (!showAllItems) {
+                    // Sử dụng JavaScript để tải và hiển thị thêm đối tượng
+                    for (let i = itemsToShow; i < itemsToShow + 3; i++) {
+                        const item = modelData[i]; // Lấy đối tượng từ Model
+
+                        if (!item) {
+                            // Đã hiển thị tất cả đối tượng, ẩn nút "Xem thêm"
+                            loadMoreButton.style.display = "none";
+                            break;
+                        }
+
+                        const itemHtml = `
+                                <div class="col-lg-4 mb-5">
+                                    <div class="card border-0 bg-light shadow-sm pb-2">
+                                        <img class="card-img-top mb-2" src="${item.hinhanh}" alt="" style="height:235px"/>
+                                        <div class="card-body text-center">
+                                            <h4 class="card-title">${item.tenSb}</h4>
+                                            <p class="card-text">
+                                                ${item.diaChi}
+                                            </p>
+                                        </div>
+                                        <div class="card-footer bg-transparent py-4 px-5">
+                                            <div class="row border-bottom">
+                                                <div class="col-5 py-1 text-right border-right">
+                                                    <strong>Loại sân</strong>
+                                                </div>
+                                           <div class="col-7 py-1">Sân ${item.loaiSan} người</div>
+                                            </div>
+                                            <div class="row border-bottom">
+                                                <div class="col-5 py-1 text-right border-right">
+                                                    <strong>Diện tích</strong>
+                                                </div>
+                                                <div class="col-7 py-1">${item.dientich}</div>
+                                            </div>
+                                            <div class="row border-bottom">
+                                                <div class="col-5 py-1 text-right border-right">
+                                                    <strong>Giá thuê</strong>
+                                                </div>
+                                                <div class="col-7 py-1">${item.giaSan}</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-5 py-1 text-right border-right">
+                                                    <strong>Trạng thái</strong>
+                                                </div>
+                                                <div class="col-7 py-1">${item.trangthai}</div>
+                                            </div>
+                                        </div>
+                                                  <a href="javascript:void(0)" class="btn btn-primary px-4 mx-auto mb-4" data-masan="${item.maSb}" onclick="fillIdSan(this)">Tìm kiếm sân trống</a>
+                                    </div>
+                                </div>
+                            `;
+
+                        itemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+                    }
+
+                    itemsToShow += 3; // Tăng số lượng đối tượng đã hiển thị
+                }
+            });
+        });
+        function fillIdSan(element) {
+            const masan = element.getAttribute("data-masan");
+            const loaisan = element.getAttribute("data-loaisan");
+            document.getElementById("loai").value = loaisan;
+            document.getElementById("idSan").value = masan;
+            $('html, body').animate({
+                scrollTop: $('#orderstadium').offset().top
+            }, 1000);
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Xử lý sự kiện khi click vào nút trong danh sách portfolio-filters
+            $('#portfolio-flters li').on('click', function () {
+                $('#portfolio-flters li').removeClass('active');
+                $(this).addClass('active');
+
+                var filterValue = $(this).attr('data-filter');
+
+                // Ẩn tất cả các mục portfolio-item
+                $('.portfolio-item').hide();
+
+                // Hiển thị các mục tương ứng với filterValue
+                if (filterValue === '*') {
+                    $('.portfolio-item').show();
+                } else {
+                    $('.portfolio-item' + filterValue).show();
+                }
+            });
+        });
+    </script>
+}

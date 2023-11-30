@@ -1,0 +1,192 @@
+﻿@using QLSanBong.Models;
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayOut.cshtml";
+}
+
+<div class="table">
+    <div>
+        <h3 class="align-center">KHUNG GIÁ GIỜ THUÊ SÂN</h3>
+    </div>
+
+
+    <div id="allBG"></div>
+
+
+    <div class="modal fade" id="addBGModal" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="Title">Thêm khung giờ mới</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="mag" class="form-label">Mã giờ</label>
+                            <input type="text" class="form-control" id="mag">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tstart" class="form-label">Giờ bắt đầu</label>
+                            <input type="datetime" class="form-control" id="tstart">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tend" class="form-label">Giờ kết thúc</label>
+                            <input type="text" class="form-control" id="tend">
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Đơn giá</label>
+                            <input type="number" class="form-control" id="price">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="addBG">Xác nhận</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="editBG" style="display:none">Cập nhật</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#allBG').load('/Admin/BangGia/AllBG');
+        });
+
+        $('#addBG').click(function () {
+            let mag = $('#mag').val();
+            let tstart = $('#tstart').val();
+            let tend = $('#tend').val();
+            let price = $('#price').val();
+
+            // thêm ràng buộc dữ liệu
+            if (mag.length == 0) {
+                alert("Vui lòng nhập đầy đủ dữ liệu");
+                return;
+            }
+
+            // dùng ajax
+            $.ajax({
+                url: '/Admin/BangGia/ThemMoi',
+                type: 'POST',
+                data: {
+                    mag:mag,
+                    tstart:tstart,
+                    tend:tend,
+                    price:price,
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert("Thêm khung giờ mới thành công");
+                        $('#allBG').load('/Admin/BangGia/AllBG');
+                    } else {
+                        alert('Có lỗi xảy ra');
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', "button[name='delete']", function () {
+            var id = $(this).data('mag');
+            if (confirm("Bạn thực sự muốn xóa khung giờ này?")) {
+                // dùng ajax để xóa lớp được chọn
+                $.ajax({
+                    url: '/Admin/BangGia/Xoa',
+                    type: 'post',
+                    data: {
+                        id: id,
+                    },
+                    success: function (data) {
+                        if (data.code == 200) {
+                            alert(data.msg);
+                            $('#allBG').load('/Admin/BangGia/AllBG');
+                        } else {
+                            alert(data.msg);
+                        }
+                    }
+                })
+            }
+        });
+
+        function Chitietbg(id) {
+            $.ajax({
+                url: '/Admin/BangGia/ChiTiet',
+                type: 'get',
+                data: {
+                    id: id,
+                },
+                success: function (data) {
+                    console.log(data);
+                    if (data.code == 200) {
+                        $('#mag').val(data.bg.magio);
+                        $('#tstart').val(data.bg.giobatdau);
+                        $('#tend').val(data.bg.gioketthuc);
+                        $('#price').val(data.bg.dongia);
+
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+     
+        var id;
+
+        $(document).on('click', "button[name='edit']", function () {
+            id = $(this).data('mag');
+            Chitietbg(id);
+            $('#Title').text('Chỉnh sửa thông tin');
+            $('#addBG').hide();
+            $('#editBG').show();
+            $('#addBGModal').modal('show');
+        });
+
+        $('#editBG').click(function () {
+            let mag = $('#mag').val();
+            let tstart = $('#tstart').val();
+            let tend = $('#tend').val();
+            let price = $('#price').val();
+
+            $.ajax({
+                url: '/Admin/BangGia/Edit',
+                type: 'POST',
+                data: {
+                    mag: mag,
+                    tstart: tstart,
+                    tend: tend,
+                    price: price,
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert("Cập nhật khung giờ thành công");
+                        $('#allBG').load('/Admin/BangGia/AllBG');
+                    } else {
+                        alert('Có lỗi xảy ra');
+                    }
+                }
+            });
+        });
+
+        $('#addBGModal').on('hidden.bs.modal', function () {
+            $('#Title').text('');
+            // Xóa giá trị của các ô input khi modal được đóng
+            $('#mag').val('');
+            $('#tstart').val('');
+            $('#tend').val('');
+            $('#price').val('');
+
+            // Bỏ thuộc tính readonly để cho phép ghi dữ liệu
+            $('#mag').prop("readonly", false);
+            $('#tstart').prop("readonly", false);
+            $('#tend').prop("readonly", false);
+            $('#price').prop("readonly", false);
+        });
+
+    </script>
+}
+

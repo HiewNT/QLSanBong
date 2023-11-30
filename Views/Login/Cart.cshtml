@@ -1,0 +1,156 @@
+﻿@using QLSanBong.Models;
+@using Microsoft.AspNetCore.Http;
+@using Newtonsoft.Json;
+
+@{
+    Layout = "~/Views/Shared/_MyLayout2.cshtml";
+ 
+}
+<div style="margin:100px"></div>
+    <div class="container">
+    <div class="text-center pb-2">
+        <h1 class="mb-4">Danh sách chờ</h1>
+    </div>
+        @if (ViewBag.ItemCarts != null && ViewBag.ItemCarts.Count > 0)
+        {
+            <table class="table table-hover table-bordered">
+                <tr>
+                    <th>STT</th>
+                    <th>Mã sân</th>
+                    <th>Ngày đặt sân</th>
+                    <th>Giờ bắt đầu</th>
+                    <th>Giờ kết thúc</th>
+                    <th>Giá sân (VNĐ)</th>
+                    <th></th>
+                </tr>
+                @foreach (var item in ViewBag.ItemCarts)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.MaSb</td>
+                        <td>@item.NgayDat</td>
+                        <td>@item.Giobatdau</td>
+                        <td>@item.Gioketthuc</td>
+                        <td>@item.Giatien</td>
+                        <td>
+                            <button class="btn btn-outline-danger xoayc" data-id="@item.Id">Hủy yêu cầu</button>
+                        </td>
+                        
+                    </tr>
+                    
+                    
+                }
+                <tr>
+                    <th> <span id="totalPrice">Tổng tiền (VNĐ): </span></th>
+                </tr>
+            </table>
+           
+            <div>
+                <input type="button" value="Xác nhận thông tin" id="gui" class="btn btn-danger" />
+            </div>
+            <div class="d-none" id="thongtinkh">
+                <form action="/Login/AddOrder" method="post" class="row">
+                <div class="col-3">
+                    <label for="name1" class="form-label">Tên</label>
+                    <input type="text" class="form-control" id="name1" name="name1">
+                </div>
+                <div class="col-3">
+                    <label for="phoneNumber1" class="form-label">Số điện thoại</label>
+                    <input type="text" class="form-control" id="phoneNumber1" name="phoneNumber1">
+                </div>
+                <div class="col-3">
+                    <label for="pttt1" class="form-label">Phương thức thanh toán</label>
+                    <select id="pttt1" class="form-control" name="pttt1">
+                        <option value="Chuyển khoản">Chuyển khoản</option>
+                        <option value="Tiền mặt">Tiền mặt</option>
+                    </select>
+                </div>
+                <input type="hidden" id="totalPriceInput" name="totalPrice1" value="" />
+                    <input type="submit" value="Gửi yêu cầu" class="btn btn-success" id="guiyc" />
+               
+                    
+                </form>
+            </div>
+           
+        }
+        else
+        {
+            <div class="center-block">
+                <h2> Chưa có lịch đặt sân nào được thêm</h2>
+                <div class="clearfix">
+                </div>
+            </div>
+        }
+    </div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+    document.getElementById("guiyc").addEventListener("click", function () {
+        alert("Gửi yêu cầu thành công! Chờ nhân viên xác nhận nhé!");
+    });
+    document.getElementById("gui").addEventListener("click", function () {
+            $("#thongtinkh").removeClass("d-none");
+            $("#gui").addClass("d-none");
+        
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        // Xử lý sự kiện khi nhấn vào liên kết "Đặt sân"
+        $(".nav-item.nav-link[href='#services']").click(function (event) {
+            event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
+
+            // Chuyển hướng đến Action "Index" của "Login" và chạy đến phần "#stadium"
+            window.location.href = '@Url.Action("Index", "Login")#services';
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        updateTotalPrice();
+        $('.xoayc').click(function () {
+            event.preventDefault();
+            var id = $(this).data('id');
+            var rowToDelete = $(this).closest('tr');
+            if (confirm("Bạn thực sự muốn hủy yêu cầu này?")) {
+                // Dùng ajax để xóa lớp được chọn
+                $.ajax({
+                    url: '/Login/Xoa',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        if (data.code == 200) {
+                            alert("Hủy yêu cầu thành công!");
+                            rowToDelete.remove(); // Xóa hàng tương ứng trên giao diện
+                            location.reload();
+                        } else {
+                            alert(data.msg);
+                        }
+                    }
+                })
+            }
+        });
+    });
+    function updateTotalPrice() {
+        var rows = document.querySelectorAll("table tr");
+        var totalPrice = 0;
+
+        for (var i = 1; i < rows.length; i++) { // Bỏ qua dòng tiêu đề và dòng tổng tiền
+            var priceCell = rows[i].querySelector("td:nth-child(6)"); // Lấy ô chứa giá tiền (cột thứ 6)
+            if (priceCell) {
+                var price = parseFloat(priceCell.innerText);
+                totalPrice += price;
+            }
+        }
+
+        document.getElementById("totalPrice").innerText = "Tổng tiền: " + totalPrice + " VNĐ";
+        document.getElementById("totalPriceInput").value = totalPrice;
+    }
+</script>

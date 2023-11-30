@@ -1,0 +1,253 @@
+﻿@using QLSanBong.Models;
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayOut.cshtml";
+}
+
+<div class="table">
+    <div>
+        <h3 class="align-center">DANH SÁCH NHÂN VIÊN</h3>
+    </div>
+    
+
+    <div id="allDS"></div>
+
+   
+    <div class="modal fade" id="addNVModal" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="Title">Thêm nhân viên mới</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="ten" class="form-label">Tên</label>
+                            <input type="text" class="form-control" id="ten">
+                        </div>
+                        <div class="mb-3">
+                            <label for="sdt" class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" id="sdt">
+                        </div>
+                        <div class="mb-3">
+                            <label for="gt" class="form-label">Giới tính</label>
+                            <select class="form-select" id="gt" name="gt">
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ns" class="form-label">Ngày sinh</label>
+                            <input type="date" class="form-control" id="ns">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cv" class="form-label">Chức vụ</label>
+                            <input type="text" class="form-control" id="cv">
+                        </div>
+                        <div class="mb-3">
+                            <label for="usernv" class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="usernv">
+                        </div> 
+                        <div class="mb-3">
+                            <label for="passnv" class="form-label">Mật khẩu</label>
+                            <input type="text" class="form-control" id="passnv">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="addNV">Xác nhận</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="editNV" style="display:none">Cập nhật</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#allDS').load('/Admin/NhanVien/AllDS');
+        });
+        
+        $('#addNV').click(function () {
+            let ten = $('#ten').val();
+            let gt = $('#gt').val();
+            let ns = $('#ns').val();
+            let cv = $('#cv').val();
+            let sdt = $('#sdt').val();
+            let usernv = $('#usernv').val();
+            let passnv = $('#passnv').val();
+
+            // thêm ràng buộc dữ liệu
+            if (ten.length == 0) {
+                alert("Vui lòng nhập đầy đủ dữ liệu");
+                return;
+            }
+
+            // dùng ajax
+            $.ajax({
+                url: '/Admin/NhanVien/ThemMoi',
+                type: 'POST',
+                data: {
+                    ten: ten,
+                    gt: gt,
+                    ns: ns,
+                    cv: cv,
+                    sdt: sdt,
+                    usernv:usernv,
+                    passnv:passnv,
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert("Thêm nhân viên mới thành công");
+                        $('#allDS').load('/Admin/NhanVien/AllDS');
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', "button[name='delete']", function () {
+            var id = $(this).data('ma-nv');
+            if (confirm("Bạn thực sự muốn xóa nhân viên này?")) {
+                // dùng ajax để xóa lớp được chọn
+                $.ajax({
+                    url: '/Admin/NhanVien/Xoa',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        if (data.code == 200) {
+                            alert(data.msg);
+                            $('#allDS').load('/Admin/NhanVien/AllDS');
+                        } else {
+                            alert(data.msg);
+                        }
+                    }
+                })
+            }
+        });
+
+        $(document).on('click', "button[name='view']", function () {
+            var id = $(this).data('ma-nv');
+            Chitietnv(id);
+            $('#addNV').hide();
+            $('#editNV').hide();
+            $('#Title').text("Thông tin chi tiết nhân viên");
+            $('#ten').prop("readonly", true);
+            $('#gt').prop("disabled", true);
+            $('#ns').prop("readonly", true);
+            $('#cv').prop("readonly", true);
+            $('#sdt').prop("readonly", true);
+            $('#usernv').prop("readonly", true);
+            $('#passnv').prop("readonly",true);
+            $('#addNVModal').modal('show');
+        });
+
+        function addLeadingZero(number) {
+            return number < 10 ? '0' + number : number;
+        }
+
+        function Chitietnv(id) {
+            $.ajax({
+                url: '/Admin/NhanVien/ChiTiet',
+                type: 'get',
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    console.log(data);
+                    if (data.code == 200) {
+                        $('#ten').val(data.nv.tenNv);
+                        $('#cv').val(data.nv.chucvu);
+                        $('#sdt').val(data.nv.sdt);
+                        $("#gt").val(data.nv.gioitinh);
+                        $('#usernv').val(data.nv.tendangnhap);
+                        
+                        var nsDate = new Date(data.nv.ngaysinh);
+                        var formattedDate = nsDate.getFullYear() + '-' + addLeadingZero(nsDate.getMonth() + 1) + '-' + addLeadingZero(nsDate.getDate());
+                        $("#ns").val(formattedDate);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        var id;
+
+        $(document).on('click', "button[name='edit']", function () {
+            id = $(this).data('ma-nv');
+            Chitietnv(id);
+            $('#Title').text('Chỉnh sửa thông tin');
+            $('#addNV').hide();
+            $('#editNV').show();
+            $('#addNVModal').modal('show');
+        });
+
+        $('#editNV').click(function () {
+            let ten = $('#ten').val();
+            let gt = $('#gt').val();
+            let ns = $('#ns').val();
+            let cv = $('#cv').val();
+            let sdt = $('#sdt').val();
+            let usernv = $('#usernv').val();
+            let passnv = $('#passnv').val();
+            $.ajax({
+                url: '/Admin/NhanVien/Edit',
+                type: 'POST',
+                data: {
+                    id: id,
+                    ten: ten,
+                    gt: gt,
+                    ns: ns,
+                    cv: cv,
+                    sdt: sdt,
+                    usernv: usernv,
+                    passnv: passnv,
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert("Cập nhật nhân viên thành công");
+                        $('#allDS').load('/Admin/NhanVien/AllDS');
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        });
+
+        $('#addNVModal').on('hidden.bs.modal', function () {
+            $('#Title').text('Thêm nhân viên mới');
+
+            $('#addNV').show();
+            $('#editNV').hide();
+            // Xóa giá trị của các ô input khi modal được đóng
+            $('#ten').val('');
+            $('#ns').val('');
+            $('#cv').val('');
+            $('#sdt').val('');
+            $('#usernv').val('');
+            $('#passnv').val('');
+
+            // Bỏ thuộc tính readonly để cho phép ghi dữ liệu
+            $('#ten').prop("readonly", false);
+            $('#gt').prop("disabled", false);
+            $('#ns').prop("readonly", false);
+            $('#cv').prop("readonly", false);
+            $('#sdt').prop("readonly", false);
+            $('#usernv').prop("readonly", false);
+            $('#passnv').prop("readonly", false);
+        });
+
+    </script>
+}
+

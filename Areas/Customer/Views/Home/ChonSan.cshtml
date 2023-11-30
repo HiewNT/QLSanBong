@@ -1,0 +1,348 @@
+﻿@model QLSanBong.Models.SanBong
+
+@{
+    ViewData["Title"] = "ChonSan";
+    Layout = "~/Areas/Customer/Views/Shared/_KH2.cshtml";
+    <style>
+        label{
+            color: white;
+            
+        }
+    </style>
+}
+
+<!-- Detail Start -->
+<div class="container py-5">
+    <div class="row pt-5">
+        <div class="col-lg-8">
+            <div class="d-flex flex-column text-left mb-3">
+                <p class="section-title pr-5">
+                    <span class="pr-2">Chi tiết sân bóng</span>
+                </p>
+                <h1 class="mb-3">Sân bóng: @Model.TenSb</h1>
+                <div class="d-flex">
+                    <p class="mr-3">
+                        <i class="fa fa-star text-primary"></i> 5
+                    </p>
+                    <p class="mr-3"><i class="fa fa-comments text-primary"></i> 15 đánh giá</p>
+                    <p class="mr-3"><i class="fa fa-map-marker text-primary"></i> @Model.DiaChi</p>
+                </div>
+            </div>
+            <div class="mb-5">
+                <img class="img-fluid rounded w-100 mb-4"
+                     src="@Model.Hinhanh"
+                     alt="Image" />
+                <p>@Model.Ghichu</p>
+                
+            </div>
+            <h3 class="mb-4">Tìm kiếm sân trống</h3>
+            <div class="container" style="background-color:#22b3c1; border-radius:10px">
+                    <form method="get">
+                        <div class="row">
+                           
+                                <div class="col-lg-4">
+                                    <input type="hidden" id="id" name="id" value="@Model.MaSb">
+                                    <div class="form-group">
+                                        <label for="dayOrder" class="form-label">Ngày đặt</label>
+                                        <input type="date" class="form-control border border-primary" id="dayOrder">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="timeStart" class="form-label">Thời gian bắt đầu</label>
+                                        <select id="timeStart" class="form-control">
+                                            <option value="05:00">05:00</option>
+                                            <option value="06:30">06:30</option>
+                                            <option value="08:00">08:00</option>
+                                            <option value="14:00">14:00</option>
+                                            <option value="15:30">15:30</option>
+                                            <option value="17:00">17:00</option>
+                                            <option value="18:30">18:30</option>
+                                            <option value="20:00">20:00</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="timeEnd" class="form-label">Thời gian kết thúc</label>
+                                        <select id="timeEnd" class="form-control">
+                                            <option value="06:30">06:30</option>
+                                            <option value="08:00">08:00</option>
+                                            <option value="09:30">09:30</option>
+                                            <option value="15:30">15:30</option>
+                                            <option value="17:00">17:00</option>
+                                            <option value="18:30">18:30</option>
+                                            <option value="20:00">20:00</option>
+                                            <option value="21:30">21:30</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-2" style="margin-top:32px">
+                                    <button type="button" class="btn btn-outline-warning" id="searchButton">
+                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        
+                    </form>
+               
+            </div>
+            <div style="margin:10px"></div>
+            <div id="allST"></div>
+
+        @*    <!-- Comment List -->
+            <div class="mb-5">
+                <h2 class="mb-4">3 Comments</h2>
+                <div class="media mb-4">
+                    <img src="~/img/users.png"
+                         alt="Image"
+                         class="img-fluid rounded-circle mr-3 mt-1"
+                         style="width: 45px" />
+                    <div class="media-body">
+                        <h6>
+                            John Doe <small><i>01 Jan 2045 at 12:00pm</i></small>
+                        </h6>
+                        <p>
+                            Diam amet duo labore stet elitr ea clita ipsum, tempor labore
+                            accusam ipsum et no at. Kasd diam tempor rebum magna dolores
+                            sed sed eirmod ipsum. Gubergren clita aliquyam consetetur
+                            sadipscing, at tempor amet ipsum diam tempor consetetur at
+                            sit.
+                        </p>
+                        <button class="btn btn-sm btn-light">Reply</button>
+                    </div>
+                </div>
+                <div class="media mb-4">
+                    <img src="img/user.jpg"
+                         alt="Image"
+                         class="img-fluid rounded-circle mr-3 mt-1"
+                         style="width: 45px" />
+                    <div class="media-body">
+                        <h6>
+                            John Doe <small><i>01 Jan 2045 at 12:00pm</i></small>
+                        </h6>
+                        <p>
+                            Diam amet duo labore stet elitr ea clita ipsum, tempor labore
+                            accusam ipsum et no at. Kasd diam tempor rebum magna dolores
+                            sed sed eirmod ipsum. Gubergren clita aliquyam consetetur
+                            sadipscing, at tempor amet ipsum diam tempor consetetur at
+                            sit.
+                        </p>
+                        <button class="btn btn-sm btn-light">Reply</button>
+                        <div class="media mt-4">
+                            <img src="img/user.jpg"
+                                 alt="Image"
+                                 class="img-fluid rounded-circle mr-3 mt-1"
+                                 style="width: 45px" />
+                            <div class="media-body">
+                                <h6>
+                                    John Doe <small><i>01 Jan 2045 at 12:00pm</i></small>
+                                </h6>
+                                <p>
+                                    Diam amet duo labore stet elitr ea clita ipsum, tempor
+                                    labore accusam ipsum et no at. Kasd diam tempor rebum
+                                    magna dolores sed sed eirmod ipsum. Gubergren clita
+                                    aliquyam consetetur, at tempor amet ipsum diam tempor at
+                                    sit.
+                                </p>
+                                <button class="btn btn-sm btn-light">Reply</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comment Form -->
+            <div class="bg-light p-5">
+                <h2 class="mb-4">Leave a comment</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" class="form-control" id="name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" class="form-control" id="email" />
+                    </div>
+                    <div class="form-group">
+                        <label for="website">Website</label>
+                        <input type="url" class="form-control" id="website" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message"
+                                  cols="30"
+                                  rows="5"
+                                  class="form-control"></textarea>
+                    </div>
+                    <div class="form-group mb-0">
+                        <input type="submit"
+                               value="Leave Comment"
+                               class="btn btn-primary px-3" />
+                    </div>
+                </form>
+            </div>*@
+        </div>
+
+        <div class="col-lg-4 mt-5 mt-lg-0">
+            <!-- Author Bio -->
+                <div id="map">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.649793342786!2d105.78431471488373!3d21.04669418598872!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab2d88bb4195%3A0x3006e474cce20274!2zSOG7jWMgdmnhu4duIEvhu7kgdGh14bqtdCBRdcOibiBz4bux!5e0!3m2!1svi!2s!4v1670420855037!5m2!1svi!2s" width="100%" height="550px" frameborder="0" style="border:0; border-radius: 23px; " allowfullscreen=""></iframe>
+            </div>
+            <!-- Category List -->
+            <div class="mb-5">
+                <h2 class="mb-4 ml-3">Related Post</h2>
+                <div class="owl-carousel post-carousel position-relative">
+                    
+                    <div class="d-flex align-items-center bg-light shadow-sm rounded overflow-hidden mx-3">
+                        <img class="img-fluid"
+                             src="img/post-1.jpg"
+                             style="width: 80px; height: 80px" />
+                        <div class="pl-3">
+                            <h5 class="">Diam amet eos at no eos</h5>
+                            <div class="d-flex">
+                                <small class="mr-3"><i class="fa fa-user text-primary"></i> Admin</small>
+                                <small class="mr-3">
+                                    <i class="fa fa-folder text-primary"></i> Web
+                                    Design
+                                </small>
+                                <small class="mr-3"><i class="fa fa-comments text-primary"></i> 15</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center bg-light shadow-sm rounded overflow-hidden mx-3">
+                        <img class="img-fluid"
+                             src="img/post-2.jpg"
+                             style="width: 80px; height: 80px" />
+                        <div class="pl-3">
+                            <h5 class="">Diam amet eos at no eos</h5>
+                            <div class="d-flex">
+                                <small class="mr-3"><i class="fa fa-user text-primary"></i> Admin</small>
+                                <small class="mr-3">
+                                    <i class="fa fa-folder text-primary"></i> Web
+                                    Design
+                                </small>
+                                <small class="mr-3"><i class="fa fa-comments text-primary"></i> 15</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center bg-light shadow-sm rounded overflow-hidden mx-3">
+                        <img class="img-fluid"
+                             src="img/post-3.jpg"
+                             style="width: 80px; height: 80px" />
+                        <div class="pl-3">
+                            <h5 class="">Diam amet eos at no eos</h5>
+                            <div class="d-flex">
+                                <small class="mr-3"><i class="fa fa-user text-primary"></i> Admin</small>
+                                <small class="mr-3">
+                                    <i class="fa fa-folder text-primary"></i> Web
+                                    Design
+                                </small>
+                                <small class="mr-3"><i class="fa fa-comments text-primary"></i> 15</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          @*  <!-- Plain Text -->
+            <div>
+                <h2 class="mb-4">Plain Text</h2>
+                Aliquyam sed lorem stet diam dolor sed ut sit. Ut sanctus erat ea
+                est aliquyam dolor et. Et no consetetur eos labore ea erat voluptua
+                et. Et aliquyam dolore sed erat. Magna sanctus sed eos tempor rebum
+                dolor, tempor takimata clita sit et elitr ut eirmod.
+            </div>*@
+        </div>
+    </div>
+</div>
+<!-- Detail End -->
+
+@section scripts{
+    <script src="~/js/notify.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Xử lý sự kiện khi click vào nút "Tìm sân trống"
+            $('#searchButton').click(function () {
+                var id = $('#id').val();
+                var dayOrder = $('#dayOrder').val();
+                var timeStart = $('#timeStart').val();
+                var timeEnd = $('#timeEnd').val();
+                $.get('/Customer/Home/AllSTbyID', { id: id, dayOrder: dayOrder, timeStart: timeStart, timeEnd: timeEnd }, function (data) {
+                    $('#allST').html(data);
+                });
+            });
+        });
+        // Lấy phần tử select cho timeStart và timeEnd
+        const timeStartSelect = document.getElementById("timeStart");
+        const timeEndSelect = document.getElementById("timeEnd");
+
+        initialTimeStartValue = timeStartSelect.value;
+        initialTimeEndValue = timeEndSelect.value;
+        // Hàm xử lý thay đổi thời gian
+        function handleTimeChange() {
+            // Lấy giá trị timeStart và timeEnd từ các select
+            const timeStartValue = timeStartSelect.value;
+            const timeEndValue = timeEndSelect.value;
+
+            // Chuyển đổi giá trị thành số để so sánh
+            const startTime = parseInt(timeStartValue.replace(":", ""));
+            const endTime = parseInt(timeEndValue.replace(":", ""));
+
+            // Kiểm tra điều kiện
+            if (startTime >= endTime) {
+                alert("Thời gian bắt đầu phải trước thời gian kết thúc.");
+
+                timeStartSelect.value = initialTimeStartValue;
+                timeEndSelect.value = initialTimeEndValue;
+                // Thực hiện xử lý khi điều kiện không đúng (nếu cần)
+            } else {
+                initialTimeStartValue = timeStartSelect.value;
+                initialTimeEndValue = timeEndSelect.value;
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            // Lấy phần tử input có ID là "dayOrder"
+            const dayOrderInput = document.getElementById("dayOrder");
+
+            // Kiểm tra xem dayOrderInput có tồn tại và có giá trị là null không
+            if (dayOrderInput && dayOrderInput.value === "") {
+                // Nếu dayOrderInput tồn tại và giá trị là null (trống)
+                // Đặt giá trị của nó thành ngày hiện tại
+                const currentDate = new Date();
+                const year = currentDate.getFullYear();
+                const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+                const day = currentDate.getDate().toString().padStart(2, "0");
+                const formattedDate = `${year}-${month}-${day}`;
+
+                // Gán giá trị cho dayOrderInput
+                dayOrderInput.value = formattedDate;
+            }
+        });
+
+      
+        // Hàm để định dạng ngày thành "yyyy-MM-dd" (định dạng của trường date)
+        function formatDate(date) {
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+
+            // Đảm bảo hiển thị "0" trước ngày và tháng nếu cần
+            if (day < 10) {
+                day = "0" + day;
+            }
+            if (month < 10) {
+                month = "0" + month;
+            }
+
+            return year + "-" + month + "-" + day;
+        }
+
+
+    </script>
+}

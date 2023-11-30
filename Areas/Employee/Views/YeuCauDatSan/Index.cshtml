@@ -1,0 +1,739 @@
+﻿@using PagedList;
+@using QLSanBong.Models;
+@model PagedList.IPagedList<YCDSViewModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Employee/Views/Shared/_NVLayOut.cshtml";
+    var ds = ViewBag.paged as PagedList<YCDSViewModel>;
+    int currentCount = ViewBag.CurrentCount;
+    List<int> dsNVDonHang = ViewBag.NVDonHangCn as List<int>;
+    List<int> dsNVKhachHang = ViewBag.NVKhachHangCn as List<int>;
+    List<int> dsNVSanBong = ViewBag.NVSanBongCn as List<int>;
+}
+<div class="container">
+    <h4 class="align-center">Tìm kiếm</h4>
+@using (Html.BeginForm("Index", "YeuCauDatSan", FormMethod.Get, new { id = "searchForm", @class = "d-flex" }))
+{
+    <div class="form-group mr-4">
+        <label for="searchname">Nhập tên khách hàng</label>
+        @Html.TextBox("searchname", null, new { @class = "form-control" })
+    </div>
+    <div class="form-group mr-4">
+        <label for="searchphone">Nhập số điện thoại</label>
+        @Html.TextBox("searchphone", null, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        <label for="searchdatedat">Chọn ngày đặt sân</label>
+        @Html.TextBox("searchdatedat", null, new { @class = "form-control", type = "date" })
+        </div>
+        <div style="margin-top:30px;margin-left:20px">
+    <button type="submit" class="btn btn-primary ml-2">
+            <i class="fas fa-search"></i>
+    </button>
+    </div>
+}
+
+</div>
+<div class="container">
+<table id="showtable" class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên người đặt</th>
+            <th>Số điện thoại</th>
+            <th>Thời gian đặt</th>
+            <th>Phương thức TT</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (ds != null)
+        {
+            foreach (var item in ds)
+            {
+                <tr>
+                    <td>@(currentCount++)</td>
+                    <td>@item.Tennguoidat</td>
+                    <td>@item.Sdt</td>
+                    <td>@String.Format("{0:dd/MM/yyyy HH:mm:ss}", item.Thoigiandat)</td>
+                    <td>@item.Phuongthuctt</td>
+                        <td>
+                            @if (dsNVDonHang != null && dsNVDonHang.Contains(3))
+                            {
+                                <button class="btn btn-light opentable" data-id="@item.Stt" style="width:110px">Chi tiết</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-light openerror" style="width:110px">Chi tiết</button>
+                            }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+</div>
+<!-- Hiển thị thanh phân trang -->
+<div class="row">
+    <div class="col-sm-12 col-md-5">
+        <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
+            Showing @ViewBag.PageStartItem to @ViewBag.PageEndItem of @ViewBag.TotalItemCount entries
+        </div>
+    </div>
+
+    @if (ds!= null && ds.PageCount > 1)
+    {
+        <nav style="float: right; margin-right: 29px;" aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                @if (ds.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <button class="page-link" onclick="changePage(@ds.PageNumber - 1)">Previous</button>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                }
+
+                @if (ds.PageCount > 5)
+                {
+                    @if (ds.PageNumber <= 2)
+                    {
+                        for (var i = 1; i <= 3; i++)
+                        {
+                            if (i == ds.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePage(@ds.PageCount)">@ds.PageCount</button>
+                        </li>
+                    }
+                    else if (ds.PageNumber == 3)
+                    {
+                        for (var i = 1; i <= 4; i++)
+                        {
+                            if (i == ds.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePage(@ds.PageCount)">@ds.PageCount</button>
+                        </li>
+                    }
+                    else if (ds.PageNumber >= ds.PageCount - 1)
+                    {
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePage(1)">1</button>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        for (var i = ds.PageCount - 2; i <= ds.PageCount; i++)
+                        {
+                            if (i == ds.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                    }
+                    else if (ds.PageNumber == ds.PageCount - 2)
+                    {
+
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePage(1)">1</button>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        for (var i = ds.PageCount - 3; i <= ds.PageCount; i++)
+                        {
+                            if (i == ds.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                </li>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePage(1)">1</button>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        @for (var i = Math.Max(1, ds.PageNumber - 1); i <= Math.Min(ds.PageCount, ds.PageNumber + 1); i++)
+                        {
+                            if (i == ds.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                </li>
+                            }
+                        }
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePage(@ds.PageCount)">@ds.PageCount</button>
+                        </li>
+                    }
+                }
+                else if (ds.PageCount == 5)
+                {
+                    @if (ds.PageNumber <= 2)
+                    {
+                        for (var i = 1; i <= 3; i++)
+                        {
+                            if (i == ds.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePage(@ds.PageCount)">@ds.PageCount</button>
+                        </li>
+                    }
+                    else if (ds.PageNumber == 3)
+                    {
+                        for (var i = 1; i <= 5; i++)
+                        {
+                            if (i == ds.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                </li>
+                            }
+                        }
+                    }
+                    else if (ds.PageNumber >= ds.PageCount - 1)
+                    {
+                        <li class="page-item">
+                            <button class="page-link" onclick="changePage(1)">1</button>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        for (var i = ds.PageCount - 2; i <= ds.PageCount; i++)
+                        {
+                            if (i == ds.PageNumber)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" onclick="changePage(@i)">@i</button>
+                                </li>
+                            }
+                        }
+
+                    }
+                }
+                else
+                {
+                    for (var i = 1; i <= ds.PageCount; i++)
+                    {
+                        if (i == ds.PageNumber)
+                        {
+                            <li class="page-item active">
+                                <span class="page-link">@i</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <button class="page-link" onclick="changePage(@i)">@i</button>
+                            </li>
+                        }
+                    }
+                }
+                @if (ds.HasNextPage)
+                {
+                    <li class="page-item">
+                        <button class="page-link" onclick="changePage(@ds.PageNumber + 1)">Next</button>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+<!-- Modal Structure -->
+<div class="modal fade" id="modaltable1" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="Title">Chi tiết yêu cầu</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="showtable1" class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Ngày sử dụng</th>
+                            <th>Giờ bắt đầu</th>
+                            <th>Giờ kết thúc</th>
+                            <th>Mã sân bóng</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addDSmodal" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="Title">Đặt sân</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3 d-none">
+                        <label for="sttds" class="form-label">STT</label>
+                        <input type="number" class="form-control" id="sttds">
+                    </div>
+                    <div class="mb-3">
+                        <label for="tends" class="form-label">Tên người đặt</label>
+                        <input type="text" class="form-control" id="tends" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sdtds" class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" id="sdtds" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="manvds" class="form-label">Mã nhân viên</label>
+                        <input type="text" class="form-control" id="manvds" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ptttds" class="form-label">PT thanh toán</label>
+                        <input type="text" class="form-control" id="ptttds" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ghichuds" class="form-label">Ghi chú</label>
+                        <select class="form-select" id="ghichuds" name="ghichuds">
+                            <option value="Đã thanh toán">Đã thanh toán</option>
+                            <option value="Chưa thanh toán">Chưa thanh toán</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="YCds">Tiếp</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ChitietDSmodal" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="Title">Chi tiết</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="nsdds" class="form-label">Ngày sử dụng</label>
+                        <input type="date" class="form-control" id="nsdds" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="giods" class="form-label">Mã giờ</label>
+                        <input type="text" class="form-control" id="giods" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="giobd" class="form-label">Giờ bắt đầu</label>
+                        <input type="time" class="form-control" id="giobd" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="giokt" class="form-label">Giờ kết thúc</label>
+                        <input type="time" class="form-control" id="giokt" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="masbds" class="form-label">Mã sân bóng</label>
+                        <input type="text" class="form-control" id="masbds" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tiends" class="form-label">Giá tiền</label>
+                        <input type="number" class="form-control" id="tiends" readonly>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="addYCds">Xác nhận</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+                            
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            $(".opentable").click(function () {
+                var stt = $(this).data("id");
+                var dsNVDonHang = dsNVDonHang;
+                // Gửi yêu cầu Ajax để lấy thông tin ChiTietYcd dựa trên Stt
+                $.ajax({
+                    url: '@Url.Action("GetChiTietYcdByStt", "YeuCauDatSan")',
+                    type: 'GET',
+                    data: { stt: stt },
+                    success: function (data) {
+                        console.log(data);
+
+                        // Xóa nội dung cũ của tbody
+                        $("#tableBody").empty();
+
+                        // Tạo hàng mới cho mỗi bản ghi
+                        data.forEach(function (item) {
+                            var newRow = $("<tr>");
+                            var dsNVDonHang = @Html.Raw(Json.Serialize(dsNVDonHang));
+                            // Định dạng ngày tháng năm
+                            var date = new Date(item.ngaysudung);
+                            var formattedDate = (date.getDate() < 10 ? '0' : '') + date.getDate() + '/' + ((date.getMonth() + 1) < 10 ? '0' : '') + (date.getMonth() + 1) + '/' + date.getFullYear();
+
+                            // Thêm cột ngày sử dụng
+                            newRow.append("<td>" + formattedDate + "</td>");
+
+                            // Thêm các cột khác
+                            newRow.append("<td>" + item.giobatdau + "</td>");
+                            newRow.append("<td>" + item.gioketthuc + "</td>");
+                            newRow.append("<td>" + item.maSb + "</td>");
+                                
+                                if (dsNVDonHang != null && dsNVDonHang.includes(2))
+                                {
+                                    newRow.append("<td>" +
+                                    "<button class='btn btn-success accept-btn' data-stt='" + item.stt + "' data-sb='" + item.maSb + "' data-gio='" + item.magio + "' style='width:110px'>Chấp nhận</button>" +
+                                    "</td>");
+                                }
+                                else
+                                {
+                                newRow.append("<td>" +
+                                    "<button class='btn btn-success accepterror' style='width:110px'>Chấp nhận</button>" +
+                                    "</td>");
+                                }
+
+                                if (dsNVDonHang != null && dsNVDonHang.includes(4))
+                                {
+                                    newRow.append("<td>" +
+                                    "<button class='btn btn-danger reject-btn' data-stt='" + item.stt + "' data-sb='" + item.maSb + "' data-gio='" + item.magio + "' style='width:110px'>Từ chối</button>" +
+                                    "</td>");
+                                }
+                                else
+                                {
+                                newRow.append("<td>" +
+                                    "<button class='btn btn-danger rejecterror' style='width:110px'>Từ chối</button>" +
+                                    "</td>");
+                                }
+                            
+
+                            // Thêm hàng vào tbody
+                            $("#tableBody").append(newRow);
+
+                        });
+
+                        // Hiển thị modal
+                        $('#modaltable1').modal('show');
+                    },
+                    error: function () {
+                        // Xử lý lỗi nếu có
+                    }
+                });
+            });
+        });
+
+        
+        $(document).on('click', '.openerror', function () {
+            alert('Bạn không có quyền truy cập chức năng này');
+        });
+
+    </script>
+    <script>
+
+
+        $(document).on('click', '.accepterror', function () {
+            alert('Bạn không có quyền truy cập chức năng này');
+        });
+
+        $(document).on('click', '.rejecterror', function () {
+            alert('Bạn không có quyền truy cập chức năng này');
+        });
+
+        // Xử lý khi nút "Chấp nhận" được nhấn
+        $(document).on('click', '.accept-btn', function () {
+            acceptedRequestId = $(this).data('stt'); // Set the acceptedRequestId variable
+            acceptedRequestgio = $(this).data('gio'); // Set the acceptedRequestId variable
+            acceptedRequestsb = $(this).data('sb'); // Set the acceptedRequestId variable
+
+            var id = acceptedRequestId;
+            var magio = acceptedRequestgio;
+            var masb = acceptedRequestsb;
+            
+            Chitietpds(id,magio,masb);
+            $('#modaltable1').modal('hide');
+            $('#addDSmodal').modal('show');
+        });
+
+        $("#addYCds").click(function () {
+            let sttds=$('#sttds').val();
+            let tends = $('#tends').val();
+            let sdtds = $('#sdtds').val();
+            let masbds = $('#masbds').val();
+            let manvds = $('#manvds').val();
+            let nsdds = $('#nsdds').val();
+            let giods = $('#giods').val();
+            let giobd = $('#giobd').val();
+            let giokt = $('#giokt').val();
+            let tiends = $('#tiends').val();
+            let ptttds = $('#ptttds').val();
+            let ghichuds = $('#ghichuds').val();
+
+            $.ajax({
+                url: '/Employee/YeuCauDatSan/AcceptRequest',
+                type: 'POST',
+                data: {
+                    sttds: sttds,
+                    tends: tends,
+                    sdtds: sdtds,
+                    masbds: masbds,
+                    manvds: manvds,
+                    nsdds: nsdds,
+                    giods: giods,
+                    giobd: giobd,
+                    giokt: giokt,
+                    tiends: tiends,
+                    ptttds: ptttds,
+                    ghichuds: ghichuds,
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert("Đã đặt sân thành công");
+
+                        // Gửi yêu cầu AJAX khác để cập nhật trạng thái
+                        $.ajax({
+                            url: '/Employee/YeuCauDatSan/AcceptRequestYC',
+                            type: 'POST',
+                            data: {
+                                id: acceptedRequestId,
+                                magio: acceptedRequestgio,
+                                masb: acceptedRequestsb
+                            },
+                            success: function (statusData) {
+                                if (statusData.code == 200) {
+                                    // Cập nhật thành công, bạn có thể thực hiện các hành động khác ở đây nếu cần
+                                }
+                            },
+                            error: function () {
+                                alert("Có lỗi xảy ra khi cập nhật trạng thái.");
+                            },
+                            complete: function () {
+                                // Sau khi AJAX hoàn thành, reload trang
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+
+            });
+        });
+        $("#YCds").click(function () {
+            // Ẩn modal `addDSmodal`
+            $('#addDSmodal').modal('hide');
+            // Hiển thị modal `ChitietDSmodal`
+            $('#ChitietDSmodal').modal('show');
+        });
+
+        function Chitietpds(id,magio,masb) {
+            $.ajax({
+                url: '/Employee/YeuCauDatSan/ChitietPds',
+                type: 'GET',
+                data: {
+                    id: id,
+                    magio:magio,
+                    masb:masb
+                },
+                success: function (data) {
+                    console.log(data);
+                    if (data.code == 200) {
+
+                        $('#sttds').val(data.ycds.stt);
+                        $('#tends').val(data.ycds.tennguoidat);
+                        $('#sdtds').val(data.ycds.sdt);
+                        $('#masbds').val(data.ycds.maSb);
+                        $('#ptttds').val(data.ycds.phuongthuctt);
+                        $('#giods').val(data.ycds.magio);
+                        $('#giobd').val(data.ycds.giobatdau);
+                        $('#giokt').val(data.ycds.gioketthuc);
+                        $('#manvds').val(data.manv);
+                        $('#tiends').val(data.giathue.dongia);
+
+
+                        var nsdDate = new Date(data.ycds.ngaysudung);
+                        var nsdformattedDate = nsdDate.getFullYear() + '-' + addLeadingZero(nsdDate.getMonth() + 1) + '-' + addLeadingZero(nsdDate.getDate());
+                        $("#nsdds").val(nsdformattedDate);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function addLeadingZero(number) {
+            return number < 10 ? '0' + number : number;
+        }
+
+        // Xử lý khi nút "Từ chối" được nhấn
+        $(document).on('click', '.reject-btn', function () {
+            var id = $(this).data('stt'); // Set the rejectedRequestId variable
+            var magio = $(this).data('gio'); // Set the rejectedRequestId variable
+            var masb = $(this).data('sb'); // Set the rejectedRequestId variable
+
+            // Gửi yêu cầu Ajax để từ chối  
+            $.ajax({
+                url: '/Employee/YeuCauDatSan/RejectRequest',
+                method: 'POST',
+                data: { id: id, magio: magio, masb: masb },
+                success: function () {
+                    alert("Từ chối yêu câu đặt sân thành công!");
+                    location.reload();
+                },
+                error: function () {
+                    alert("Có lỗi xảy ra khi từ chối yêu cầu.");
+            console.log(id);
+            console.log(magio);
+            console.log(masb);
+                }
+            });
+        });
+
+    </script>
+    <script>
+            function changePage(pageNumber) {
+                // Lấy giá trị từ các trường input
+                var searchName = $("#searchname").val();
+                var searchPhone = $("#searchphone").val();
+                var searchDateDat = $("#searchdatedat").val();
+
+                // Gửi yêu cầu tìm kiếm và chuyển trang đến server
+                $.ajax({
+                    url: '@Url.Action("Index", "YeuCauDatSan")',
+                    type: 'GET',
+                    data: {
+                        searchname: searchName,
+                        searchphone: searchPhone,
+                        searchdatedat: searchDateDat,
+                        page: pageNumber
+                    },
+                    success: function (res) {
+
+                        // Cập nhật URL với các tham số tìm kiếm
+                        var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
+                            '&searchphone=' + encodeURIComponent(searchPhone) +
+                            '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                            '&page=' + pageNumber;
+
+                        // Thay đổi URL trình duyệt mà không làm tải lại trang
+                        window.history.replaceState({}, '', newUrl);
+                    window.location.reload();
+                    },
+                    error: function () {
+                        console.log('Error');
+                    }
+                });
+            }
+    </script>
+
+}

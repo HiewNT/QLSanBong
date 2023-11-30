@@ -1,0 +1,54 @@
+﻿@model IEnumerable<QLSanBong.Models.PhieuDatSan>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Customer/Views/Shared/_KH2.cshtml";
+}
+
+@if(Model.Count() != 0){
+    <div class="container-fluid pt-5">
+        <div class="container pb-3">
+            @foreach (var item in Model)
+            {
+                <div class=" bg-light shadow-sm border-top rounded" style="padding: 30px">
+                    <div class="pl-4">
+                        <h4>Hóa đơn số: @item.MaPds</h4>
+                        <p class="m-0">Người đặt: @item.TenKh</p>
+                        <p class="m-0">Ngày lập hóa đơn: @item.Ngaylap</p>
+                        <p class="m-0">Nhân viên xác nhận: @item.MaNv</p>
+                        <hr />
+                        <input type="hidden" id="soPhieu" value="@item.MaPds"/> 
+                        <button class="btn btn-outline-info" id="xemCT">Chi tiết hóa đơn</button>
+                        <div style="margin:20px"></div>
+                        <div id="ctPhieuDat"></div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+}
+else
+{
+    <div class="container center-block">
+        <h2> Chưa có hóa đơn nào được xác nhận</h2>
+        <div class="clearfix">
+        </div>
+    </div>
+}
+@section scripts{
+    <script src="~/js/notify.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#xemCT').click(function () {
+                var soPhieu = $('#soPhieu').val();
+
+                $.get('/Customer/DatSan/ChiTiet', { soPhieu: soPhieu }, function (data) {
+                    $('#ctPhieuDat').html(data);
+                });
+            });
+
+
+        });
+    </script>
+    }

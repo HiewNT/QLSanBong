@@ -1,0 +1,39 @@
+﻿@model IEnumerable<QLSanBong.Models.NhomNguoiDung>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayOut.cshtml";
+    int count = 1;
+}
+<h2>Danh sách nhóm người dùng</h2>
+<p>
+    <a asp-action="Create">Thêm nhóm người dùng</a>
+</p>
+<div class="container">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>
+                    Tên nhóm
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(count++)</td>
+                    <td>
+                        @item.TenNhom
+                    </td>
+                    <td>
+                        <a href="@Url.Action("PhanQuyen", "PhanQuyen", new { id = item.MaNhom })">Phân Quyền</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

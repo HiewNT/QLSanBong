@@ -1,0 +1,82 @@
+﻿@model IEnumerable<QLSanBong.Models.Santrong2>
+@{
+    int count = 1;
+}
+<div class="container">
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Ngày đặt sân</th>
+            <th>Giờ bắt đầu</th>
+            <th>Giờ kết thúc</th>
+            <th>Giá thuê</th>
+            <th></th>
+           <!--Thêm các cột khác tại đây-->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sb in Model)
+        {
+            <tr>
+                <td>@count</td>
+                <td>@String.Format("{0:dd/MM/yyyy}", sb.Ngaydatsan)</td>
+                <td>@sb.Giobatdau</td>
+                <td>@sb.Gioketthuc</td>
+                <td>@sb.Giatien</td>
+                    <td>
+                        <button class="btn add-to-cart"
+                                data-ma-san="@sb.MaSb"
+                                data-ngay-dat-san="@sb.Ngaydatsan"
+                                data-ma-gio="@sb.Magio" name="dscho">
+                            <i class="fas fa-calendar-alt"></i> Thêm vào danh sách chờ duyệt
+                        </button>
+
+                    </td>
+            </tr>
+count++;
+            }
+            
+    </tbody>
+</table>
+</div>
+
+<script src="~/js/notify.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".add-to-cart").on('click', function () {
+            var masb = $(this).data("ma-san");
+            var ngay = $(this).data("ngay-dat-san");
+            var magio = $(this).data("ma-gio");
+            $.ajax({
+                url: '/Customer/Cart/AddItem',
+                data: {
+                    MaSb: masb,
+                    NgayDat: ngay,
+                    MaGio: magio,
+                },
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success) {
+                        $.notify("Lịch đặt sân này đã được thêm vào danh sách chờ.", "success");
+                        // Cập nhật số lượng ngay sau khi thêm vào giỏ
+                        updateCartItemCount();
+                    } else {
+                        $.notify("Lịch đặt sân này đã có trong danh sách chờ.", "error");
+                    }
+                }
+            });
+        });
+
+        // JavaScript để cập nhật số lượng mục trong giỏ hàng
+        function updateCartItemCount() {
+            $.get('@Url.Action("GetItemCount", "Cart")', function (data) {
+                if (data.success) {
+                    var cartItemCount = data.itemCount;
+                    document.getElementById("cartItemCount").textContent = cartItemCount;
+                }
+            });
+        }
+    });
+</script>

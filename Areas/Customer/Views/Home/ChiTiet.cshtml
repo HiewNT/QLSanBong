@@ -1,0 +1,72 @@
+﻿@model QLSanBong.Models.KhachHang
+
+@{
+    ViewData["Title"] = "ChiTiet";
+    Layout = "~/Areas/Customer/Views/Shared/_KH2.cshtml";
+    List<int> dsKHKhachHang = ViewBag.KHKhachHangCn as List<int>;
+}
+
+
+
+<div class="container">
+    <h2>CHI TIẾT KHÁCH HÀNG</h2>
+    <hr />
+    <div>
+        <dl class="dl-horizontal">
+            <dt>
+                Tên khách hàng
+            </dt>
+
+            <dd>
+                @Model.TenKh
+            </dd>
+
+            <dt>
+                Số điện thoại
+            </dt>
+
+            <dd>
+                @Model.Sdt
+            </dd>
+
+            <dt>
+                Giới tính
+            </dt>
+
+            <dd>
+                @Model.Gioitinh
+            </dd>
+
+            <dt>
+                Địa chỉ
+            </dt>
+
+            <dd>
+                @Model.Diachi
+            </dd>
+
+            <dt>
+                Tên đăng nhập
+            </dt>
+
+            <dd>
+                @Model.Tendangnhap
+            </dd>
+        </dl>
+    </div>
+    <p>
+        <div class="col-md-offset-2 col-md-10">
+        <a href="@Url.Action("CapNhat", "Home", new { id = Model.MaKh })" class="btn btn-success">
+            Sửa thông tin
+        </a>
+        <a href="@Url.Action("Index", "Home", new { id = Model.MaKh })" class="btn btn-danger">
+            Xóa tài khoản
+        </a>
+        </div>
+        <div class="col-md-offset-2 col-md-10" style="margin-top:20px">
+            <a href="@Url.Action("Index","Home")" class="btn btn-outline-info">
+                Trở về
+            </a>
+        </div>
+    </p>
+</div>
