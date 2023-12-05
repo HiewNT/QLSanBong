@@ -2,106 +2,155 @@
 
 @{
     Layout = "_MyLayout2";
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link href="~/css/slide.css" rel="stylesheet">
+
 }
+<style>
+    .carousel-inner img {
+        max-width: 100vw;
+        height: 98vh;
+        margin: auto;
+        transition: opacity 0.5s ease; /* Thêm hiệu ứng chuyển động */
+    }
+
+    #fixed-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(10%, -50%);
+        z-index: 2;
+        background-color: rgba(173, 216, 230, 0); /* Màu nền có độ trong suốt (trong suốt là 0.7) */
+        padding: 20px;
+    }
+
+
+</style>
 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
 
-<div class="container-fluid px-0 px-md-5 mb-5" style="margin-top:85px;background-color:aliceblue">
+@*<div class="container-fluid px-0 px-md-5 mb-5" style="margin-top:85px;background-color:aliceblue">
     <div class="row align-items-center px-3">
         <div class="col-lg-5 text-center text-lg-left">
             <h2 class="display-4 font-weight-bold text-blue text-center">
                 Đem lại những trải nhiệm tốt nhất cho bạn
             </h2>
+            <a href="#orderstadium" class="btn btn-primary mt-1 ml-5 py-3 px-5" id="order">Đặt sân bóng</a>
             <a href="#dssan" class="btn btn-success mt-1 ml-5 py-3 px-5" id="ds">Danh sách sân</a>
-            <a href="#stadium" class="btn btn-primary mt-1 ml-5 py-3 px-5" id="order">Đặt sân bóng</a>
         </div>
         <div class="col-lg-7 text-center text-lg-right">
 
             <div id="khunggia"></div>
         </div>
     </div>
-</div>
-<!-- Header End -->
-
-<div class="container-fluid pt-5" id="orderstadium">
-    <div class="container">
-        <div class="text-center pb-2">
-            <p class="section-title px-5">
-                <span class="px-2">Sân bóng mini</span>
-            </p>
-            <h1 class="mb-4">Đặt sân bóng</h1>
+</div>*@
+<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="2000">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img class="d-block w-100" src="~/img/sb.jpg">
         </div>
-        <div class="container">
-            <form method="get">
-                <div class="row">
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="idSan" class="form-label">Chọn sân</label>
-                            <input type="text" class="form-control border" id="idSan">
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="loai" class="form-label">Loại sân</label>
-                            <select id="loai" class="form-control">
-                                <option value=""></option>
-                                <option value="5">Sân 5</option>
-                                <option value="7">Sân 7</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="dayOrder" class="form-label">Ngày đặt</label>
-                            <input type="date" class="form-control border border-primary" id="dayOrder">
-                        </div>
-                    </div>
-
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="timeStart" class="form-label">Thời gian bắt đầu</label>
-                            <select id="timeStart" class="form-control">
-                                <option value="05:00">05:00</option>
-                                <option value="06:30">06:30</option>
-                                <option value="08:00">08:00</option>
-                                <option value="14:00">14:00</option>
-                                <option value="15:30">15:30</option>
-                                <option value="17:00">17:00</option>
-                                <option value="18:30">18:30</option>
-                                <option value="20:00">20:00</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="timeEnd" class="form-label">Thời gian kết thúc</label>
-                            <select id="timeEnd" class="form-control">
-                                <option value="06:30">06:30</option>
-                                <option value="08:00">08:00</option>
-                                <option value="09:30">09:30</option>
-                                <option value="15:30">15:30</option>
-                                <option value="17:00">17:00</option>
-                                <option value="18:30">18:30</option>
-                                <option value="20:00">20:00</option>
-                                <option value="21:30">21:30</option>
-                            </select>
-
-                        </div>
-                    </div>
-                    <div class="col-md-2" style="margin-top:32px">
-                        <button class="btn btn-primary" id="searchButton" type="button">
-                            <i class="fas fa-search fa-sm"></i>Tìm sân trống
-                        </button>
-                    </div>
-                </div>
-            </form>
+        <!-- Thêm các slide khác nếu cần -->
+    </div> 
+    <div id="fixed-content">
+        <h2 class="display-3 font-weight-bold text-light text-center" style="margin-top:100px">
+            Chuyên nghiệp
+        </h2>
+            <h2 class="display-5 font-weight-bold text-white text-center">
+            Chất lượng tạo nên sự chuyên nghiệp
+        </h2>
+        <div class="d-flex justify-content-between mt-8" style="margin-top:150px">
+            <a href="#orderstadium" class="btn btn-primary font-weight-bold mt-5 py-3 px-5" id="order" style="margin-right: 70px;">ĐẶT SÂN BÓNG</a>
+            <a href="#dssan" class="btn btn-primary font-weight-bold mt-5 py-3 px-5" id="ds" style="margin-left: 70px;">DANH SÁCH SÂN</a>
         </div>
     </div>
+
 </div>
 
+
+<!-- Header End -->
+<section id="orderstadium">
+    <div class="container-fluid pt-5">
+        <div class="container">
+            <div class="text-center pb-2">
+                <p class="section-title px-5">
+                    <span class="px-2">Sân bóng mini</span>
+                </p>
+                <h1 class="mb-4">Đặt sân bóng</h1>
+            </div>
+            <div class="container">
+                <form method="get">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="idSan" class="form-label">Chọn sân</label>
+                                <input type="text" class="form-control border" id="idSan">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="loai" class="form-label">Loại sân</label>
+                                <select id="loai" class="form-control">
+                                    <option value=""></option>
+                                    <option value="5">Sân 5</option>
+                                    <option value="7">Sân 7</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="dayOrder" class="form-label">Ngày đặt</label>
+                                <input type="date" class="form-control border border-primary" id="dayOrder">
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="timeStart" class="form-label">Thời gian bắt đầu</label>
+                                <select id="timeStart" class="form-control">
+                                    <option value="05:00">05:00</option>
+                                    <option value="06:30">06:30</option>
+                                    <option value="08:00">08:00</option>
+                                    <option value="14:00">14:00</option>
+                                    <option value="15:30">15:30</option>
+                                    <option value="17:00">17:00</option>
+                                    <option value="18:30">18:30</option>
+                                    <option value="20:00">20:00</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="timeEnd" class="form-label">Thời gian kết thúc</label>
+                                <select id="timeEnd" class="form-control">
+                                    <option value="06:30">06:30</option>
+                                    <option value="08:00">08:00</option>
+                                    <option value="09:30">09:30</option>
+                                    <option value="15:30">15:30</option>
+                                    <option value="17:00">17:00</option>
+                                    <option value="18:30">18:30</option>
+                                    <option value="20:00">20:00</option>
+                                    <option value="21:30">21:30</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2" style="margin-top:32px">
+                            <button class="btn btn-primary" id="searchButton" type="button">
+                                <i class="fas fa-search fa-sm"></i>Tìm sân trống
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
 <div id="allST"></div>
 <!-- Class Start -->
-<div class="container-fluid pt-5" id="dssan">
+
+<section id="dssan">
+<div class="container-fluid pt-5">
     <div class="container">
         <div class="text-center pb-2">
             <p class="section-title px-5">
@@ -158,13 +207,13 @@
 
 
 <button id="load-more" class="btn btn-primary px-4 mx-auto d-block mb-4">Xem thêm</button>
-
+</section>
 
 <!-- Class End -->
 
-
+<section id="services">
 <!-- Gallery Start -->
-<div class="container-fluid pt-5 pb-3" id="services">
+<div class="container-fluid pt-5 pb-3">
     <div class="container">
         <div class="text-center pb-2">
             <p class="section-title px-5">
@@ -221,7 +270,7 @@
     </div>
 </div>
 <!-- Gallery End -->
-
+</section>
 @section scripts{
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
@@ -607,6 +656,32 @@
                 } else {
                     $('.portfolio-item' + filterValue).show();
                 }
+            });
+        });
+    </script><script>
+        $(document).ready(function () {
+            $("#order").click(function (event) {
+
+                // Lấy vị trí của phần "#orderstadium"
+                var targetOffset = $("#orderstadium").offset().top;
+
+                // Cuộn trang đến vị trí của phần "#orderstadium"
+                $("html, body").animate({
+                    scrollTop: targetOffset
+                }, 800); // 800 là thời gian cuộn (milliseconds), bạn có thể điều chỉnh theo ý muốn
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#ds").click(function (event) {
+                // Lấy vị trí của phần "#orderstadium"
+                var targetOffset = $("#dssan").offset().top;
+
+                // Cuộn trang đến vị trí của phần "#orderstadium"
+                $("html, body").animate({
+                    scrollTop: targetOffset
+                }, 800); // 800 là thời gian cuộn (milliseconds), bạn có thể điều chỉnh theo ý muốn
             });
         });
     </script>

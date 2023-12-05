@@ -84,6 +84,15 @@ namespace QLSanBong.Areas.Customer.Controllers
             ).FirstOrDefault();
             var nv = db.KhachHangs.Find(id);
 
+            string userName = HttpContext.Session.GetString("user");
+            var tenNguoiDung = (
+            from kh in db.KhachHangs
+            join tk in db.TaiKhoans on kh.Tendangnhap equals tk.Username
+            where tk.Username == userName
+            select kh.TenKh
+            ).FirstOrDefault();
+            ViewBag.ten = tenNguoiDung;
+
             ViewBag.KHDonHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLDH").Select(q => q.MaCn).ToList();
             ViewBag.KHKhachHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLKH").Select(q => q.MaCn).ToList();
             ViewBag.KHSanBongCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLS").Select(q => q.MaCn).ToList();
@@ -153,6 +162,14 @@ namespace QLSanBong.Areas.Customer.Controllers
         // đưa ra thông tin sân chọn để đặt
         public IActionResult ChonSan(string id)
         {
+            string userName = HttpContext.Session.GetString("user");
+            var tenNguoiDung = (
+            from kh in db.KhachHangs
+            join tk in db.TaiKhoans on kh.Tendangnhap equals tk.Username
+            where tk.Username == userName
+            select kh.TenKh
+            ).FirstOrDefault();
+            ViewBag.ten = tenNguoiDung;
             var sb = db.SanBongs.Find(id);
             return View(sb);
         }
