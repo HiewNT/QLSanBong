@@ -107,6 +107,7 @@ namespace QLSanBong.Controllers
         }
 
         [HttpPost]
+
         public ActionResult Login(string userName, string password)
         {
             var user = db.TaiKhoans.SingleOrDefault(m => m.Username == userName);
@@ -116,6 +117,7 @@ namespace QLSanBong.Controllers
                 HttpContext.Session.SetString("user", userName);
 
                 if (user.Quyen == "ADMIN")
+
                 {
                     return Json(new { success = true, role = "ADMIN" });
                 }

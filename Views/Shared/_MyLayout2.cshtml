@@ -18,13 +18,7 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
           rel="stylesheet" />
-
-    <!-- Flaticon Font -->
-    <link href="~/lib/flaticon/font/flaticon.css" rel="stylesheet" />
-
-    <!-- Libraries Stylesheet -->
-    <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
-    <link href="~/lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
+          
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="~/css/style.css" rel="stylesheet" />
@@ -37,12 +31,13 @@
             line-height: 1.2;
             color: #00394f;
         }
+
     </style>
 </head>
 
 <body>
     <!-- Navbar Start -->
-    <div class="container-fluid bg-light position-relative shadow">
+    <div class="container-fluid bg-blue position-relative shadow">
         <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0 px-lg-5 fixed-top">
             <a href="@Url.Action("Index","Login")" class="logo">
                 <img src="~/img/logo2.png" />
@@ -55,9 +50,24 @@
             </button>
             <div class="collapse navbar-collapse justify-content-right" id="navbarCollapse">
                 <div class="navbar-nav font-weight-bold mx-auto py-0">
-                    <a href="@Url.Action("Index","Login")" class="nav-item nav-link">Trang chủ</a>
-                    <a href="#services" class="nav-item nav-link" id="dv">Dịch vụ</a>
-                    <a href="#about" class="nav-item nav-link" id="lh">Liên hệ</a>
+                    <!-- Liên kết Trang chủ với icon -->
+                    <a href="@Url.Action("Index", "Login")" class="nav-item nav-link">
+                        <i class="fas fa-home"></i> Trang chủ
+                    </a>
+
+                    <!-- Liên kết Dịch vụ với icon -->
+                    <a href="#services" class="nav-item nav-link" id="dv">
+                        <i class="fas fa-tags"></i> Dịch vụ
+                    </a>
+
+                    <!-- Liên kết Liên hệ với icon -->
+                    <a href="#about" class="nav-item nav-link" id="lh">
+                        <i class="fas fa-envelope"></i> Liên hệ
+                    </a>
+                    <!-- Liên kết Liên hệ với icon -->
+                    <a class="nav-item nav-link" style="cursor:pointer" id="bg">
+                        <i class="fas fa-clipboard"></i> Bảng giá
+                    </a>
                     <div style="margin-top: 30px;margin-left:20px;margin-right:20px">
                         @{
                             var httpContext = ViewContext.HttpContext;
@@ -100,9 +110,15 @@
                             window.addEventListener("load", updateCartItemCount);
                         </script>
                     </div>
-                    
-                    <a class="nav-item nav-link" data-bs-toggle="modal" href="#modalLogin">Đăng nhập</a>
-                    <a class="nav-item nav-link" data-bs-toggle="modal" href="#addKHModal">Đăng kí</a>
+                    <!-- Liên kết Đăng nhập với icon -->
+                    <a class="nav-item nav-link" data-bs-toggle="modal" href="#modalLogin">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    </a>
+
+                    <!-- Liên kết Đăng ký với icon -->
+                    <a class="nav-item nav-link" data-bs-toggle="modal" href="#addKHModal">
+                        <i class="fas fa-user-plus"></i> Đăng ký
+                    </a>
                 </div>
                </div>
         </nav>
@@ -474,12 +490,9 @@
     @*<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>*@
 
     @*<script src="~/lib/easing/easing.min.js"></script>*@
-   <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="~/lib/isotope/isotope.pkgd.min.js"></script>
     @*<script src="~/lib/lightbox/js/lightbox.min.js"></script>*@
 
     <!-- Template Javascript -->
-    <script src="~/js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
 
@@ -544,36 +557,7 @@
         
 
     </script>
-    <script>
-        $(document).ready(function () {
-            $("#order").click(function (event) {
-                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
-
-                // Lấy vị trí của phần "#orderstadium"
-                var targetOffset = $("#orderstadium").offset().top;
-
-                // Cuộn trang đến vị trí của phần "#orderstadium"
-                $("html, body").animate({
-                    scrollTop: targetOffset
-                }, 800); // 800 là thời gian cuộn (milliseconds), bạn có thể điều chỉnh theo ý muốn
-            });
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
-            $("#ds").click(function (event) {
-                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
-
-                // Lấy vị trí của phần "#orderstadium"
-                var targetOffset = $("#dssan").offset().top;
-
-                // Cuộn trang đến vị trí của phần "#orderstadium"
-                $("html, body").animate({
-                    scrollTop: targetOffset
-                }, 800); // 800 là thời gian cuộn (milliseconds), bạn có thể điều chỉnh theo ý muốn
-            });
-        });
-    </script>
+    
     <script>
         $(document).ready(function () {
             $("#dv").click(function (event) {
