@@ -68,12 +68,6 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Index","Home")">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Tổng quan</span>
-                </a>
-            </li>
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -93,7 +87,6 @@
                 }
                 else
                 {
-                    <a id="error" href="#" class="nav-link"> <i class="fas fa-solid fa-users"></i><span>Khách hàng</span></a>
                 }
             </li>
 
@@ -108,7 +101,7 @@
                 }
                 else
                 {
-                    <a id="error1" href="#" class="nav-link"> <i class="fas fa-solid fa-futbol"></i><span>Sân bóng - Đặt sân</span></a>
+                  
                 }
             </li>
 
@@ -130,7 +123,6 @@
                 }
                 else
                 {
-                    <a id="error2" href="#" class="nav-link"> <i class="fas fa-solid fa-tag"></i><span>Yêu cầu đặt sân</span></a>
                 }
             </li>
             <li class="nav-item">
@@ -160,14 +152,13 @@
                     <!-- Topbar -->
                     <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
-                        <!-- Sidebar Toggle (Topbar) -->
-                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                            <i class="fa fa-bars"></i>
-                        </button>
                         <!-- Nav Item - Alerts -->
 
                         <ul class="navbar-nav ml-auto">
+
                             <li class="nav-item dropdown no-arrow mx-2">
+                                @if (dsNVDonHang != null && dsNVDonHang.Contains(1))
+                                {
                                 <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-bell fa-fw"></i>
                                     <!-- Counter - Alerts -->
@@ -185,6 +176,11 @@
                                         }
                                     </span>
                                 </a>
+                                }
+                                else
+                                {
+                                }
+                                
 
                                 <!-- Dropdown - Alerts -->
                                 <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown"">
@@ -309,31 +305,6 @@
             if (currentUrl === linkUrl) {
                 // Nếu trùng, thêm lớp "active" vào mục menu
                 link.parentElement.classList.add('active');
-            }
-        });
-    </script>
-    <script>
-        // JavaScript để xử lý sự kiện click và hiển thị thông báo
-        document.addEventListener('DOMContentLoaded', function () {
-            var errorLink = document.getElementById('error');
-            var error1Link = document.getElementById('error1');
-            var error2Link = document.getElementById('error2');
-
-            if (errorLink) {
-                errorLink.addEventListener('click', function () {
-                    alert('Bạn không có quyền truy cập chức năng này!');
-                });
-            }
-
-            if (error1Link) {
-                error1Link.addEventListener('click', function () {
-                    alert('Bạn không có quyền truy cập chức năng này!');
-                });
-            }
-            if (error2Link) {
-                error2Link.addEventListener('click', function () {
-                    alert('Bạn không có quyền truy cập chức năng này!');
-                });
             }
         });
     </script>

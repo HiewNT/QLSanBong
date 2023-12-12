@@ -14,6 +14,11 @@ namespace QLSanBong.Areas.Customer.Controllers
         public IActionResult Index()
         {
 
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
+
             string userName = HttpContext.Session.GetString("user");
             var tenNguoiDung = (
             from kh in db.KhachHangs

@@ -21,23 +21,23 @@
                         <h3 class="card-title">Quản lý yêu cầu đặt sân</h3>
                     </div>
 
-                    @using (Html.BeginForm("Index", "DatSan", FormMethod.Get, new { id = "searchForm", @class = "d-flex" }))
+                    @using (Html.BeginForm("Index", "DatSan", FormMethod.Get, new { id = "Form", @class = "d-flex" }))
                     {
                         <div class="form-group mr-4">
-                            <label for="searchname">Nhập tên khách hàng</label>
-                            @Html.TextBox("searchname", null, new { @class = "form-control" })
+                            <label for="name">Nhập tên khách hàng</label>
+                            @Html.TextBox("name", null, new { @class = "form-control" })
                         </div>
                         <div class="form-group mr-4">
-                            <label for="searchphone">Nhập số điện thoại</label>
-                            @Html.TextBox("searchphone", null, new { @class = "form-control" })
+                            <label for="phone">Nhập số điện thoại</label>
+                            @Html.TextBox("phone", null, new { @class = "form-control" })
                         </div>
                         <div class="form-group mr-4">
-                            <label for="searchdatedat">Thời gian đặt sân</label>
-                            @Html.TextBox("searchdatedat", null, new { @class = "form-control", type = "date" })
+                            <label for="datedat">Thời gian đặt sân</label>
+                            @Html.TextBox("datedat", null, new { @class = "form-control", type = "date" })
                         </div>
                         <div class="form-group mr-4">
-                            <label for="searchdatesd">Ngày sử dụng sân</label>
-                            @Html.TextBox("searchdatesd", null, new { @class = "form-control", type = "date" })
+                            <label for="datesd">Ngày sử dụng sân</label>
+                            @Html.TextBox("datesd", null, new { @class = "form-control", type = "date" })
                         </div>
                         <div style="margin-top:30px">
                             <button type="submit" class="btn btn-primary ml-2">
@@ -1620,26 +1620,26 @@
     <script>
         function changePageall(pageNumber) {
             // Lấy giá trị từ các trường input
-            var searchName = $("#searchname").val();
-            var searchPhone = $("#searchphone").val();
-            var searchDateDat = $("#searchdatedat").val();
+            var Name = $("#name").val();
+            var Phone = $("#phone").val();
+            var DateDat = $("#datedat").val();
 
             // Gửi yêu cầu tìm kiếm và chuyển trang đến server
             $.ajax({
                 url: '@Url.Action("Index", "DatSan")',
                 type: 'GET',
                 data: {
-                    searchname: searchName,
-                    searchphone: searchPhone,
-                    searchdatedat: searchDateDat,
+                    name: Name,
+                    phone: Phone,
+                    datedat: DateDat,
                     page: pageNumber
                 },
                 success: function (res) {
 
                     // Cập nhật URL với các tham số tìm kiếm
-                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
-                        '&searchphone=' + encodeURIComponent(searchPhone) +
-                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                    var newUrl = window.location.pathname + '?name=' + encodeURIComponent(Name) +
+                        '&phone=' + encodeURIComponent(Phone) +
+                        '&datedat=' + encodeURIComponent(DateDat) +
                         '&pageall=' + pageNumber;
 
                     // Thay đổi URL trình duyệt mà không làm tải lại trang
@@ -1655,26 +1655,26 @@
     <script>
         function changePagexn(pageNumber) {
             // Lấy giá trị từ các trường input
-            var searchName = $("#searchname").val();
-            var searchPhone = $("#searchphone").val();
-            var searchDateDat = $("#searchdatedat").val();
+            var Name = $("#name").val();
+            var Phone = $("#phone").val();
+            var DateDat = $("#datedat").val();
 
             // Gửi yêu cầu tìm kiếm và chuyển trang đến server
             $.ajax({
                 url: '@Url.Action("Index", "DatSan")',
                 type: 'GET',
                 data: {
-                    searchname: searchName,
-                    searchphone: searchPhone,
-                    searchdatedat: searchDateDat,
+                    name: Name,
+                    phone: Phone,
+                    datedat: DateDat,
                     page: pageNumber
                 },
                 success: function (res) {
 
                     // Cập nhật URL với các tham số tìm kiếm
-                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
-                        '&searchphone=' + encodeURIComponent(searchPhone) +
-                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                    var newUrl = window.location.pathname + '?name=' + encodeURIComponent(Name) +
+                        '&phone=' + encodeURIComponent(Phone) +
+                        '&datedat=' + encodeURIComponent(DateDat) +
                         '&pagexn=' + pageNumber;
 
                     // Thay đổi URL trình duyệt mà không làm tải lại trang
@@ -1690,26 +1690,26 @@
     <script>
         function changePagehuy(pageNumber) {
             // Lấy giá trị từ các trường input
-            var searchName = $("#searchname").val();
-            var searchPhone = $("#searchphone").val();
-            var searchDateDat = $("#searchdatedat").val();
+            var Name = $("#name").val();
+            var Phone = $("#phone").val();
+            var DateDat = $("#datedat").val();
 
             // Gửi yêu cầu tìm kiếm và chuyển trang đến server
             $.ajax({
                 url: '@Url.Action("Index", "DatSan")',
                 type: 'GET',
                 data: {
-                    searchname: searchName,
-                    searchphone: searchPhone,
-                    searchdatedat: searchDateDat,
+                    name: Name,
+                    phone: Phone,
+                    datedat: DateDat,
                     page: pageNumber
                 },
                 success: function (res) {
 
                     // Cập nhật URL với các tham số tìm kiếm
-                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
-                        '&searchphone=' + encodeURIComponent(searchPhone) +
-                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                    var newUrl = window.location.pathname + '?name=' + encodeURIComponent(Name) +
+                        '&phone=' + encodeURIComponent(Phone) +
+                        '&datedat=' + encodeURIComponent(DateDat) +
                         '&pagehuy=' + pageNumber;
 
                     // Thay đổi URL trình duyệt mà không làm tải lại trang
@@ -1725,26 +1725,26 @@
     <script>
         function changePageht(pageNumber) {
             // Lấy giá trị từ các trường input
-            var searchName = $("#searchname").val();
-            var searchPhone = $("#searchphone").val();
-            var searchDateDat = $("#searchdatedat").val();
+            var Name = $("#name").val();
+            var Phone = $("#phone").val();
+            var DateDat = $("#datedat").val();
 
             // Gửi yêu cầu tìm kiếm và chuyển trang đến server
             $.ajax({
                 url: '@Url.Action("Index", "DatSan")',
                 type: 'GET',
                 data: {
-                    searchname: searchName,
-                    searchphone: searchPhone,
-                    searchdatedat: searchDateDat,
+                    name: Name,
+                    phone: Phone,
+                    datedat: DateDat,
                     page: pageNumber
                 },
                 success: function (res) {
 
                     // Cập nhật URL với các tham số tìm kiếm
-                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
-                        '&searchphone=' + encodeURIComponent(searchPhone) +
-                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                    var newUrl = window.location.pathname + '?name=' + encodeURIComponent(Name) +
+                        '&phone=' + encodeURIComponent(Phone) +
+                        '&datedat=' + encodeURIComponent(DateDat) +
                         '&pageht=' + pageNumber;
 
                     // Thay đổi URL trình duyệt mà không làm tải lại trang
@@ -1760,26 +1760,26 @@
     <script>
         function changePagecho(pageNumber) {
             // Lấy giá trị từ các trường input
-            var searchName = $("#searchname").val();
-            var searchPhone = $("#searchphone").val();
-            var searchDateDat = $("#searchdatedat").val();
+            var Name = $("#name").val();
+            var Phone = $("#phone").val();
+            var DateDat = $("#datedat").val();
 
             // Gửi yêu cầu tìm kiếm và chuyển trang đến server
             $.ajax({
                 url: '@Url.Action("Index", "DatSan")',
                 type: 'GET',
                 data: {
-                    searchname: searchName,
-                    searchphone: searchPhone,
-                    searchdatedat: searchDateDat,
+                    name: Name,
+                    phone: Phone,
+                    datedat: DateDat,
                     page: pageNumber
                 },
                 success: function (res) {
 
                     // Cập nhật URL với các tham số tìm kiếm
-                    var newUrl = window.location.pathname + '?searchname=' + encodeURIComponent(searchName) +
-                        '&searchphone=' + encodeURIComponent(searchPhone) +
-                        '&searchdatedat=' + encodeURIComponent(searchDateDat) +
+                    var newUrl = window.location.pathname + '?name=' + encodeURIComponent(Name) +
+                        '&phone=' + encodeURIComponent(Phone) +
+                        '&datedat=' + encodeURIComponent(DateDat) +
                         '&pagecho=' + pageNumber;
 
                     // Thay đổi URL trình duyệt mà không làm tải lại trang

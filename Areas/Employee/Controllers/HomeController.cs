@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿    using Microsoft.AspNetCore.Mvc;
 using QLSanBong.Data;
 
 namespace QLSanBong.Areas.Employee.Controllers

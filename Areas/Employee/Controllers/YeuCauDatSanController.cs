@@ -11,8 +11,13 @@ namespace QLSanBong.Areas.Employee.Controllers
     {
         QlsanBongContext db = new QlsanBongContext(); 
         [HttpGet]        
-        public IActionResult Index(string searchname, string searchphone, DateTime? searchdatedat, int page = 1, int pageSize = 5)
+        public IActionResult Index(string searchname, string searchphone, DateTime? searchdatedatmin, DateTime? searchdatedatmax, int page = 1, int pageSize = 5)
         {
+
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
             string userName = HttpContext.Session.GetString("user");
             var tenNguoiDung = (
                 from nv in db.NhanViens
@@ -26,12 +31,13 @@ namespace QLSanBong.Areas.Employee.Controllers
             ViewBag.NVKhachHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 2 && q.MaQuyen == "QLKH").Select(q => q.MaCn).ToList();
             ViewBag.NVSanBongCn = db.NhomQuyenCns.Where(q => q.MaNhom == 2 && q.MaQuyen == "QLS").Select(q => q.MaCn).ToList();
 
-            var query = from yc in db.YeuCauDatSans
+            var query = (from yc in db.YeuCauDatSans
                         join ct in db.ChiTietYcds on yc.Stt equals ct.Stt
                         where ct.TrangThai == "Đang chờ"
                               && (string.IsNullOrEmpty(searchname) || yc.Tennguoidat.Contains(searchname))
                               && (string.IsNullOrEmpty(searchphone) || yc.Sdt.Contains(searchphone))
-                              && (!searchdatedat.HasValue || ct.Ngaysudung.HasValue && ct.Ngaysudung.Value.Date == searchdatedat.Value.Date)
+                              && (!searchdatedatmin.HasValue || yc.Thoigiandat.HasValue && yc.Thoigiandat.Value.Date >= searchdatedatmin.Value.Date)
+                              && (!searchdatedatmax.HasValue || yc.Thoigiandat.HasValue && yc.Thoigiandat.Value.Date <= searchdatedatmax.Value.Date)
                         select new YCDSViewModel
                         {
                             Stt = yc.Stt,
@@ -45,9 +51,9 @@ namespace QLSanBong.Areas.Employee.Controllers
                             MaSb = ct.MaSb,
                             Phuongthuctt = yc.Phuongthuctt,
                             TrangThai = ct.TrangThai
-                        };
+                        }).ToList();
 
-            var uniqueQuery = query.GroupBy(x => x.Stt).Select(g => g.First());
+            var uniqueQuery = query.GroupBy(x => x.Stt).Select(g => g.First()).OrderByDescending(x=>x.Thoigiandat);
 
             var totalItemCount = uniqueQuery.Count();
             var model = uniqueQuery.ToList();
@@ -127,7 +133,7 @@ namespace QLSanBong.Areas.Employee.Controllers
                 where nv.Tendangnhap == userName
                 select nv.MaNv
             ).FirstOrDefault();
-
+            
             var ycds = (from yc in db.YeuCauDatSans
                                     join ct in db.ChiTietYcds on yc.Stt equals ct.Stt
                                     where ct.Magio==magio && ct.MaSb==masb && ct.Stt==id

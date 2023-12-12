@@ -13,8 +13,12 @@ namespace QLSanBong.Areas.Employee.Controllers
         QlsanBongContext db = new QlsanBongContext();
         public IActionResult Index(string searchname, string searchphone,string searchdiachi, int page = 1, int pageSize = 3 )
         {
-
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
             string userName = HttpContext.Session.GetString("user");
+            
             var tenNguoiDung = (
             from nv in db.NhanViens
             join tk in db.TaiKhoans on nv.Tendangnhap equals tk.Username

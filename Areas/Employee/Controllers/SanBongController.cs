@@ -15,6 +15,11 @@ namespace QLSanBong.Areas.Employee.Controllers
         QlsanBongContext db = new QlsanBongContext();
         public IActionResult Index()
         {
+
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
             string userName = HttpContext.Session.GetString("user");
             var tenNguoiDung = (
             from nv in db.NhanViens

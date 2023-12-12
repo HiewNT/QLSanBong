@@ -14,6 +14,11 @@ namespace QLSanBong.Areas.Admin.Controllers
         QlsanBongContext db = new QlsanBongContext();
         public IActionResult Index(string timname, DateTime? timdate, int page = 1, int pageSize = 5)
         {
+
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
             var pds = db.PhieuDatSans.Where(pd => (string.IsNullOrEmpty(timname) || pd.TenKh.Contains(timname)) && (!timdate.HasValue || timdate.Value.Date <= pd.Ngaylap.Value.Date)).ToList();
             // Thực hiện phân trang
             var totalItemCount = pds.Count();

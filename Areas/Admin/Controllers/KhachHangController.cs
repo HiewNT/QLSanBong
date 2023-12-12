@@ -14,6 +14,10 @@ namespace QLSanBong.Controllers
         public IActionResult Index(string searchname, string searchphone, string searchdiachi, int page = 1, int pageSize = 4)
         {
 
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
             var query = (from kh in db.KhachHangs
                          where (string.IsNullOrEmpty(searchname) || kh.TenKh.Contains(searchname))
                           && (string.IsNullOrEmpty(searchphone) || kh.Sdt.Contains(searchphone))

@@ -12,6 +12,11 @@ namespace QLSanBong.Controllers
         QlsanBongContext db = new QlsanBongContext();
         public IActionResult Index()
         {
+
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
             return View();
         }
         public IActionResult AllSB(int page = 1, int pageSize = 3)

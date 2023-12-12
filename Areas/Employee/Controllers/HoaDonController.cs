@@ -10,8 +10,13 @@ namespace QLSanBong.Areas.Employee.Controllers
     public class HoaDonController : Controller
     {
         QlsanBongContext db = new QlsanBongContext();
-        public IActionResult Index(string timname,DateTime? timdate, int page = 1, int pageSize = 5)
+        public IActionResult Index(string timname,DateTime? timdatemin,DateTime? timdatemax, int page = 1, int pageSize = 5)
         {
+
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
             string userName = HttpContext.Session.GetString("user");
             var tenNguoiDung = (
             from nv in db.NhanViens
@@ -33,7 +38,7 @@ namespace QLSanBong.Areas.Employee.Controllers
             ).FirstOrDefault();
 
 
-            var pds = db.PhieuDatSans.Where(pd=>pd.MaNv==manv && (string.IsNullOrEmpty(timname)||pd.TenKh.Contains(timname))&& (!timdate.HasValue || timdate.Value.Date<=pd.Ngaylap.Value.Date)).ToList();
+            var pds = db.PhieuDatSans.Where(pd=>pd.MaNv==manv && (string.IsNullOrEmpty(timname)||pd.TenKh.Contains(timname))&& (!timdatemin.HasValue || timdatemin.Value.Date<=pd.Ngaylap.Value.Date)&& (!timdatemax.HasValue || timdatemax.Value.Date>=pd.Ngaylap.Value.Date)).ToList();
             var totalItemCount = pds.Count();
             var model = pds.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
@@ -51,8 +56,8 @@ namespace QLSanBong.Areas.Employee.Controllers
             ViewBag.Page = page;
             ViewBag.TotalItemCount = totalItemCount;
 
-            int currentCount = (page - 1) * pageSize + 1;
-            ViewBag.CurrentCount = currentCount;
+            int currentCount1 = (page - 1) * pageSize + 1;
+            ViewBag.CurrentCount = currentCount1;
 
             return View(pagedList);
         }

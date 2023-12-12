@@ -14,7 +14,12 @@
         </div>
         <div class="form-group">
             <label for="searchdatedat">Ngày lập hóa đơn</label>
-            @Html.TextBox("timdate", null, new { @class = "form-control", type = "date" })
+            <div class="d-flex">
+                <span class="mx-2 my-1">Từ</span>
+                @Html.TextBox("timdatemin", null, new { @class = "form-control", type = "date" })
+                <span class="mx-2 my-1">đến</span>
+                @Html.TextBox("timdatemax", null, new { @class = "form-control", type = "date" })
+            </div>
         </div>
         <div style="margin-top:30px;margin-left:20px">
             <button type="submit" class="btn btn-primary ml-2">
@@ -342,7 +347,8 @@ else
         function changePagehd(pageNumber) {
             // Lấy giá trị từ các trường input
             var timName = $("#timname").val();
-            var timDate = $("#timdate").val();
+            var timDatemin = $("#timdatemin").val();
+            var timDatemax = $("#timdatemax").val();
 
             // Gửi yêu cầu tìm kiếm và chuyển trang đến server
             $.ajax({
@@ -350,14 +356,16 @@ else
                 type: 'GET',
                 data: {
                     timname: timName,
-                    timdate: timDate,
+                    timdatemin: timDatemin,
+                    timdatemax: timDatemax,
                     page: pageNumber
                 },
                 success: function (res) {
 
                     // Cập nhật URL với các tham số tìm kiếm
                     var newUrl = window.location.pathname + '?timname=' + encodeURIComponent(timName) +
-                        '&timdate=' + encodeURIComponent(timDate) +
+                        '&timdatemin=' + encodeURIComponent(timDatemin) +
+                        '&timdatemax=' + encodeURIComponent(timDatemax) +
                         '&page=' + pageNumber;
 
                     // Thay đổi URL trình duyệt mà không làm tải lại trang

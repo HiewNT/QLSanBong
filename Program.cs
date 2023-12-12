@@ -37,7 +37,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapAreaControllerRoute(
       name: "Employee",
       areaName: "Employee",
-      pattern: "Employee/{controller=Home}/{action=Index}"
+      pattern: "Employee/{controller=YeuCauDatSan}/{action=Index}"
     );
     endpoints.MapControllerRoute(
       name: "areas",

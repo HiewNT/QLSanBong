@@ -12,6 +12,11 @@ namespace QLSanBong.Controllers
         QlsanBongContext db = new QlsanBongContext();
         public IActionResult Index(string searchname, string searchphone, DateTime? searchdatedat, DateTime? searchdatesd, int pagecho = 1, int pageall = 1, int pagexn = 1, int pageht = 1, int pagehuy = 1, int pageSize = 5)
         {
+
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
             string userName = HttpContext.Session.GetString("user");
             var tenNguoiDung = (
             from nv in db.NhanViens
