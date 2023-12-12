@@ -51,7 +51,7 @@ namespace QLSanBong.Areas.Employee.Controllers
                             MaSb = ct.MaSb,
                             Phuongthuctt = yc.Phuongthuctt,
                             TrangThai = ct.TrangThai
-                        }).ToList();
+                        }).OrderByDescending(q => q.Thoigiandat).ToList();
 
             var uniqueQuery = query.GroupBy(x => x.Stt).Select(g => g.First()).OrderByDescending(x=>x.Thoigiandat);
 

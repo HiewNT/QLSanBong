@@ -28,10 +28,10 @@
                     <tr>
                         <td>@item.Id</td>
                         <td>@item.MaSb</td>
-                        <td>@item.NgayDat</td>
+                        <td>@string.Format("{0:dd/MM/yyyy}", item.NgayDat)</td>
                         <td>@item.Giobatdau</td>
                         <td>@item.Gioketthuc</td>
-                        <td>@item.Giatien</td>
+                        <td>@string.Format("{0:N0}", item.Giatien)</td>
                         <td>
                             <button class="btn btn-outline-danger xoayc" data-id="@item.Id">Hủy yêu cầu</button>
                         </td>
@@ -46,7 +46,7 @@
             </table>
            
             <div>
-                <input type="button" value="Xác nhận thông tin" id="gui" class="btn btn-danger" />
+            <input type="button" value="Xác nhận thông tin" id="gui" class="btn btn-danger" />
             </div>
             <div class="d-none" id="thongtinkh">
                 <form action="/Login/AddOrder" method="post" class="row">
@@ -101,17 +101,6 @@
 
 <script>
     $(document).ready(function () {
-        // Xử lý sự kiện khi nhấn vào liên kết "Đặt sân"
-        $(".nav-item.nav-link[href='#services']").click(function (event) {
-            event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
-
-            // Chuyển hướng đến Action "Index" của "Login" và chạy đến phần "#stadium"
-            window.location.href = '@Url.Action("Index", "Login")#services';
-        });
-    });
-</script>
-<script>
-    $(document).ready(function () {
         updateTotalPrice();
         $('.xoayc').click(function () {
             event.preventDefault();
@@ -150,7 +139,11 @@
             }
         }
 
-        document.getElementById("totalPrice").innerText = "Tổng tiền: " + totalPrice + " VNĐ";
-        document.getElementById("totalPriceInput").value = totalPrice;
+        // Convert totalPrice to VNĐ (assuming 1 unit = 1,000 VNĐ)
+        var totalPriceInVND = totalPrice * 1000;
+
+        document.getElementById("totalPrice").innerText = "Tổng tiền: " + totalPriceInVND.toLocaleString() + " VNĐ";
+        document.getElementById("totalPriceInput").value = totalPriceInVND;
     }
+
 </script>

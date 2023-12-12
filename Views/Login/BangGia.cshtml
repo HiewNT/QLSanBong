@@ -1,0 +1,21 @@
+﻿@using QLSanBong.Models;
+@using Microsoft.AspNetCore.Http;
+@using Newtonsoft.Json;
+
+@{
+    Layout = "~/Views/Shared/_MyLayout2.cshtml";
+
+}
+<div class="text-center pb-2">
+    <h1 class="mb-4">Danh sách bảng giá giờ thuê</h1>
+</div>
+<div id="banggia" class="table table-hover table-bordered"></div>
+@section scripts{
+
+    <script>
+
+        $(document).ready(function () {
+            $('#banggia').load('/Login/Khunggia');
+        });
+    </script>
+}

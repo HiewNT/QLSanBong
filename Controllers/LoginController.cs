@@ -91,6 +91,10 @@ namespace QLSanBong.Controllers
             return PartialView("_santrong", sansTrong);
 
         }
+        public IActionResult BangGia()
+        {
+            return View();
+        }
         public IActionResult Khunggia()
         {
             List<GiaGioThue> khunggia = db.GiaGioThues.ToList();
