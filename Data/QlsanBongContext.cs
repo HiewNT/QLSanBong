@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using QLSanBong.Models;
 
@@ -45,28 +43,8 @@ public partial class QlsanBongContext : DbContext
     public virtual DbSet<YeuCauDatSan> YeuCauDatSans { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer("Data Source=hiew\\nthieu;Initial Catalog=QLSanBong;User ID=sa;Encrypt=false;Trusted_Connection=True;TrustServerCertificate=True;");
-    }
-    public void ConfigureServices(IServiceCollection services)
-    {
-        // Cấu hình Authentication
-        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = "/Login/Index"; // Đường dẫn đến trang đăng nhập
-            });
-
-        // Cấu hình Authorization
-        services.AddAuthorization(options =>
-        {
-            options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-        });
-
-        // Các cấu hình và dịch vụ khác
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=hiew\\nthieu;Initial Catalog=QLSanBong;User ID=sa;Encrypt=false;Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -121,6 +99,7 @@ public partial class QlsanBongContext : DbContext
             entity.Property(e => e.Magio)
                 .HasMaxLength(8)
                 .IsUnicode(false);
+            entity.Property(e => e.GhiChu).HasMaxLength(200);
             entity.Property(e => e.GiaTien).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.Ngaysudung).HasColumnType("date");
             entity.Property(e => e.TrangThai).HasMaxLength(50);

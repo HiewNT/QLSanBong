@@ -421,6 +421,29 @@
     </div>
 </div>
 
+<div class="modal fade" id="Tuchoiyc" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="Title">Lý do từ chối</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="lydo" class="form-label">Lý do</label>
+                        <input type="text" class="form-control" id="lydo">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="addlydo">Xác nhận</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="ChitietDSmodal" tabindex="-1" aria-labelledby="Title" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -664,29 +687,34 @@
             return number < 10 ? '0' + number : number;
         }
 
-        // Xử lý khi nút "Từ chối" được nhấn
-        $(document).on('click', '.reject-btn', function () {
-            var id = $(this).data('stt'); // Set the rejectedRequestId variable
-            var magio = $(this).data('gio'); // Set the rejectedRequestId variable
-            var masb = $(this).data('sb'); // Set the rejectedRequestId variable
+        var rejectedRequestId, rejectedRequestgio, rejectedRequestsb; // Đặt biến toàn cục
 
-            // Gửi yêu cầu Ajax để từ chối  
+        $(document).on('click', '.reject-btn', function () {
+            rejectedRequestId = $(this).data('stt');
+            rejectedRequestgio = $(this).data('gio');
+            rejectedRequestsb = $(this).data('sb');
+
+            $('#Tuchoiyc').modal('show');
+        });
+
+        // Xử lý khi nút "Từ chối" được nhấn
+        $(document).on('click', '#addlydo', function () {
+            var lydo = $("#lydo").val();
+            // Gửi yêu cầu Ajax để từ chối
             $.ajax({
                 url: '/Employee/YeuCauDatSan/RejectRequest',
                 method: 'POST',
-                data: { id: id, magio: magio, masb: masb },
+                data: { id: rejectedRequestId, magio: rejectedRequestgio, masb: rejectedRequestsb, lydo: lydo },
                 success: function () {
                     alert("Từ chối yêu câu đặt sân thành công!");
                     location.reload();
                 },
                 error: function () {
                     alert("Có lỗi xảy ra khi từ chối yêu cầu.");
-            console.log(id);
-            console.log(magio);
-            console.log(masb);
-                }
+                },
             });
         });
+
 
     </script>
     <script>

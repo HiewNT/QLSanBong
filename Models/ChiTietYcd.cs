@@ -21,5 +21,7 @@ public partial class ChiTietYcd
 
     public string? TrangThai { get; set; }
 
+    public string? GhiChu { get; set; }
+
     public virtual YeuCauDatSan SttNavigation { get; set; } = null!;
 }

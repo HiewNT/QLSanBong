@@ -100,11 +100,12 @@ namespace QLSanBong.Areas.Employee.Controllers
             return Json(chiTietYcdList);
         }
         [HttpPost]
-        public IActionResult RejectRequest(int id, string magio, string masb)
+        public IActionResult RejectRequest(int id, string magio, string masb,string lydo)
         {
             var request = db.ChiTietYcds.FirstOrDefault(yc => yc.Stt == id && yc.Magio == magio && yc.MaSb == masb);
             if (request != null)
             {
+                request.GhiChu = lydo;
                 request.TrangThai = "Đã hủy";
                 db.SaveChanges();
                 return RedirectToAction("Index");
