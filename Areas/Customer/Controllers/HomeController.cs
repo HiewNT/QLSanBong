@@ -171,6 +171,9 @@ namespace QLSanBong.Areas.Customer.Controllers
             ).FirstOrDefault();
             ViewBag.ten = tenNguoiDung;
             var sb = db.SanBongs.Find(id);
+
+            ViewBag.danhgia = db.DanhGia.Where(s => s.MaSb == id).ToList();
+
             return View(sb);
         }
         // từ thời gian lấy ra danh sách sân chưa ai đặt trên sân đó

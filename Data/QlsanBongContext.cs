@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using QLSanBong.Models;
 
@@ -24,6 +22,8 @@ public partial class QlsanBongContext : DbContext
 
     public virtual DbSet<ChucNang> ChucNangs { get; set; }
 
+    public virtual DbSet<DanhGia> DanhGia{ get; set; }
+
     public virtual DbSet<GiaGioThue> GiaGioThues { get; set; }
 
     public virtual DbSet<KhachHang> KhachHangs { get; set; }
@@ -45,28 +45,8 @@ public partial class QlsanBongContext : DbContext
     public virtual DbSet<YeuCauDatSan> YeuCauDatSans { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer("Data Source=hiew\\nthieu;Initial Catalog=QLSanBong;User ID=sa;Encrypt=false;Trusted_Connection=True;TrustServerCertificate=True;");
-    }
-    public void ConfigureServices(IServiceCollection services)
-    {
-        // Cấu hình Authentication
-        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = "/Login/Index"; // Đường dẫn đến trang đăng nhập
-            });
-
-        // Cấu hình Authorization
-        services.AddAuthorization(options =>
-        {
-            options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-        });
-
-        // Các cấu hình và dịch vụ khác
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=NGUYEN-THUY-QUY\\QUYNH;Initial Catalog=QLSanBong;Encrypt=false;Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,7 +54,7 @@ public partial class QlsanBongContext : DbContext
         {
             entity.HasKey(e => new { e.MaPds, e.Magio, e.MaSb }).HasName("PK__ChiTietP__3AE048CAA0E04E9B");
 
-            entity.ToTable("ChiTietPDS", tb => tb.HasTrigger("UpdateTongTienTrigger"));
+            entity.ToTable("ChiTietPDS");
 
             entity.Property(e => e.MaPds)
                 .HasMaxLength(8)
@@ -145,9 +125,26 @@ public partial class QlsanBongContext : DbContext
                 .HasColumnName("TenCN");
         });
 
+        modelBuilder.Entity<DanhGia>(entity =>
+        {
+            entity.HasKey(e => e.MaLuotDanhGia);
+
+            entity.Property(e => e.MaSb)
+                .HasMaxLength(8)
+                .IsUnicode(false);
+            entity.Property(e => e.NoiDung).HasColumnType("ntext");
+            entity.Property(e => e.TenKh)
+                .HasMaxLength(50)
+                .HasColumnName("TenKH");
+            entity.Property(e => e.ThoiGianGanhGia)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .IsFixedLength();
+        });
+
         modelBuilder.Entity<GiaGioThue>(entity =>
         {
-            entity.HasKey(e => e.Magio).HasName("PK__GiaGioTh__3455403EE3BA3574");
+            entity.HasKey(e => e.Magio).HasName("PK__GiaGioTh__3455403EE4BEB0B1");
 
             entity.ToTable("GiaGioThue");
 
@@ -160,7 +157,7 @@ public partial class QlsanBongContext : DbContext
 
         modelBuilder.Entity<KhachHang>(entity =>
         {
-            entity.HasKey(e => e.MaKh).HasName("PK__KhachHan__2725CF1EE538993A");
+            entity.HasKey(e => e.MaKh).HasName("PK__KhachHan__2725CF1E3D30D14A");
 
             entity.ToTable("KhachHang");
 
@@ -184,12 +181,12 @@ public partial class QlsanBongContext : DbContext
             entity.HasOne(d => d.TendangnhapNavigation).WithMany(p => p.KhachHangs)
                 .HasForeignKey(d => d.Tendangnhap)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__KhachHang__Tenda__4E88ABD4");
+                .HasConstraintName("FK__KhachHang__Tenda__3F466844");
         });
 
         modelBuilder.Entity<NhanVien>(entity =>
         {
-            entity.HasKey(e => e.MaNv).HasName("PK__NhanVien__2725D70A1D7EE5A5");
+            entity.HasKey(e => e.MaNv).HasName("PK__NhanVien__2725D70A805499DB");
 
             entity.ToTable("NhanVien");
 
