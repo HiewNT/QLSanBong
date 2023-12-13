@@ -12,14 +12,14 @@ namespace QLSanBong.Areas.Admin.Controllers
     public class HoaDonController : Controller
     {
         QlsanBongContext db = new QlsanBongContext();
-        public IActionResult Index(string timname, DateTime? timdate, int page = 1, int pageSize = 5)
+        public IActionResult Index(string timname, DateTime? timdatemin,DateTime? timdatemax, int page = 1, int pageSize = 5)
         {
 
             if (HttpContext.Session.GetString("user") == null)
             {
                 return Redirect("~/Login/Index");
             }
-            var pds = db.PhieuDatSans.Where(pd => (string.IsNullOrEmpty(timname) || pd.TenKh.Contains(timname)) && (!timdate.HasValue || timdate.Value.Date <= pd.Ngaylap.Value.Date)).ToList();
+            var pds = db.PhieuDatSans.Where(pd => (string.IsNullOrEmpty(timname) || pd.TenKh.Contains(timname)) && (!timdatemin.HasValue || timdatemin.Value.Date <= pd.Ngaylap.Value.Date) && (!timdatemax.HasValue || timdatemax.Value.Date >= pd.Ngaylap.Value.Date)).ToList();
             // Thực hiện phân trang
             var totalItemCount = pds.Count();
             var model = pds.Skip((page - 1) * pageSize).Take(pageSize).ToList();

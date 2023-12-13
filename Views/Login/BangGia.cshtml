@@ -6,16 +6,154 @@
     Layout = "~/Views/Shared/_MyLayout2.cshtml";
 
 }
-<div class="text-center pb-2">
-    <h1 class="mb-4">Danh sách bảng giá giờ thuê</h1>
-</div>
-<div id="banggia" class="table table-hover table-bordered"></div>
-@section scripts{
+<div style="display:flex">
+    <div style="margin-top:120px" class="col-lg-6">
+        <div class="wpb_wrapper">
+            <h1 class="text-center">SÂN BÓNG ĐÁ CỎ NHÂN TẠO</h1>
+            <p style="text-align: justify;">Sân bóng đá cỏ nhân tạo TH Stadium đầu tư từ năm 2023 với <span style="color: #ff0000;"><strong>01 sân bóng mini 5 người</strong></span> và <span style="color: #ff0000;"><strong>9 sân bóng 7 người</strong></span>, được quản lý bởi Công ty TNHH 2 thành viên QH .</p>
+            <ul>
+                <li style="text-align: justify;">Hệ thống sân bóng đá được đầu tư xây dựng hiện đại, đáp ứng các tiêu chuẩn công nghệ của Châu Âu. Cỏ nhân tạo được nhập khẩu từ Ý và Mỹ&nbsp; với những ưu thế như mềm, độ nẩy thấp, cỏ được trám đều đảm bảo độ chuẩn xác của đường chuyền, lăn…</li>
+                <li style="text-align: justify;">Hệ thống đèn chiếu sáng chuyên dụng, cung cấp đầy đủ ánh sáng cho cá trận bóng sôi động và hào hứng mỗi đêm.</li>
+                <li style="text-align: justify;">Không gian sân bóng rộng rãi, thoáng đãng. Có bãi đỗ xe ô tô và xe máy rộng rãi, mát mẽ, an toàn.</li>
+                <li style="text-align: justify;">Giá cả hợp lý, phù hợp với mọi lứa tuổi có niềm đam mê bóng đá, vị trí nằm ở trung tâm thành phố, lựa chọn hàng đầu cho sân bóng ở thành phố Hà Nội.</li>
+                <li style="text-align: justify;">Bên cạnh đó còn có căng tin cung cấp dịch vụ phục vụ nước giải khát, vui chơi giải trí cho các khách hàng trước và sau khi chơi bóng.</li>
+            </ul>
+            <p style="text-align: justify;">Tất cả đã tạo nên một hệ thống sân thi đấu hiện đại và chất lượng. Đến với <span style="color: green;"><strong>Sân bóng đá mini TH Stadium</strong></span> , các bạn sẽ thấy được sự khác biệt, không gian và tầm nhìn thông thoáng, rộng rãi là điều kiện thích hợp để thi đấu thể thao và giải trí sau một ngày làm việc mệt nhọc.</p>
+            
+            <div class="center-block" style="text-align: center;">
+                <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <span class="d-inline-flex">
+                        <a class="nav-item nav-link btn btn-primary" data-bs-toggle="modal" href="#orderstadium" id="order1">Đặt sân ngay</a>
+                        <a style="margin-left:50px;width:140px" class="btn btn-success" data-bs-toggle="modal" href="#" id="dv">Dịch vụ</a>
+                    </span>
+                </h4>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:120px" class="col-lg-6">
+        <div class="text-center pb-2">
+            <h1 class="text-center">BẢNG GIÁ</h1>
+        </div>
+        <div id="banggia" class="table table-hover" ></div>
 
+        </div>
+</div>
+<hr>
+<!-- Class End -->
+
+<section id="services">
+    <!-- Gallery Start -->
+    <div class="container-fluid pt-5 pb-3">
+        <div class="container">
+            <div class="text-center pb-2">
+                <p class="section-title px-5">
+                    <span class="px-2">Sân bóng mini</span>
+                </p>
+                <h1 class="mb-4">Dịch vụ của chúng tôi</h1>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center mb-2">
+                    <ul class="list-inline mb-4" id="portfolio-flters">
+                        <li class="btn btn-outline-primary m-1 active" data-filter="*">
+                            Tất cả
+                        </li>
+                        <li class="btn btn-outline-primary m-1" data-filter=".first">
+                            Sân bóng
+                        </li>
+                        <li class="btn btn-outline-primary m-1" data-filter=".second">
+                            Dịch vụ
+                        </li>
+                        <li class="btn btn-outline-primary m-1" data-filter=".third">
+                            Khuyến mãi
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row portfolio-container">
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item first">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid w-100" src="~/img/sb.jpg" alt="" style="height:245px" />
+
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item second">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid w-100" src="~/img/9880_softdrinks.jpg" alt="" style="height:245px" />
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item third">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid w-100" src="~/img/chuong_trinh_khuyen_mai-800x560.png" alt="" />
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item second">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid w-100" src="~/img/shop.jpg" alt="" style="height:245px" />
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item second">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid w-100" src="~/img/giuxe.jpg" alt="" style="height:245px" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Gallery End -->
+</section>
+@section scripts{
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Xử lý sự kiện khi nhấn vào liên kết "Đặt sân"
+            $(".nav-item.nav-link[href='#orderstadium']").click(function (event) {
+                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
+                // Chuyển hướng đến Action "Index" của "Login" và chạy đến phần "#stadium"
+                window.location.href = '@Url.Action("Index", "Login")#orderstadium';
+            });
+        });
+    </script>
     <script>
 
         $(document).ready(function () {
             $('#banggia').load('/Login/Khunggia');
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Xử lý sự kiện khi click vào nút trong danh sách portfolio-filters
+            $('#portfolio-flters li').on('click', function () {
+                $('#portfolio-flters li').removeClass('active');
+                $(this).addClass('active');
+
+                var filterValue = $(this).attr('data-filter');
+
+                // Ẩn tất cả các mục portfolio-item
+                $('.portfolio-item').hide();
+
+                // Hiển thị các mục tương ứng với filterValue
+                if (filterValue === '*') {
+                    $('.portfolio-item').show();
+                } else {
+                    $('.portfolio-item' + filterValue).show();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#dv").click(function (event) {
+                // Lấy vị trí của phần "#orderstadium"
+                var targetOffset = $("#services").offset().top;
+
+                // Cuộn trang đến vị trí của phần "#orderstadium"
+                $("html, body").animate({
+                    scrollTop: targetOffset
+                }, 800); // 800 là thời gian cuộn (milliseconds), bạn có thể điều chỉnh theo ý muốn
+            });
         });
     </script>
 }

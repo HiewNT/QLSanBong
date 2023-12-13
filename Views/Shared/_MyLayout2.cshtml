@@ -55,18 +55,12 @@
                         <i class="fas fa-home"></i> Trang chủ
                     </a>
 
-                    <!-- Liên kết Dịch vụ với icon -->
-                    <a href="#services" class="nav-item nav-link" id="dv">
-                        <i class="fas fa-tags"></i> Dịch vụ
-                    </a>
-
                     <!-- Liên kết Liên hệ với icon -->
-                    <a href="#about" class="nav-item nav-link" id="lh">
+                    <a class="nav-item nav-link" style="cursor: pointer" href="@Url.Action("BangGia", "Login")">
+                        <i class="fas fa-info-circle"></i> Thông tin
+                    </a>
+                    <a class="nav-item nav-link" style="cursor: pointer" href="#" onclick="scrollToContact()">
                         <i class="fas fa-envelope"></i> Liên hệ
-                    </a>
-                    <!-- Liên kết Liên hệ với icon -->
-                    <a class="nav-item nav-link" style="cursor:pointer" href="@Url.Action("BangGia", "Login")">
-                        <i class="fas fa-clipboard"></i> Bảng giá
                     </a>
                     <div style="margin-top: 30px;margin-left:20px;margin-right:20px">
                         @{
@@ -274,18 +268,16 @@
     </div>
 
     <!-- Footer Start -->
-    <div id="contact" class="container-fluid bg-secondary text-white px-sm-3 px-md-5">
-        <div class="row pt-5">
-            <div class="col-lg-3 col-md-6 mb-5">
+    <div id="contact" class="container-fluid bg-secondary text-white pt-3">
+        <div class="row pt-3">
+            <div class="col-lg-4 col-md-6 mb-5">
                 <a href=""
                    class="navbar-brand font-weight-bold text-primary m-0 mb-4 p-0"
-                   style="font-size: 40px; line-height: 40px">
-                    <span class="text-white">QL Sân bóng</span>
+                   style="font-size: 40px; line-height: 40px;text-align:center">
+                    <span class="text-primary">SÂN BÓNG MINI</span>
+                    <h4 class="text-white">TH Stadium</h4>
                 </a>
-                <p>
-                    
-                </p>
-                <div class="d-flex justify-content-start mt-4">
+                <div class="d-flex justify-content-start mt-4" style="margin-left:60px">
                     <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
                        style="width: 38px; height: 38px"
                        href="#">
@@ -308,14 +300,13 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-5">
-                <h3 class="text-primary mb-4">Get In Touch</h3>
+            <div class="col-lg-4 col-md-6 mb-5">
                 <div class="d-flex">
                     <h4 class="fa fa-map-marker-alt text-primary"></h4>
                     <div class="pl-3">
                         <h5 class="text-white">Address</h5>
                         <p>236 Hoàng Quốc Việt, Cổ Nhuế 1, Bắc Từ Liêm</p>
-                    </div>
+                    </div>     
                 </div>
                 <div class="d-flex">
                     <h4 class="fa fa-envelope text-primary"></h4>
@@ -328,32 +319,53 @@
                     <h4 class="fa fa-phone-alt text-primary"></h4>
                     <div class="pl-3">
                         <h5 class="text-white">Phone</h5>
-                        <p>+012 345 67890</p>
+                        <p>+84 927 019 126</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <h4 class="fa fa-clock text-primary"></h4>
+                    <div class="pl-3">
+                        <h5 class="text-white">Opening Hours</h5>
+                        <strong>Phục vụ cả tuần:</strong>
+                        <p class="m-0">05:00 AM - 21:30 PM</p>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-5">
-               
-            </div>
-            <div class="col-lg-3 col-md-6 mb-5">
-                <h3 class="text-primary mb-4">Newsletter</h3>
-                <form action="">
-                    <div class="form-group">
+            <div class="col-lg-4 col-md-6 mb-5">
+
+                <form name="sentMessage" id="contactForm" novalidate="novalidate">
+                    <div class="control-group">
                         <input type="text"
-                               class="form-control border-0 py-4"
+                               class="form-control"
+                               id="name"
                                placeholder="Your Name"
-                               required="required" />
+                               required="required"
+                               data-validation-required-message="Please enter your name" />
+                        <p class="help-block text-danger"></p>
                     </div>
-                    <div class="form-group">
+                    <div class="control-group">
                         <input type="email"
-                               class="form-control border-0 py-4"
-                               placeholder="Your Email"
-                               required="required" />
+                               class="form-control"
+                               id="phone"
+                               placeholder="Your Phone"
+                               required="required"
+                               data-validation-required-message="Please enter your phone" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <textarea class="form-control"
+                                  rows="6"
+                                  id="message"
+                                  placeholder="Message"
+                                  required="required"
+                                  data-validation-required-message="Please enter your message"></textarea>
+                        <p class="help-block text-danger"></p>
                     </div>
                     <div>
-                        <button class="btn btn-primary btn-block border-0 py-3"
-                                type="submit">
-                            Submit Now
+                        <button class="btn btn-primary py-2 px-4"
+                                type="submit"
+                                id="sendMessageButton">
+                            Send Message
                         </button>
                     </div>
                 </form>
@@ -391,6 +403,15 @@
     @*<script src="~/lib/easing/easing.min.js"></script>*@
     @*<script src="~/lib/lightbox/js/lightbox.min.js"></script>*@
 
+    <script>
+        function scrollToContact() {
+            var contactSection = document.getElementById('contact');
+
+            if (contactSection) {
+                contactSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
     <!-- Template Javascript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
@@ -441,7 +462,7 @@
                         } else if (data.role === 'KHACHHANG') {
                             window.location.href = '/Customer/Home';
                         } else if (data.role === 'NHANVIEN') {
-                            window.location.href = '/Employee/Home';
+                            window.location.href = '/Employee/YeuCauDatSan';
                         }
                     } else {
                         alert("Sai thông tin đăng nhập");
@@ -457,27 +478,6 @@
 
     </script>
     
-    <script>
-
-        $(document).ready(function () {
-            // Xử lý sự kiện khi nhấn vào liên kết "Đặt sân"
-            $(".nav-item.nav-link[href='#services']").click(function (event) {
-                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
-
-                // Chuyển hướng đến Action "Index" của "Login" và chạy đến phần "#stadium"
-                window.location.href = '@Url.Action("Index", "Login")#services';
-            });
-        });
-        $(document).ready(function () {
-            // Xử lý sự kiện khi nhấn vào liên kết "Đặt sân"
-            $(".nav-item.nav-link[href='#about']").click(function (event) {
-                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
-
-                // Chuyển hướng đến Action "Index" của "Login" và chạy đến phần "#stadium"
-                window.location.href = '@Url.Action("Index", "Login")#about';
-            });
-        });
-    </script>
    
     <script>
         $(document).ready(function () {

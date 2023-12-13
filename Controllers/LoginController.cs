@@ -12,7 +12,7 @@ namespace QLSanBong.Controllers
         public IActionResult Index()
         {
             var sb = db.SanBongs.ToList();
-          
+
             return View(sb);
         }
 
@@ -23,7 +23,7 @@ namespace QLSanBong.Controllers
                  from ggt in db.GiaGioThues
                  where ggt.Giobatdau >= timeStart
                        && ggt.Gioketthuc <= timeEnd
-                       && (idSan == null || sb.MaSb == idSan) 
+                       && (idSan == null || sb.MaSb == idSan)
                        && (string.IsNullOrEmpty(loai) || sb.LoaiSan == loai)
                  select new
                  {
@@ -50,7 +50,7 @@ namespace QLSanBong.Controllers
                     dayOrder,
                     yc.Magio,
                     yc.Giobatdau,
-                    yc.Gioketthuc, 
+                    yc.Gioketthuc,
                     sb.LoaiSan
                 }
             ).Distinct();
@@ -68,7 +68,7 @@ namespace QLSanBong.Controllers
                     dayOrder,
                     yc.Magio,
                     yc.Giobatdau,
-                    yc.Gioketthuc, 
+                    yc.Gioketthuc,
                     sb.LoaiSan
                 }
             ).Distinct();
@@ -98,7 +98,7 @@ namespace QLSanBong.Controllers
         public IActionResult Khunggia()
         {
             List<GiaGioThue> khunggia = db.GiaGioThues.ToList();
-            return PartialView("_khunggia",khunggia);
+            return PartialView("_khunggia", khunggia);
         }
         public IActionResult AllSB()
         {
@@ -141,7 +141,7 @@ namespace QLSanBong.Controllers
         }
 
         [HttpPost]
-        public JsonResult ThemMoi(string name, DateTime day, TimeSpan start,string magio, TimeSpan end, string idstadium, string phoneNumber,string trangthai,string pttt)
+        public JsonResult ThemMoi(string name, DateTime day, TimeSpan start, string magio, TimeSpan end, string idstadium, string phoneNumber, string trangthai, string pttt)
         {
             try
             {
@@ -161,7 +161,7 @@ namespace QLSanBong.Controllers
                 }
 
                 db.YeuCauDatSans.Add(yc);
-                    db.SaveChanges();
+                db.SaveChanges();
                 var ctyc = new ChiTietYcd
                 {
                     Stt = yc.Stt,
@@ -175,8 +175,8 @@ namespace QLSanBong.Controllers
                 };
                 db.ChiTietYcds.Add(ctyc);
                 db.SaveChanges();
-                    return Json(new { code = 200, mgs = "Yêu cầu đặt sân thành công" });
-               
+                return Json(new { code = 200, mgs = "Yêu cầu đặt sân thành công" });
+
             }
             catch (Exception ex)
             {
@@ -331,12 +331,12 @@ namespace QLSanBong.Controllers
         : new List<Cart>();
 
             YeuCauDatSan yc = new YeuCauDatSan();
-                yc.Tennguoidat = name1;
-                yc.Sdt = phoneNumber1;
-                yc.Thoigiandat = DateTime.Now;
-                yc.Phuongthuctt = pttt1;
-                yc.TongTien = totalPrice1;
-            if(pttt1=="Chuyển khoản")
+            yc.Tennguoidat = name1;
+            yc.Sdt = phoneNumber1;
+            yc.Thoigiandat = DateTime.Now;
+            yc.Phuongthuctt = pttt1;
+            yc.TongTien = totalPrice1;
+            if (pttt1 == "Chuyển khoản")
             {
                 yc.GhiChu = "Đã thanh toán";
             }
@@ -345,11 +345,11 @@ namespace QLSanBong.Controllers
                 yc.GhiChu = "Chưa thanh toán";
             }
 
-                db.YeuCauDatSans.Add(yc);
-                db.SaveChanges();
+            db.YeuCauDatSans.Add(yc);
+            db.SaveChanges();
             foreach (Cart item in listCarts)
             {
-               
+
                 ChiTietYcd ctyc = new ChiTietYcd();
                 ctyc.Stt = yc.Stt;
                 ctyc.Ngaysudung = item.NgayDat;
@@ -375,7 +375,7 @@ namespace QLSanBong.Controllers
 
             int itemCount = itemCarts.Count();
 
-            return Json(new { success = true, itemCount = itemCount });
+            return Json(new { success = true, itemCount });
         }
     }
 }

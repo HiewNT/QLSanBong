@@ -6,13 +6,14 @@
     Layout = "~/Views/Shared/_MyLayout2.cshtml";
  
 }
-<div style="margin:100px"></div>
+<div style="margin:125px">
     <div class="container">
-    <div class="text-center pb-2">
-        <h1 class="mb-4">Danh sách chờ</h1>
-    </div>
+    
         @if (ViewBag.ItemCarts != null && ViewBag.ItemCarts.Count > 0)
         {
+            <div class="text-center pb-2">
+        <h1 class="mb-4">Danh sách chờ đặt sân</h1>
+    </div>
             <table class="table table-hover table-bordered">
                 <tr>
                     <th>STT</th>
@@ -75,15 +76,17 @@
         }
         else
         {
-            <div class="center-block">
-                <h2> Chưa có lịch đặt sân nào được thêm</h2>
-                <div class="clearfix">
-                </div>
-            </div>
+        <div class="center-block" style="text-align: center;">
+            <h3 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                Chưa có lịch đặt sân nào được thêm!
+                <a class="nav-item nav-link" data-bs-toggle="modal" href="#orderstadium" id="order1">Đặt sân ngay</a>
+            </h3>
+        </div>
+
         }
     </div>
 
-
+</div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -96,6 +99,16 @@
             $("#thongtinkh").removeClass("d-none");
             $("#gui").addClass("d-none");
         
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        // Xử lý sự kiện khi nhấn vào liên kết "Đặt sân"
+        $(".nav-item.nav-link[href='#orderstadium']").click(function (event) {
+            event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
+            // Chuyển hướng đến Action "Index" của "Login" và chạy đến phần "#stadium"
+            window.location.href = '@Url.Action("Index", "Login")#orderstadium';
+        });
     });
 </script>
 

@@ -12,7 +12,7 @@
     var danhSachDatSan = (from yc in db.YeuCauDatSans
                           join ct in db.ChiTietYcds on yc.Stt equals ct.Stt
                           where ct.TrangThai == "Đang chờ"
-                          select yc).Distinct().ToList();
+                          select yc).Distinct().OrderByDescending(d=>d.Thoigiandat).ToList();
 
     // Gửi danh sách người đặt sân đến view
     ViewBag.DanhSachDatSan = danhSachDatSan;

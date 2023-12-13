@@ -18,6 +18,7 @@ namespace QLSanBong.Areas.Employee.Controllers
                 return Redirect("~/Login/Index");
             }
             string userName = HttpContext.Session.GetString("user");
+            
             var tenNguoiDung = (
             from nv in db.NhanViens
             join tk in db.TaiKhoans on nv.Tendangnhap equals tk.Username

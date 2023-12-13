@@ -61,6 +61,10 @@ namespace QLSanBong.Areas.Employee.Controllers
         public PartialViewResult AllST(DateTime? dayOrder, TimeSpan timeStart, TimeSpan timeEnd)
         {
 
+            ViewBag.NVDonHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 2 && q.MaQuyen == "QLDH").Select(q => q.MaCn).ToList();
+            ViewBag.NVKhachHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 2 && q.MaQuyen == "QLKH").Select(q => q.MaCn).ToList();
+            ViewBag.NVSanBongCn = db.NhomQuyenCns.Where(q => q.MaNhom == 2 && q.MaQuyen == "QLS").Select(q => q.MaCn).ToList();
+
             var sanallQuery = (
                  from sb in db.SanBongs
                  from ggt in db.GiaGioThues

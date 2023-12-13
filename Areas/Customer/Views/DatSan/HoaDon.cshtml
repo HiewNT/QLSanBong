@@ -5,46 +5,50 @@
     Layout = "~/Areas/Customer/Views/Shared/_KH2.cshtml";
 }
 
-@if(Model.Count() != 0){
+@if (Model.Count() != 0)
+{
     <div class="container-fluid pt-5">
-        <div class="container pb-3">
-            @foreach (var item in Model)
-            {
-                <div class=" bg-light shadow-sm border-top rounded" style="padding: 30px">
-                    <div class="pl-4">
-                        <h4>Hóa đơn số: @item.MaPds</h4>
-                        <p class="m-0">Người đặt: @item.TenKh</p>
-                        <p class="m-0">Ngày lập hóa đơn: @item.Ngaylap</p>
-                        <p class="m-0">Nhân viên xác nhận: @item.MaNv</p>
-                        <hr />
-                        <input type="hidden" id="soPhieu" value="@item.MaPds"/> 
-                        <button class="btn btn-outline-info" id="xemCT">Chi tiết hóa đơn</button>
-                        <div style="margin:20px"></div>
-                        <div id="ctPhieuDat"></div>
+        @foreach (var item in Model)
+        {
+            <div style="display:flex" class="container pb-3">
+                <div class="row" style="padding: 0px;margin-left:30px">
+                    <div class="pl-2">
+                        <h5>Hóa đơn số: @item.MaPds</h5>
+                        <p>Người đặt: @item.TenKh</p>
+                        <p>Nhân viên xác nhận: @ViewBag.ten</p>
+                        <p>Tông tiền: @item.TongTien VND</p>
+                        <p class="m-0">Ngày lập hóa đơn: @String.Format("{0:dd/MM/yyyy}",item.Ngaylap)</p>
                     </div>
                 </div>
-            }
-
-        </div>
+                <div style="margin-left:20px">
+                    <input type="hidden" class="soPhieu" value="@item.MaPds" />
+                    <button class="btn btn-outline-info xemCT">Chi tiết hóa đơn</button>
+                    <div style="margin:5px"></div>
+                    <div class="ctPhieuDat"></div>
+                </div>
+            </div>
+            <hr />
+        }
     </div>
 }
 else
 {
     <div class="container center-block">
         <h2> Chưa có hóa đơn nào được xác nhận</h2>
-        <div class="clearfix">
-        </div>
+        <div class="clearfix"></div>
     </div>
+}  </div>
 }
 @section scripts{
     <script src="~/js/notify.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#xemCT').click(function () {
-                var soPhieu = $('#soPhieu').val();
+            $('.xemCT').click(function () {
+                var soPhieu = $(this).siblings('.soPhieu').val();
+                var ctPhieuDat = $(this).siblings('.ctPhieuDat');
 
                 $.get('/Customer/DatSan/ChiTiet', { soPhieu: soPhieu }, function (data) {
-                    $('#ctPhieuDat').html(data);
+                    ctPhieuDat.html(data);
                 });
             });
 
