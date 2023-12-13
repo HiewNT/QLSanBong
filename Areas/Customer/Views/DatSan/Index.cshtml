@@ -35,7 +35,7 @@
                         Trạng thái
                     </th>
                     
-                    <th></th>
+                    <th>Ghi chú</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,7 +59,9 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.TrangThai)
                         </td>
-                        
+                        <td>
+                            @Html.DisplayFor(modelItem=>item.GhiChu)
+                        </td>
                         
                         @if (item.Ngaysudung > DateTime.Now && item.TrangThai == "Đang chờ")
                         {
