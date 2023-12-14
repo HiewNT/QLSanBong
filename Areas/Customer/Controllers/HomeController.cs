@@ -12,7 +12,7 @@ namespace QLSanBong.Areas.Customer.Controllers
         QlsanBongContext db = new QlsanBongContext();
        
         [HttpGet]
-        public IActionResult Index(string tensb, string loaisan, string dc, int page = 1, int pageSize = 3)
+        public IActionResult Index(string tensb, string ls, string dc, int page = 1, int pageSize = 3)
         {
             string userName = HttpContext.Session.GetString("user");
             var tenNguoiDung = (
@@ -34,10 +34,11 @@ namespace QLSanBong.Areas.Customer.Controllers
             var query = (from sb in db.SanBongs
                          where (string.IsNullOrEmpty(tensb) || sb.TenSb.Contains(tensb))
                          && (string.IsNullOrEmpty(dc) || sb.DiaChi.Contains(dc))
+                         && (string.IsNullOrEmpty(ls) || sb.LoaiSan.Contains(ls))
                          select sb).ToList();
 
             // Thực hiện phân trang
-            var totalItemCount = query.Count();
+                    var totalItemCount = query.Count();
             var model = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             if (model.Count == 0)
@@ -58,16 +59,6 @@ namespace QLSanBong.Areas.Customer.Controllers
             ViewBag.CurrentCount = currentCount;
 
             return View(pagedList);
-            //var totalItemCount = sbQuery.Count();
-            //var model = sbQuery.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-            //var pagedList = new StaticPagedList<SanBong>(model, page, pageSize, totalItemCount);
-
-            //// Truyền dữ liệu phân trang, kết quả tìm kiếm và các thông tin tùy chọn vào view
-            //ViewBag.PageStartItem = (page - 1) * pageSize + 1;
-            //ViewBag.PageEndItem = Math.Min(page * pageSize, totalItemCount);
-            //ViewBag.Page = page;
-            //ViewBag.TotalItemCount = totalItemCount;
-            //return View(pagedList);
         }
         public ActionResult Logout()
         {

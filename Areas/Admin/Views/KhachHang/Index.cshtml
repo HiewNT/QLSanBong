@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayOut.cshtml";
-    int currentCount = ViewBag.CurrentCount;
+    int currentCount = ViewBag.CurrentCount ?? 0;
 }
 
 <div class="container">

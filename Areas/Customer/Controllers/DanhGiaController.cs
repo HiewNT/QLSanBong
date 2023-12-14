@@ -14,6 +14,11 @@ namespace QLSanBong.Areas.Customer.Controllers
         }
         public IActionResult DanhGia(string maSb, DateTime ngaySudung, TimeSpan gioBatDau, TimeSpan gioKetThuc, decimal giaTien)
         {
+
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                return Redirect("~/Login/Index");
+            }
             ViewBag.sb = db.SanBongs.Find(maSb);
 
             string userName = HttpContext.Session.GetString("user");

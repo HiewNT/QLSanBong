@@ -39,7 +39,10 @@ namespace QLSanBong.Areas.Employee.Controllers
             ).FirstOrDefault();
 
 
-            var pds = db.PhieuDatSans.Where(pd=>pd.MaNv==manv && (string.IsNullOrEmpty(timname)||pd.TenKh.Contains(timname))&& (!timdatemin.HasValue || timdatemin.Value.Date<=pd.Ngaylap.Value.Date)&& (!timdatemax.HasValue || timdatemax.Value.Date>=pd.Ngaylap.Value.Date)).ToList();
+            var pds = db.PhieuDatSans.Where(pd=>pd.MaNv==manv 
+                                            && (string.IsNullOrEmpty(timname)||pd.TenKh.Contains(timname))
+                                            && (!timdatemin.HasValue ||timdatemin.Value.Date<=pd.Ngaylap.Value.Date)
+                                            && (!timdatemax.HasValue ||timdatemax.Value.Date>=pd.Ngaylap.Value.Date)).ToList();
             var totalItemCount = pds.Count();
             var model = pds.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 

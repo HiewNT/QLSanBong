@@ -12,15 +12,16 @@
 }
 <div class="container">
     <h4 class="align-center">Tìm kiếm</h4>
+
 @using (Html.BeginForm("Index", "YeuCauDatSan", FormMethod.Get, new { id = "Form", @class = "d-flex" }))
 {
     <div class="form-group mr-4">
         <label for="name">Nhập tên khách hàng</label>
-        @Html.TextBox("name", null, new { @class = "form-control" })
+        @Html.TextBox("searchname", null, new { @class = "form-control" })
     </div>
     <div class="form-group mr-4">
         <label for="phone">Nhập số điện thoại</label>
-        @Html.TextBox("phone", null, new { @class = "form-control" })
+        @Html.TextBox("searchphone", null, new { @class = "form-control" })
         </div>
 
         <div class="form-group">
@@ -720,8 +721,8 @@
     <script>
             function changePage(pageNumber) {
                 // Lấy giá trị từ các trường input
-                var Name = $("#name").val();
-                var Phone = $("#phone").val();
+                var Name = $("#searchname").val();
+                var Phone = $("#searchphone").val();
                 var DateDatmin = $("#datedatmin").val();
                 var DateDatmax = $("#datedatmax").val();
 
@@ -741,8 +742,8 @@
                         // Cập nhật URL với các tham số tìm kiếm
                         var newUrl = window.location.pathname + '?name=' + encodeURIComponent(Name) +
                             '&phone=' + encodeURIComponent(Phone) +
-                            '&datedatmin=' + encodeURIComponent(DateDatmin) +
-                            '&datedatmax=' + encodeURIComponent(DateDatmax) +
+                            '&datmin=' + encodeURIComponent(DateDatmin) +
+                            '&datmax=' + encodeURIComponent(DateDatmax) +
                             '&page=' + pageNumber;
 
                         // Thay đổi URL trình duyệt mà không làm tải lại trang

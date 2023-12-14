@@ -1,4 +1,14 @@
-﻿@{
+﻿@using QLSanBong.Models;
+@using Microsoft.AspNetCore.Http;
+@using Newtonsoft.Json;
+
+@{
+    Layout = "~/Areas/Customer/Views/Shared/_KH2.cshtml";
+    List<int> dsKHDonHang = ViewBag.KHDonHangCn as List<int>;
+}
+
+
+@{
     var sb = ViewBag.sb;
     var ngay = ViewBag.ngay;
     var gioBD = ViewBag.gioBD;
@@ -6,31 +16,31 @@
     var gia = ViewBag.gia;
 }
 
-<h2>Đánh giá sử dụng sân bóng</h2>
+<h2 class="text-center" style="margin:50px">Đánh giá sử dụng sân bóng</h2>
 
-<div class="containe">
+<div class="container">
     
         <div class="form-group row">
-            <div class="col-4">
-                <label>@sb.MaSb</label>
-                <img class="img-fluid rounded w-100 mb-4"
+        <div style="text-align:center"  class="col-lg-6">
+                <img class="img-fluid rounded w-60 mb-3"
                      src="@sb.Hinhanh"
-                     alt="Image" />
+                 alt="Image" />
+                <h4 class="text-primary">@sb.TenSb</h4>
             </div>
-            <div class="col-6">
-                <label>Thời gian sử dụng: Từ @gioBD - @gioKT ngày @ngay.ToString("dd/MM/yyyy")</label>
-                <label>Nguời đặt: @ViewBag.ten</label>
+            <div class="col-lg-6" style="font-size:20px">
+                <p>Thời gian sử dụng: Từ <strong>@gioBD - @gioKT</strong> ngày <strong>@ngay.ToString("dd/MM/yyyy")</strong></p>
+                <p>Người đặt:<strong style="color:cadetblue"> @ViewBag.ten</strong></p>
+            <form asp-action="DanhGia" method="post">
+                <input type="hidden" value="@sb.MaSb" name="masb" />
+                <input type="hidden" value="@ViewBag.ten" name="ten" />
+                <div class="form-group">
+                    <label>Nội dung đánh giá:</label>
+                    <textarea class="form-control" name="danhgia" rows="6"></textarea>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Gửi" />
+            </form>
             </div>
 
         </div>
-    <form asp-action="DanhGia" method="post">
-        <input type="hidden" value="@sb.MaSb" name="masb" />
-        <input type="hidden" value="@ViewBag.ten" name="ten" />
-        <div class="form-group row">
-            <label>Nội dung đánh giá:</label>
-            <input type="text" class="form-control" name="danhgia" />
-        </div>
-        <input type="submit" class="btn btn-primary" value="Gửi" />
-    </form>
  
 </div>

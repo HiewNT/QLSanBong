@@ -36,8 +36,8 @@ namespace QLSanBong.Areas.Employee.Controllers
                         where ct.TrangThai == "Đang chờ"
                               && (string.IsNullOrEmpty(searchname) || yc.Tennguoidat.Contains(searchname))
                               && (string.IsNullOrEmpty(searchphone) || yc.Sdt.Contains(searchphone))
-                              && (!searchdatedatmin.HasValue || yc.Thoigiandat.HasValue && yc.Thoigiandat.Value.Date >= searchdatedatmin.Value.Date)
-                              && (!searchdatedatmax.HasValue || yc.Thoigiandat.HasValue && yc.Thoigiandat.Value.Date <= searchdatedatmax.Value.Date)
+                              && (!searchdatedatmin.HasValue ||  yc.Thoigiandat.Value.Date >= searchdatedatmin.Value.Date)
+                              && (!searchdatedatmax.HasValue || yc.Thoigiandat.Value.Date <= searchdatedatmax.Value.Date)
                         select new YCDSViewModel
                         {
                             Stt = yc.Stt,

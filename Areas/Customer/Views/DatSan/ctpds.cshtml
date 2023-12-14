@@ -12,7 +12,6 @@
                 <th>Giờ bắt đầu</th>
                 <th>Giờ kết thúc</th>
                 <th>Giá tiền</th>
-                <th>Ghi chú</th>
                 <!--Thêm các cột khác tại đây-->
                 <th></th>
             </tr>
@@ -27,11 +26,8 @@
                     <td>@sb.Giobatdau</td>
                     <td>@sb.Gioketthuc</td>
                     <td>@sb.Giatien</td>
-                    <td>@sb.Ghichu</td>
                     <td>
-                        @if (sb.Ngaysudung < DateTime.Today)
-                        {
-                            <a href="@Url.Action("DanhGia", "DanhGia", new
+                        <a href="@Url.Action("DanhGia", "DanhGia", new
                                 {
                                     maSb = sb.MaSb,
                                     ngaySudung = sb.Ngaysudung, 
@@ -39,10 +35,9 @@
                                     gioKetThuc = sb.Gioketthuc,
                                     giaTien = sb.Giatien
                                 })"
-                               class="btn btn-primary mt-2 py-2 px-4">
+                               class="btn btn-primary" style="width:100px">
                                 Đánh giá
                             </a>
-                        }
                     </td>
                 </tr>
                 count++;
