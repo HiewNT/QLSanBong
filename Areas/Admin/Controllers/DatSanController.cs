@@ -21,7 +21,7 @@ namespace QLSanBong.Controllers
             ).FirstOrDefault();
             ViewBag.ten = tenNguoiDung;
 
-            var queryall = from yc in db.YeuCauDatSans
+            var queryall = (from yc in db.YeuCauDatSans
                            join ct in db.ChiTietYcds on yc.Stt equals ct.Stt
                            where (string.IsNullOrEmpty(searchname) || yc.Tennguoidat.Contains(searchname))
                               && (string.IsNullOrEmpty(searchphone) || yc.Sdt.Contains(searchphone))
@@ -41,7 +41,7 @@ namespace QLSanBong.Controllers
                                MaSb = ct.MaSb,
                                Phuongthuctt = yc.Phuongthuctt,
                                TrangThai = ct.TrangThai
-                           };
+                           }).OrderByDescending(qr=>qr.Thoigiandat);
 
             var querycho = queryall.Where(x => x.TrangThai == "Đang chờ");
             var queryxn = queryall.Where(x => x.TrangThai == "Đã xác nhận");
