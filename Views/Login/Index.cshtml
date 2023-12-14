@@ -281,18 +281,6 @@
                 dayOrderInput.value = formattedDate;
             }
         });
-        // Khi nút "Sign up" được nhấn
-        $("#themKH1").on("click", function () {
-            // Đóng modalLogin
-            $("#modalOrder").modal("hide");
-            // Mở addKHModal
-            $("#addKHModal").modal("show");
-        }); $("#themKH2").on("click", function () {
-            // Đóng modalLogin
-            $("#modalLogin").modal("hide");
-            // Mở addKHModal
-            $("#addKHModal").modal("show");
-        });
 
         $(document).on('click', "button[name='order']", function () {
             var maSan = this.getAttribute('data-ma-san');

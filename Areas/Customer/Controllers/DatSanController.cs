@@ -28,6 +28,11 @@ namespace QLSanBong.Areas.Customer.Controllers
             ).FirstOrDefault();
             ViewBag.ten = tenNguoiDung;
 
+
+            ViewBag.KHDonHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLDH").Select(q => q.MaCn).ToList();
+            ViewBag.KHKhachHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLKH").Select(q => q.MaCn).ToList();
+            ViewBag.KHSanBongCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLS").Select(q => q.MaCn).ToList();
+
             var sdt = (
             from kh in db.KhachHangs
             join tk in db.TaiKhoans on kh.Tendangnhap equals tk.Username
@@ -73,6 +78,8 @@ namespace QLSanBong.Areas.Customer.Controllers
             ViewBag.ten = tenNguoiDung;
 
             ViewBag.KHDonHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLDH").Select(q => q.MaCn).ToList();
+            ViewBag.KHKhachHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLKH").Select(q => q.MaCn).ToList();
+            ViewBag.KHSanBongCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLS").Select(q => q.MaCn).ToList();
 
             if (HttpContext.Session.GetString("user") == null)
             {
@@ -88,6 +95,10 @@ namespace QLSanBong.Areas.Customer.Controllers
         {
             var ctpds = db.ChiTietPds.Where(n => n.MaPds == soPhieu);
             return PartialView("ctpds", ctpds);
+
+            ViewBag.KHDonHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLDH").Select(q => q.MaCn).ToList();
+            ViewBag.KHKhachHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLKH").Select(q => q.MaCn).ToList();
+            ViewBag.KHSanBongCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLS").Select(q => q.MaCn).ToList();
         }
         
     }

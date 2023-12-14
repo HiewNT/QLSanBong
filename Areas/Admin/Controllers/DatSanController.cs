@@ -12,11 +12,6 @@ namespace QLSanBong.Controllers
         QlsanBongContext db = new QlsanBongContext();
         public IActionResult Index(string searchname, string searchphone, DateTime? searchdatedat, DateTime? searchdatesd, int pagecho = 1, int pageall = 1, int pagexn = 1, int pageht = 1, int pagehuy = 1, int pageSize = 5)
         {
-
-            if (HttpContext.Session.GetString("user") == null)
-            {
-                return Redirect("~/Login/Index");
-            }
             string userName = HttpContext.Session.GetString("user");
             var tenNguoiDung = (
             from nv in db.NhanViens
@@ -26,7 +21,7 @@ namespace QLSanBong.Controllers
             ).FirstOrDefault();
             ViewBag.ten = tenNguoiDung;
 
-            var queryall = (from yc in db.YeuCauDatSans
+            var queryall = from yc in db.YeuCauDatSans
                            join ct in db.ChiTietYcds on yc.Stt equals ct.Stt
                            where (string.IsNullOrEmpty(searchname) || yc.Tennguoidat.Contains(searchname))
                               && (string.IsNullOrEmpty(searchphone) || yc.Sdt.Contains(searchphone))
@@ -46,7 +41,7 @@ namespace QLSanBong.Controllers
                                MaSb = ct.MaSb,
                                Phuongthuctt = yc.Phuongthuctt,
                                TrangThai = ct.TrangThai
-                           }).OrderByDescending(q=>q.Thoigiandat);
+                           };
 
             var querycho = queryall.Where(x => x.TrangThai == "Đang chờ");
             var queryxn = queryall.Where(x => x.TrangThai == "Đã xác nhận");

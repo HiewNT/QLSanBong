@@ -161,6 +161,11 @@ namespace QLSanBong.Areas.Customer.Controllers
             select kh.TenKh
             ).FirstOrDefault();
             ViewBag.ten = tenNguoiDung;
+
+            ViewBag.KHDonHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLDH").Select(q => q.MaCn).ToList();
+            ViewBag.KHKhachHangCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLKH").Select(q => q.MaCn).ToList();
+            ViewBag.KHSanBongCn = db.NhomQuyenCns.Where(q => q.MaNhom == 3 && q.MaQuyen == "QLS").Select(q => q.MaCn).ToList();
+
             var sb = db.SanBongs.Find(id);
 
             ViewBag.danhgia = db.DanhGia.Where(s => s.MaSb == id).ToList();
