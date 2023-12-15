@@ -19,7 +19,7 @@ namespace QLSanBong.Controllers
             }
             return View();
         }
-        public IActionResult AllSB(int page = 1, int pageSize = 3)
+        public IActionResult AllSB(int page = 1, int pageSize = 6)
         {
             var query = db.SanBongs.AsQueryable();
             var totalItemCount = query.Count();

@@ -6,6 +6,7 @@
     int currentCount = ViewBag.CurrentCount ?? 0;
 }
 <div class="container">
+    <h3>Danh sách hóa đơn đặt sân</h3>
     @using (Html.BeginForm("Index", "HoaDon", FormMethod.Get, new { id = "searchForm", @class = "d-flex" }))
     {
         <div class="form-group mr-4">

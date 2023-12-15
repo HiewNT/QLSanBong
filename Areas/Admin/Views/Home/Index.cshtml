@@ -1,3 +1,185 @@
-﻿@{
-    Layout = "~/Areas/Admin/Views/Shared/_AdminLayOut.cshtml";
+﻿@using QLSanBong.Models;
+@using System.Text.Json;
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayOut.cshtml"; 
+    var doanhThuTheoThang = ViewBag.DoanhThuTheoThang as List<DoanhThuThang>;
+    var thangLabels = doanhThuTheoThang.Select(result => result.Thang).ToArray();
+    var doanhThuData = doanhThuTheoThang.Select(result => result.DoanhThu).ToArray();
+
+    var luotdatsan = ViewBag.luotdatsan as List<LuotDatSan>;
+    var ldsData = luotdatsan.Select(result => result.SoLuotDat).ToArray();
+    var san = luotdatsan.Select(result => result.MaSB).ToArray();
+}
+
+
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xxs font-weight-bold text-primary text-uppercase mb-1">
+                                Tổng doanh thu
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.Tongdoanhthu VND</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xxs font-weight-bold text-success text-uppercase mb-1" style="width:190px">
+                                Doanh thu tháng @ViewBag.thanght
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" style="width:170px">
+                                @ViewBag.TongdoanhthuThisMonth VND
+                            </div>
+                        </div>
+                        <div class="h6 font-weight-bold col ml-0" style="color: @(ViewBag.phantram.Contains("-") ? "red" : "green");margin-top:30px">(@ViewBag.phantram)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xxs font-weight-bold text-info text-uppercase mb-1">
+                                Tổng lượt đặt
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.Tonghoadon</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Pending Requests Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xxs font-weight-bold text-warning text-uppercase mb-1">
+                                Lượt đặt tháng @ViewBag.thanght
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" style="width:170px">
+                                @ViewBag.hdthang
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- Area Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Doanh thu</h6>
+                
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="doanhThuChart" ></canvas>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Lượt đặt sân</h6>
+                
+                </div>
+                <!-- Card Body -->
+                <div class="card-body" style="width:400px; height:352px">
+                    <div class="chart-pie" style="display: flex; justify-content: center; align-items: center">
+                        <canvas id="luotDatSanChart"></canvas>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+        <script src="https://cdn.jsdelivr.net/npm/chart.js" ></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('doanhThuChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(JsonSerializer.Serialize(thangLabels)),
+                    datasets: [{
+                        label: 'Doanh thu theo tháng',
+                        data: @Html.Raw(JsonSerializer.Serialize(doanhThuData)),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('luotDatSanChart').getContext('2d');
+            var myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: @Html.Raw(JsonSerializer.Serialize(san)),
+                    datasets: [{
+                        data: @Html.Raw(JsonSerializer.Serialize(ldsData)),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(255, 206, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)',
+                            'rgba(153, 102, 255, 0.5)',
+                            'rgba(255, 159, 64, 0.5)',
+                            'rgba(50, 205, 50, 0.5)',
+                            'rgba(255, 0, 0, 0.5)',
+                            'rgba(0, 255, 0, 0.5)',
+                            'rgba(0, 0, 255, 0.5)',
+                            // Add more colors if needed
+                        ],
+                    }],
+                },
+            });
+        });
+    </script>
 }

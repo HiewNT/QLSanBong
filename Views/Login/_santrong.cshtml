@@ -58,42 +58,144 @@
 </div>
 
 
-<script src="~/js/notify.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $(".add-to-cart").on('click', function () {
-            var masb = $(this).data("ma-san");
-            var ngay = $(this).data("ngay-dat-san");
-            var magio = $(this).data("ma-gio");
-            $.ajax({
-                url: '/Login/AddItem',
-                data: {
-                    MaSb: masb,
-                    NgayDat: ngay,
-                    MaGio: magio,
-                },
-                type: 'POST',
-                dataType: 'json',
-                success: function (data) {
-                    if (data.success) {
-                        $.notify("Lịch đặt sân này đã được thêm vào danh sách chờ.", "success");
-                        // Cập nhật số lượng ngay sau khi thêm vào giỏ
-                        updateCartItemCount();
-                    } else {
-                        $.notify("Lịch đặt sân này đã có trong danh sách chờ.", "error");
+    <script src="~/js/notify.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".add-to-cart").on('click', function () {
+                var masb = $(this).data("ma-san");
+                var ngay = $(this).data("ngay-dat-san");
+                var magio = $(this).data("ma-gio");
+                $.ajax({
+                    url: '/Login/AddItem',
+                    data: {
+                        MaSb: masb,
+                        NgayDat: ngay,
+                        MaGio: magio,
+                    },
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success) {
+                            $.notify("Lịch đặt sân này đã được thêm vào danh sách chờ.", "success");
+                            // Cập nhật số lượng ngay sau khi thêm vào giỏ
+                            updateCartItemCount();
+                        } else {
+                            $.notify("Lịch đặt sân này đã có trong danh sách chờ.", "error");
+                        }
                     }
-                }
+                });
             });
-        });
 
-        // JavaScript để cập nhật số lượng mục trong giỏ hàng
-        function updateCartItemCount() {
-            $.get('@Url.Action("GetItemCount", "Login")', function (data) {
-                if (data.success) {
-                    var cartItemCount = data.itemCount;
-                    document.getElementById("cartItemCount").textContent = cartItemCount;
-                }
-            });
-        }
+            // JavaScript để cập nhật số lượng mục trong giỏ hàng
+            function updateCartItemCount() {
+                $.get('@Url.Action("GetItemCount", "Login")', function (data) {
+                    if (data.success) {
+                        var cartItemCount = data.itemCount;
+                        document.getElementById("cartItemCount").textContent = cartItemCount;
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+    $(document).on('click', "button[name='order']", function () {
+        var maSan = this.getAttribute('data-ma-san');
+        var ngayDatSan = this.getAttribute('data-ngay-dat-san');
+        var gioBatDau = this.getAttribute('data-gio-bat-dau');
+        var gioKetThuc = this.getAttribute('data-gio-ket-thuc');
+        // Chuyển đổi giá trị ngày từ datetime sang date
+        var ngayDatSanDate = new Date(ngayDatSan);
+        var ngayDatSanFormatted = formatDate(ngayDatSanDate);
+        magiods = this.getAttribute('data-ma-gio');
+        $('#idstadium').val(maSan);
+        $('#day').val(ngayDatSanFormatted);
+        $('#start').val(gioBatDau);
+        $('#end').val(gioKetThuc);
     });
-</script>
+    // Sự kiện khi modal bị ẩn (đóng)
+    $('#modalOrder').on('hidden.bs.modal', function (e) {
+        // Đặt giá trị của các trường "userName" và "phoneNumber" về chuỗi rỗng
+        $('#name').val("");
+        $('#phoneNumber').val("");
+    });
+
+
+    // Hàm để định dạng ngày thành "yyyy-MM-dd" (định dạng của trường date)
+    function formatDate(date) {
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+
+        // Đảm bảo hiển thị "0" trước ngày và tháng nếu cần
+        if (day < 10) {
+            day = "0" + day;
+        }
+        if (month < 10) {
+            month = "0" + month;
+        }
+
+        return year + "-" + month + "-" + day;
+    }
+    var magiods;
+    let lastSearch = {}
+    $('#addYC').click(function () {
+        let name = $('#name').val();
+        let phoneNumber = $('#phoneNumber').val();
+        let day = $('#day').val();
+        let start = $('#start').val();
+        let end = $('#end').val();
+        let magio = magiods;
+        let idstadium = $('#idstadium').val();
+        let pttt = $('#pttt').val();
+        // thêm ràng buộc dữ liệu
+        if (name.length == 0 || phoneNumber.length == 0) {
+            alert("Vui lòng nhập đầy đủ dữ liệu");
+            return;
+        }
+
+        lastSearch = {
+            dayOrder: $('#dayOrder').val(),
+            timeStart: $('#timeStart').val(),
+            timeEnd: $('#timeEnd').val(),
+            idSan: $('#idSan').val(),
+            loai: $('#loai').val(),
+        };
+
+        // dùng ajax
+        $.ajax({
+            url: '/Login/ThemMoi',
+            type: 'POST',
+            data: {
+                name: name,
+                day: day,
+                start: start,
+                end: end,
+                magio: magio,
+                phoneNumber: phoneNumber,
+                idstadium: idstadium,
+                trangthai: 'Đang chờ',
+                pttt: pttt,
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    alert("Yêu cầu đặt sân thành công");
+                    $('#modalOrder').modal('hide');
+                    loadAllST(lastSearch);
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+    });
+    </script>
+    <script>
+    $("#themKH1").on("click", function () {
+        // Đóng modalLogin
+        $("#modalLogin").modal("hide");
+        // Mở addKHModal
+        $("#addKHModal").modal("show");
+    });
+    $("#order").on("click", function () {
+        $("#modalOrder").modal("show");
+    });
+    </script>

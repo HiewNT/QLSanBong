@@ -12,7 +12,6 @@ namespace QLSanBong.Controllers
         public IActionResult Index()
         {
             var sb = db.SanBongs.ToList();
-
             return View(sb);
         }
 
@@ -234,6 +233,15 @@ namespace QLSanBong.Controllers
             {
                 return Json(new { code = 500, mgs = "Đăng ký khách hàng mới thất bại. Lỗi: " + ex.Message });
             }
+        }
+
+        public IActionResult ChonSan(string id)
+        {
+            var sb = db.SanBongs.Find(id);
+
+            ViewBag.danhgia = db.DanhGia.Where(s => s.MaSb == id).ToList();
+
+            return View(sb);
         }
 
         public IActionResult Cart()
