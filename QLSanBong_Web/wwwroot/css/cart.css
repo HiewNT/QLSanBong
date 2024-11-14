@@ -1,0 +1,97 @@
+﻿.cart-container {
+    max-width: 100%;
+    width: 95%;
+    margin: 5vh auto 0 auto;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex; /* Sử dụng Flexbox */
+    flex-direction: column; /* Xếp theo cột */
+    position: relative; /* Đặt vị trí relative cho container */
+}
+
+
+.cart-title {
+    text-align: center;
+    font-size: 2.5rem; /* Tăng kích thước font tương đối */
+    color: #333;
+    margin-top: 1.3rem; /* Sử dụng rem thay vì px cho margin */
+}
+
+.cart-table {
+    width: 100%; /* Chiều rộng 100% cho bảng */
+    border-collapse: collapse;
+    margin-bottom: 2rem; /* Sử dụng rem thay vì px cho margin */
+}
+
+.cart-table th, .cart-table td {
+    padding: 1.2rem; /* Sử dụng rem thay vì px cho padding */
+    text-align: left;
+    font-size: 1.1rem; /* Sử dụng rem cho font-size */
+    border-bottom: 0.1rem solid #ddd; /* Dùng rem thay vì px cho border-bottom */
+}
+
+.cart-table th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.cart-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.cart-table tbody td {
+    vertical-align: middle; /* Căn giữa nội dung theo chiều dọc */
+}
+
+
+.clear-cart {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 0.5rem; /* Sử dụng rem cho border-radius */
+    transition: background-color 0.3s;
+    padding: 8px 16px; /* Điều chỉnh kích thước của nút */
+    font-size: 16px; /* Giảm kích thước chữ */
+    align-self: flex-end; /* Căn nút vào bên phải */
+    margin-bottom: 20px; /* Tạo khoảng cách với tiêu đề */
+}
+
+.clear-cart:hover {
+    background-color: #c0392b; /* Đổi màu khi hover */
+}
+
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+}
+
+
+/* Giảm kích thước của span */
+.small-span {
+    width: 12rem; /* Cho phép ô span tự động điều chỉnh chiều rộng */
+}
+
+/* Căn chỉnh các phần tử theo chiều ngang */
+.d-flex {
+    display: flex;
+    align-items: center; /* Căn chỉnh các phần tử theo chiều dọc giữa */
+}
+
+/* Căn chỉnh các phần tử trong mỗi dòng */
+.row {
+    margin-bottom: 1rem; /* Thêm khoảng cách giữa các dòng */
+}
+
+.btn-small {
+    font-size: auto; /* Kích thước chữ nhỏ */
+    padding: 0.4rem 1rem; /* Điều chỉnh padding để nút nhỏ hơn */
+    height: auto;
+}
+
+

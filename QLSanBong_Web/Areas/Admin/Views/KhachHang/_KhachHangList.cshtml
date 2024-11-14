@@ -1,0 +1,287 @@
+﻿<table id="khachHangTable" class="table table-striped table-bordered display" style="width:100%">
+    <thead class="thead-dark">
+        <tr>
+            <th style="width: 8%; text-align: center;">Mã KH</th>
+            <th style="width: 18%; text-align: center;">Họ Tên</th>
+            <th style="width: 10%; text-align: center;">SĐT</th>
+            <th style="width: 8%; text-align: center;">GT  </th>
+            <th style="width: 13%; text-align: center;">Địa chỉ</th>
+            <th style="width: 8%; text-align: center;">Tên ĐN</th>
+            <th style="width: 21%; text-align: center;">Mật khẩu</th>
+            <th style="width: 14%; text-align: center;"></th> <!-- Cột Hành động -->
+        </tr>
+
+    </thead>
+    <tbody id="khachHangList"></tbody> <!-- Đảm bảo ID này chính xác -->
+</table>
+
+
+<div class="modal fade" id="updateKHModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Cập nhật thông tin khách hàng</h2>
+                <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="tenkh1" class="form-label">Tên</label>
+                        <input type="text" class="form-control" id="tenkh1" placeholder="Tên khách hàng">
+                    </div>
+                    <div class="mb-3">
+                        <label for="sdtkh1" class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" id="sdtkh1" placeholder="Số điện thoại">
+                    </div>
+                    <div class="mb-3">
+                        <label for="gtkh1" class="form-label">Giới tính</label>
+                        <select class="form-control" id="gtkh1">
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dckh1" class="form-label">Địa chỉ</label>
+                        <input type="text" class="form-control" id="dckh1" placeholder="Địa chỉ">
+                    </div>
+                    <div class="mb-3">
+                        <label for="userkh1" class="form-label">Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="userkh1" placeholder="Tên đăng nhập">
+                    </div>
+                    <div class="mb-3">
+                        <label for="passkh1" class="form-label">Mật khẩu</label>
+                        <input type="password" class="form-control" id="passkh1" placeholder="Mật khẩu">
+                    </div>
+                    <p id="ermessage1" style="color: red; display: none;"></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="updateKH" onclick="updateCustomer()">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let khachHangs = [];
+    document.addEventListener("DOMContentLoaded", async function () {
+        await loadkhachHangs();
+    });
+
+    async function loadkhachHangs() {
+        let url = `https://localhost:7182/api/KhachHang/getall`;
+        try {
+            const token = sessionStorage.getItem("Token");
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("Không thể tải danh sách khách hàng.");
+            }
+
+            const khachHangs = await response.json();
+            const khachHangList = document.getElementById('khachHangList');
+
+            if (!khachHangList) {
+                throw new Error("Không tìm thấy phần tử để hiển thị danh sách khách hàng.");
+            }
+
+            khachHangList.innerHTML = ''; // Xóa nội dung trước đó
+
+            khachHangs.forEach(kh => {
+
+                khachHangList.innerHTML += `
+                    <tr>
+                        <td>${kh.maKh}</td>
+                        <td>${kh.tenKh}</td>
+                        <td>${kh.sdt}</td>
+                        <td>${kh.gioitinh}</td>
+                        <td>${kh.diachi}</td>
+                        <td>${kh.tendangnhap}</td>
+                        <td>${kh.taiKhoan ? kh.taiKhoan.password : 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editKhachHang('${kh.maKh}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteKhachHang('${kh.maKh}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+
+            // Khởi tạo DataTable sau khi thêm dữ liệu vào bảng
+            $('#khachHangTable').DataTable({
+                "paging": true,
+                "ordering": true,
+                "info": true,
+                "searching": true,
+                "language": {
+                    "paginate": {
+                        "next": "Trang sau",
+                        "previous": "Trang trước"
+                    },
+                    "info": "Hiển thị từ _START_ đến _END_ của _TOTAL_ khách hàng",
+                    "search": "Tìm kiếm:"
+                }
+            });
+        } catch (error) {
+            console.error("Lỗi:", error);
+            document.getElementById('khachHangContainer').innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
+        }
+    }
+    async function loadKhachHangById(maKh) {
+        const url = `https://localhost:7182/api/KhachHang/getbyid?id=${maKh}`;
+        try {
+            const token = sessionStorage.getItem("Token");
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("Không thể tải thông tin khách hàng.");
+            }
+
+            const khachHang = await response.json();
+
+            // Kiểm tra nếu dữ liệu tồn tại, sau đó điền dữ liệu vào modal
+            if (khachHang) {
+                document.getElementById('tenkh1').value = khachHang.tenKh;
+                document.getElementById('sdtkh1').value = khachHang.sdt;
+                document.getElementById('gtkh1').value = khachHang.gioitinh;
+                document.getElementById('dckh1').value = khachHang.diachi;
+                document.getElementById('userkh1').value = khachHang.tendangnhap;
+                document.getElementById('passkh1').value = khachHang.taiKhoan ? khachHang.taiKhoan.password : '';
+
+                // Hiển thị modal chỉnh sửa
+                $('#updateKHModal').modal('show');
+            } else {
+                console.error("Không tìm thấy khách hàng.");
+            }
+        } catch (error) {
+            console.error("Lỗi:", error.message);
+            alert("Không thể tải thông tin khách hàng.");
+        }
+    }
+    // Hàm Sửa khách hàng
+    window.editKhachHang = function (maKh) {
+        loadKhachHangById(maKh); // Tải dữ liệu khách hàng
+
+        // Hiển thị modal chỉnh sửa khách hàng
+        $('#updateKHModal').modal('show');
+
+        // Gán `maNv` vào biến toàn cục để dùng khi cập nhật
+        window.currentMaKh = maKh;
+    };
+
+    // Hàm cập nhật khách hàng
+    async function updateCustomer() {
+        const tenKh1 = document.getElementById('tenkh1').value;
+        const sdtKh1 = document.getElementById('sdtkh1').value;
+        const gtkh1 = document.getElementById('gtkh1').value;
+        const dckh1 = document.getElementById('dckh1').value;
+        const tenDangNhap1 = document.getElementById('userkh1').value;
+        const matKhau1 = document.getElementById('passkh1').value;
+
+        // Kiểm tra các trường không được để trống
+        if (!tenKh1 || !sdtKh1 || !tenDangNhap1 || !matKhau1) {
+            document.getElementById("ermessage1").textContent = "Vui lòng điền đầy đủ thông tin.";
+            document.getElementById("ermessage1").style.display = 'block';
+            return;
+        }
+
+        // Gọi API để cập nhật khách hàng
+        try {
+            const response = await fetch(`https://localhost:7182/api/KhachHang/update?id=${window.currentMaKh}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
+                },
+                body: JSON.stringify({
+                    tenKh: tenKh1,
+                    sdt: sdtKh1,
+                    gioitinh: gtkh1,
+                    diachi: dckh1,
+                    tendangnhap: tenDangNhap1,
+                    taiKhoan: {
+                        password: matKhau1,
+                        role: "KhachHang"  // Đặt role mặc định là KhachHang
+                    }
+                })
+            });
+
+            if (response.ok) {
+                alert("Cập nhật thông tin khách hàng thành công!");
+                $('#updateKHModal').modal('hide'); // Đóng modal
+
+                // Hủy khởi tạo DataTable trước đó nếu có
+                if ($.fn.DataTable.isDataTable('#khachHangTable')) {
+                    $('#khachHangTable').DataTable().destroy();
+                }
+
+                loadkhachHangs(); // Tải lại danh sách khách hàng
+            } else {
+                let errorMessage = "Có lỗi xảy ra trong quá trình cập nhật.";
+                const result = await response.text();
+
+                if (result) {
+                    if (result.includes("Tài khoản đã tồn tại.")) {
+                        errorMessage = "Tên đăng nhập đã tồn tại.";
+                    } else if (result.includes("Số điện thoại đã tồn tại.")) {
+                        errorMessage = "Số điện thoại đã tồn tại.";
+                    } else {
+                        errorMessage = result;
+                    }
+                }
+
+                document.getElementById("ermessage1").textContent = errorMessage;
+                document.getElementById("ermessage1").style.display = 'block';
+            }
+        } catch (error) {
+            document.getElementById("ermessage1").textContent = "Có lỗi xảy ra khi cập nhật khách hàng.";
+            document.getElementById("ermessage1").style.display = 'block';
+        }
+    }
+
+
+    // Hàm Xóa khách hàng
+    window.deleteKhachHang = function (maKh) {
+        if (confirm("Bạn có chắc chắn muốn xóa khách hàng này?")) {
+            const url = `https://localhost:7182/api/KhachHang/delete?id=${maKh}`;
+            fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Xóa khách hàng thành công!");
+
+                        // Hủy khởi tạo DataTable trước đó nếu có
+                        if ($.fn.DataTable.isDataTable('#khachHangTable')) {
+                            $('#khachHangTable').DataTable().destroy();
+                        }
+                        loadkhachHangs(); // Tải lại danh sách khách hàng
+                    } else {
+                        throw new Error("Xóa khách hàng thất bại.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi:", error);
+                    alert(error.message);
+                });
+        }
+    }
+</script>

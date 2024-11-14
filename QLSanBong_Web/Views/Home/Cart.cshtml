@@ -1,0 +1,45 @@
+﻿@{
+    Layout = "_Layout";
+}
+<div id="cartContainer" class="cart-container">
+    <h2 class="cart-title">Giỏ hàng của bạn</h2>
+    <button id="clearCartButton" class="btn clear-cart">Xóa tất cả</button>
+    <table id="cartTable" class="cart-table">
+        <thead>
+            <tr>
+                <th>Mã sân bóng</th>
+                <th>Tên sân bóng</th>
+                <th>Địa chỉ</th>
+                <th>Ngày Đặt Sân</th>
+                <th>Giờ bắt đầu</th>
+                <th>Giờ kết thúc</th>
+                <th>Đơn giá</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="cartItems">
+            <!-- Sản phẩm trong giỏ hàng sẽ được thêm vào đây -->
+        </tbody>
+    </table>
+    <!-- Nút Đặt hàng ngay -->
+    <div class="order-button-container">
+        <button class="btn btn-primary" data-bs-toggle="modal" href="#modalLogin">Đặt sân ngay</button>
+    </div>
+</div>
+<style>
+    /* Căn chỉnh nút Đặt hàng ngay ở góc dưới bên trái */
+    .order-button-container {
+        position: relative;
+        text-align: left;
+        margin-top: 1rem;
+    }
+
+    /* Kiểu nút Đặt hàng */
+    #placeOrderButton {
+        background-color: #007bff;
+        border: none;
+        color: white;
+    }
+</style>
+<link rel="stylesheet" href="~/css/cart.css" />
+<script src="~/js/cart.js"></script>

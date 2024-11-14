@@ -1,0 +1,86 @@
+﻿<style>
+    .btn-group .btn.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .btn-group .btn:hover {
+        background-color: #f0f0f0;
+        color: #007bff;
+    }
+
+    .btn-group .btn {
+        background-color: #f8f9fa;
+        color: #007bff;
+        border: 1px solid #007bff;
+    }
+
+    #hoaDonTable {
+        background-color: #ffffff;
+        color: #495057;
+        border-collapse: collapse;
+    }
+
+        #hoaDonTable th {
+            background-color: #f8f9fa;
+            color: #343a40;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        #hoaDonTable td {
+            background-color: #ffffff;
+            color: #495057;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        #hoaDonTable tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        #hoaDonTable tr:hover {
+            background-color: #f1f1f1;
+        }
+
+    .thead-white th {
+        background-color: #ffffff;
+        color: #343a40;
+    }
+</style>
+
+<table id="hoaDonTable" class="table table-striped table-bordered display" style="width:100%">
+    <thead class="thead-dark">
+        <tr>
+            <th style="width: 10%; text-align: center;">Mã PDS</th>
+            <th style="width: 15%; text-align: center;">Tên KH</th>
+            <th style="width: 10%; text-align: center;">SDT KH</th>
+            <th style="width: 10%; text-align: center;">Mã NV</th>
+            <th style="width: 15%; text-align: center;">Ngày lập phiếu</th>
+            <th style="width: 10%; text-align: center;">Tổng tiền</th>
+            <th style="width: 15%; text-align: center;">Ghi chú</th>
+            <th style="width: 10%; text-align: center;"></th>
+        </tr>
+    </thead>
+    <tbody id="hoaDonList"></tbody>
+</table>
+
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="hoaDonModal" tabindex="-1" role="dialog" aria-labelledby="hoaDonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="hoaDonModalLabel">Chi tiết hóa đơn khách hàng</h5>
+                <button type="button" class="modalclose" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/employee/billemployee.js"></script>

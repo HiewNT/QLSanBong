@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="d-flex justify-content-end mb-3">
+            <!-- Căn phải cho nút -->
+            <button class="btn btn-success mt-2 " onclick="openAddPriceModal()">Thêm giá giờ thuê mới</button> <!-- Nút thêm khách hàng -->
+        </div>
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">Danh sách giá giờ thuê</h3> <!-- Tiêu đề danh sách -->
+        </div>
+        <div class="card-body">
+            <div id="giaThueContainer">
+                @Html.Partial("_GiaThueList") <!-- Chèn Partial View -->
+            </div>
+        </div>
+    </div>
+</div>

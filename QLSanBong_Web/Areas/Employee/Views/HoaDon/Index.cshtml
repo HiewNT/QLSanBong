@@ -1,0 +1,16 @@
+@{
+    Layout = "_EmployeeLayout";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">Danh sách hóa đơn</h3> <!-- Tiêu đề danh sách -->
+        </div>
+        <div class="card-body">
+            <div id="hoaDonContainer">
+                @Html.Partial("_HoaDonList") <!-- Chèn Partial View -->
+            </div>
+        </div>
+    </div>
+</div>

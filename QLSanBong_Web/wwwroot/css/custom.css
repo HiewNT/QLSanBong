@@ -1,0 +1,205 @@
+﻿/* Carousel và Nội dung Cố định */
+#myCarousel, .carousel-image-container {
+    margin-top:2.4rem;
+    position: relative;
+    width: 100%;
+}
+
+.carousel-image-container {
+    padding-top: 41%;
+    overflow: hidden;
+}
+
+    .carousel-image-container img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(80%);
+    }
+
+#fixed-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #fff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3); /* Tăng độ mờ để dễ đọc hơn */
+    padding: 20px;
+}
+
+#slogan h2 {
+    font-size: clamp(2rem, 3.5vw, 3.5rem); /* Tự động điều chỉnh kích thước chữ */
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+    animation: fadeInDown 1.5s;
+}
+
+#dsne {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    animation: fadeInUp 2s;
+}
+
+    #dsne a.btn {
+        font-weight: bold;
+        font-size: 1.25rem;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        background-color: #17A2B8;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        #dsne a.btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
+
+.marquee-text {
+    display: inline-block;
+    animation: marquee 30s linear infinite, colorChange 5s ease-in-out infinite; /* Thêm animation màu */
+    font-size: 1.2rem; /* Kích thước chữ */
+}
+
+/* Animation trượt ngang */
+@keyframes marquee {
+    0% {
+        transform: translateX(100%); /* Bắt đầu ngoài màn hình bên phải */
+    }
+
+    100% {
+        transform: translateX(-100%); /* Kết thúc ngoài màn hình bên trái */
+    }
+}
+
+/* Animation thay đổi màu */
+@keyframes colorChange {
+    0% {
+        color: #333; /* Màu khởi đầu */
+    }
+
+    25% {
+        color: #17A2B8; /* Màu thứ nhất */
+    }
+
+    50% {
+        color: #28A745; /* Màu thứ hai */
+    }
+
+    75% {
+        color: #FFC107; /* Màu thứ ba */
+    }
+
+    100% {
+        color: #DC3545; /* Màu cuối cùng */
+    }
+}
+
+
+/* Tiêu Đề */
+.section-title {
+    font-size: clamp(2rem, 3vw, 3rem);
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #007bff;
+    text-align: center;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+    .section-title::after {
+        content: '';
+        display: block;
+        width: 50%;
+        height: 4px;
+        background: #007bff;
+        margin: 0 auto;
+    }
+
+/* Modal Tùy Chỉnh */
+.custom-modal {
+    max-width: 90%;
+    width: auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #slogan h2 {
+        font-size: 2.5vw;
+    }
+
+    .section-title {
+        font-size: 2.5vw;
+    }
+
+    .marquee-text {
+        font-size: 1rem;
+    }
+}
+
+
+#sanBongGrid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Khoảng cách giữa các ô sân bóng */
+}
+
+    #sanBongGrid .sanBongItem {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+
+        #sanBongGrid .sanBongItem:hover {
+            transform: scale(1.05); /* Hiệu ứng phóng to khi hover */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+        }

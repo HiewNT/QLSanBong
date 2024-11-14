@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - QLSanBong_Web</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/QLSanBong_Web.styles.css" asp-append-version="true" />
+    <link href="~/img/favicon.ico" rel="icon" />
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&family=Nunito&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        /* Đảm bảo footer nằm ở cuối trang */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            flex: 1;
+            /* Để phần nội dung chính mở rộng */
+        }
+
+        footer {
+            padding: 10px 0;
+            /* Khoảng cách cho footer */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar Start -->
+    <div class="container-fluid bg-blue position-relative shadow">
+        <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0 px-lg-5 fixed-top">
+            <span class="logo">
+                <img src="~/img/logo2.png" />
+            </span>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-right" id="navbarCollapse">
+                <div class="navbar-nav font-weight-bold mx-auto py-0">
+                    <!-- Liên kết Trang chủ với icon -->
+                    <a href="/" class="nav-item nav-link">
+                        <i class="fas fa-home"></i> Trang chủ
+                    </a>
+
+                    <!-- Liên kết Liên hệ với icon -->
+                    <a class="nav-item nav-link" style="cursor: pointer" href="#infomation">
+                        <i class="fas fa-info-circle"></i> Thông tin
+                    </a>
+                    <a href="@Url.Action("Cart", "Home", new { area = "" })" class="nav-item nav-link"
+                        style="text-decoration:none; display: flex; align-items: center; position: relative;">
+                        <i class="fa fa-cart-plus" aria-hidden="true" style="font-size: 1.5em; margin-right: 8px;"></i>
+                        <span id="cartItemCount"
+                            style="position: absolute; top: -5px; right: -2px; background-color: brown; color: white; font-weight: bold; padding: 3px 8px; border-radius: 50%; font-size: 0.7em;"></span>
+                    </a>
+
+
+                    <!-- Liên kết Đăng nhập với icon -->
+                    <a class="nav-item nav-link" data-bs-toggle="modal" href="#modalLogin">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    </a>
+
+                    <!-- Liên kết Đăng ký với icon -->
+                    <a class="nav-item nav-link" data-bs-toggle="modal" href="#addKHModal">
+                        <i class="fas fa-user-plus"></i> Đăng ký
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <!-- Navbar End -->
+
+    <div>
+        @RenderBody()
+    </div>
+
+    <div>
+        <!-- Footer Start -->
+        <section id="infomation" class="container-fluid bg-light text-primary mt-4 pt-3">
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <a href="" class="navbar-brand font-weight-bold text-primary m-0 mb-4 p-0"
+                    style="font-size: 40px; line-height: 40px;text-align:center">
+                    <span class="text-primary">SÂN BÓNG MINI</span>
+                    <h4 class="text-primary">TH Stadium</h4>
+                </a>
+                <div class="d-flex justify-content-start gap-3 pt-4">
+                    <a class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-0"
+                        href="#" style="width: 50px; height: 50px; font-size: 24px;">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-0"
+                        href="#" style="width: 50px; height: 50px; font-size: 24px;">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-0"
+                        href="#" style="width: 50px; height: 50px; font-size: 24px;">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-0"
+                        href="#" style="width: 50px; height: 50px; font-size: 24px;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5">
+                <div class="d-flex">
+                    <h2 class="fa fa-map-marker-alt text-primary"></h2>
+                    <div class="pl-3">
+                        <h5 class="text-primary">Địa chỉ</h5>
+                        <p>236 Hoàng Quốc Việt, Cổ Nhuế 1, Bắc Từ Liêm</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <h4 class="fa fa-envelope text-primary"></h4>
+                    <div class="pl-3">
+                        <h5 class="text-primary">Email</h5>
+                        <p>ThStadium@gmail.com</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <h4 class="fa fa-phone-alt text-primary"></h4>
+                    <div class="pl-3">
+                        <h5 class="text-primary">Điện thoại</h5>
+                        <p>+84 374 015 917</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <h4 class="fa fa-clock text-primary"></h4>
+                    <div class="pl-3">
+                        <h5 class="text-primary">Giờ mở cửa</h5>
+                        <strong>Phục vụ cả tuần:</strong>
+                        <p class="m-0">06:00 - 22:30</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 mb-5">
+                <!-- Sử dụng col-md-12 cho màn hình nhỏ hơn -->
+                <form name="sentMessage" id="contactForm" novalidate="novalidate">
+                    <div class="control-group mb-3">
+                        <!-- Thêm margin-bottom để cách dòng -->
+                        <input type="text" class="form-control" id="name" placeholder="Tên của bạn" required="required"
+                            data-validation-required-message="Nhập tên của bạn" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group mb-3">
+                        <input type="email" class="form-control" id="phone" placeholder="Số điện thoại" required="required"
+                            data-validation-required-message="Nhập số điện thoại" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group mb-3">
+                        <textarea class="form-control" rows="6" id="message" placeholder="Tin nhắn" required="required"
+                            data-validation-required-message="Tin nhắn"></textarea>
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary py-2 px-4" type="submit" id="sendMessageButton">
+                            Gửi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    </div>
+
+    <!-- Modal Đăng nhập -->
+    <div class="modal fade" id="modalLogin" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="text-primary">Đăng nhập tài khoản</h2>
+                    <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm" onsubmit="return false;">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control border border-primary" id="username" name="username" autocomplete="off"
+                                placeholder="Tên đăng nhập">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control border border-primary" id="password" autocomplete="off"
+                                name="password" placeholder="Mật khẩu">
+                        </div>
+                        <p id="errorMessage" style="color: red; display: none;"></p>
+                        <button type="submit" class="btn btn-primary mt-2 float-end">Đăng nhập</button>
+                    </form>
+                </div>
+                <div class="d-flex align-items-center justify-content-center" style="margin-bottom:20px">
+                    <p class="mb-0 me-1">Chưa có tài khoản?</p>
+                    <button type="button" class="btn btn-link p-0" data-bs-dismiss="modal" id="themKH2">Đăng ký
+                        ngay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Đăng ký -->
+    <div class="modal fade" id="addKHModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Đăng ký khách hàng mới</h2>
+                    <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="tenkh" class="form-label">Tên</label>
+                            <input type="text" class="form-control" id="tenkh" placeholder="Tên khách hàng">
+                        </div>
+                        <div class="mb-3">
+                            <label for="sdtkh" class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" id="sdtkh" placeholder="Số điện thoại">
+                        </div>
+                        <div class="mb-3">
+                            <label for="gtkh" class="form-label">Giới tính</label>
+                            <select class="form-control" id="gtkh">
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dckh" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="dckh" placeholder="Địa chỉ">
+                        </div>
+                        <div class="mb-3">
+                            <label for="userkh" class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="userkh" placeholder="Tên đăng nhập" autocomplete="off">
+                        </div>
+                        <div class="mb-3">
+                            <label for="passkh" class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control" id="passkh" placeholder="Mật khẩu" autocomplete="off">
+                        </div>
+                        <p id="errorMessagesignup" style="color: red; display: none;"></p>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="addKH">Xác nhận đăng ký</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <style>
+        .back-to-top {
+            position: fixed;
+            /* Đặt vị trí cố định */
+            bottom: 5%;
+            /* 5% từ đáy màn hình */
+            right: 5%;
+            /* 5% từ bên phải màn hình */
+            border-radius: 60%;
+            /* Hình tròn */
+            transition: background-color 0.3s, transform 0.3s;
+            /* Hiệu ứng chuyển tiếp */
+        }
+
+        .back-to-top:hover {
+            background-color: gray;
+            /* Màu nền khi di chuột */
+            transform: scale(1.1);
+            /* Phóng to một chút khi di chuột */
+        }
+    </style>
+    <!-- Footer End -->
+    <a href="#" class="btn btn-white text-dark p-3 back-to-top">
+        <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+    </a>
+
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/account.js"></script>
+
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+
+</html>

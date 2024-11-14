@@ -1,0 +1,305 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - QLSanBong_Web</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/QLSanBong_Web.styles.css" asp-append-version="true" />
+    - Favicon -->
+    <link href="~/img/favicon.ico" rel="icon" />
+
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&family=Nunito&display=swap"
+          rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+          rel="stylesheet" />
+    <style>
+        /* Đảm bảo footer nằm ở cuối trang */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            flex: 1; /* Để phần nội dung chính mở rộng */
+        }
+
+        footer {
+            padding: 10px 0; /* Khoảng cách cho footer */
+        }
+    </style>
+</head>
+<body>
+    <script>
+            // Kiểm tra token ngay lập tức
+            const token = sessionStorage.getItem("Token");
+
+            if (!token) {
+                // Nếu không có token, điều hướng về Home/Index
+                window.location.href = "/";
+            } else {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] == "Admin") {
+                window.location.href = "Admin/";
+            }
+            if (payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] == "NhanVien") {
+                window.location.href = "Employee/";
+            }
+            }
+    </script>
+
+    <!-- Navbar Start --><!-- Navbar Start -->
+    <div class="container-fluid bg-primary shadow-sm fixed-top">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white px-lg-5">
+            <a href="@Url.Action("Index", "Home", new { area = "Customer" })" class="navbar-brand">
+                <img src="~/img/logo2.png" alt="Logo" class="logo" style="height: 50px;">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                <!-- Navbar Left Links -->
+                <ul class="navbar-nav font-weight-bold">
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "Home", new { area = "Customer" })" class="nav-link">
+                            <i class="fas fa-home"></i> Trang chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#infomation" class="nav-link">
+                            <i class="fas fa-info-circle"></i> Thông tin
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "YeuCau", new { area = "Customer" })" class="nav-link">
+                            <i class="fa fa-list-alt"></i> Yêu cầu đặt sân
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "HoaDon", new { area = "Customer" })" class="nav-link">
+                            <i class="fa fa-bars"></i> Hóa đơn
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="@Url.Action("Cart", "Home", new { area = "Customer" })" class="nav-item nav-link" style="text-decoration:none; display: flex; align-items: center; position: relative;">
+                            <i class="fa fa-cart-plus" aria-hidden="true" style="font-size: 1.5em; margin-right: 8px;"></i>
+                            <span id="cartItemCount" style="position: absolute; top: -5px; right: -2px; background-color: brown; color: white; font-weight: bold; padding: 3px 8px; border-radius: 50%; font-size: 0.7em;"></span>
+                        </a>
+                    </li>
+                </ul>
+                <!-- Navbar Right User Dropdown -->
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span id="userNameDisplay" class="d-none d-lg-inline text-dark font-weight-medium">Khách hàng</span>
+                            <img class="img-profile rounded-circle ml-2" src="/img/users.png" style="height: 30px; width: 30px;">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Thông tin
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#CustomerLogout">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <!-- Navbar End -->
+
+    <div>
+         @RenderBody()
+    </div>
+
+    <!-- Footer Start -->
+    <section id="infomation" class="container-fluid bg-light text-primary pt-3">
+        <div class="row pt-3">
+            <div class="col-lg-4 col-md-6 mb-5">
+                <a href="" class="navbar-brand font-weight-bold text-primary m-0 mb-4 p-0" style="font-size: 40px; line-height: 40px;text-align:center">
+                    <span class="text-primary">SÂN BÓNG MINI</span>
+                    <h4 class="text-primary">TH Stadium</h4>
+                </a>
+                <div class="d-flex justify-content-start gap-3 pt-4">
+                    <a class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-0"
+                       href="#" style="width: 50px; height: 50px; font-size: 24px;">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-0"
+                       href="#" style="width: 50px; height: 50px; font-size: 24px;">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-0"
+                       href="#" style="width: 50px; height: 50px; font-size: 24px;">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-0"
+                       href="#" style="width: 50px; height: 50px; font-size: 24px;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5">
+                <div class="d-flex">
+                    <h2 class="fa fa-map-marker-alt text-primary"></h2>
+                    <div class="pl-3">
+                        <h4 class="text-primary">Địa chỉ</h4>
+                        <p>236 Hoàng Quốc Việt, Cổ Nhuế 1, Bắc Từ Liêm</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <h4 class="fa fa-envelope text-primary"></h4>
+                    <div class="pl-3">
+                        <h4 class="text-primary">Email</h4>
+                        <p>ThStadium@gmail.com</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <h4 class="fa fa-phone-alt text-primary"></h4>
+                    <div class="pl-3">
+                        <h4 class="text-primary">Điện thoại</h4>
+                        <p>+84 374 015 917</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <h4 class="fa fa-clock text-primary"></h4>
+                    <div class="pl-3">
+                        <h4 class="text-primary">Giờ mở cửa <small>(Phục vụ tất cả các ngày lễ tết)</small> </h4>
+                        <p class="m-0">06:00 - 22:30</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 mb-5">
+                <!-- Sử dụng col-md-12 cho màn hình nhỏ hơn -->
+                <form name="sentMessage" id="contactForm" novalidate="novalidate">
+                    <div class="control-group mb-3">
+                        <!-- Thêm margin-bottom để cách dòng -->
+                        <input type="text" class="form-control" id="name" placeholder="Your Name" required="required" data-validation-required-message="Please enter your name" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group mb-3">
+                        <input type="email" class="form-control" id="phone" placeholder="Your Phone" required="required" data-validation-required-message="Please enter your phone" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group mb-3">
+                        <textarea class="form-control" rows="4" id="message" placeholder="Message" required="required" data-validation-required-message="Please enter your message"></textarea>
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary py-2 px-4" type="submit" id="sendMessageButton">
+                            Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="CustomerLogout" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Đăng xuất ?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Bạn có chắc chắn muốn đăng xuất ?</div>
+                <div class="modal-footer">
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary mr-2" type="button" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary ml-2" onclick="confirmLogout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        function confirmLogout() {
+            // Thực hiện hành động đăng xuất ở đây
+            // Ví dụ: chuyển hướng hoặc xóa thông tin session
+            sessionStorage.removeItem('Token'); // Nếu cần
+            window.location.href = '/'; // Điều hướng sau khi đăng xuất
+        }
+
+        // Kiểm tra nếu token đã có trong sessionStorage hoặc localStorage
+        const jwtToken = sessionStorage.getItem('Token'); // Hoặc localStorage.getItem('Token');
+
+        if (jwtToken) {
+            // Gọi API để lấy thông tin người dùng từ token
+            fetchUserInfo(jwtToken);
+        }
+
+        function fetchUserInfo(token) {
+            fetch('https://localhost:7182/api/Account/userinfo', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const tennguoidung = data.tennguoidung;
+                    console.log(tennguoidung);
+                    // Cập nhật phần tử hiển thị Tennguoidung
+                    document.getElementById('userNameDisplay').innerText = tennguoidung;
+                })
+                .catch(error => console.error('Error fetching user info:', error));
+        }
+
+    </script>
+    <style>
+        .back-to-top {
+            position: fixed; /* Đặt vị trí cố định */
+            bottom: 5%; /* 5% từ đáy màn hình */
+            right: 5%; /* 5% từ bên phải màn hình */
+            border-radius: 60%; /* Hình tròn */
+            transition: background-color 0.3s, transform 0.3s; /* Hiệu ứng chuyển tiếp */
+        }
+
+            .back-to-top:hover {
+                background-color: gray; /* Màu nền khi di chuột */
+                transform: scale(1.1); /* Phóng to một chút khi di chuột */
+            }
+    </style>
+    <!-- Footer End -->
+    <a href="#" class="btn btn-white text-dark p-3 back-to-top">
+        <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+    </a>
+
+    <script src="~/js/cart.js"></script>
+    <script src="~/js/customer/santrongcustomer.js"></script>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript Libraries -->
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Thêm DataTables CSS và JavaScript -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,266 @@
+﻿@* _NhanVienList.cshtml *@
+<table id="nhanVienTable" class="table table-striped table-bordered display" style="width:100%">
+    <thead class="thead-dark">
+        <tr>
+            <th style="width: 10%; text-align: center;">Mã NV</th>
+            <th style="width: 22%; text-align: center;">Họ Tên</th>
+            <th style="width: 10%; text-align: center;">SĐT</th>
+            <th style="width: 16%; text-align: center;">Tên đăng nhập</th>
+            <th style="width: 30%; text-align: center;">Mật khẩu</th>
+            <th style="width: 12%"></th> <!-- Cột Hành động -->
+        </tr>
+    </thead>
+    <tbody id="nhanVienList"></tbody> <!-- Đảm bảo ID này chính xác -->
+</table>
+
+<div class="modal fade" id="updateNVModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Sửa thông tin nhân viên</h2>
+                <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="tennv1" class="form-label">Tên</label>
+                        <input type="text" class="form-control" id="tennv1" placeholder="Tên nhân viên">
+                    </div>
+                    <div class="mb-3">
+                        <label for="sdtnv1" class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" id="sdtnv1" placeholder="Số điện thoại">
+                    </div>
+                    <div class="mb-3">
+                        <label for="usernv1" class="form-label">Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="usernv1" placeholder="Tên đăng nhập">
+                    </div>
+                    <div class="mb-3">
+                        <label for="passnv1" class="form-label">Mật khẩu</label>
+                        <input type="password" class="form-control" id="passnv1" placeholder="Mật khẩu">
+                    </div>
+                    <p id="messageerror1" style="color: red; display: none;"></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="updatenv" onclick="updateEmployee()">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let nhanViens = [];
+    document.addEventListener("DOMContentLoaded", async function () {
+        await loadNhanViens();
+    });
+
+    async function loadNhanViens() {
+        let url = `https://localhost:7182/api/NhanVien/getall`;
+        try {
+            const token = sessionStorage.getItem("Token");
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("Không thể tải danh sách nhân viên.");
+            }
+
+            const nhanViens = await response.json();
+            const nhanVienList = document.getElementById('nhanVienList');
+
+            if (!nhanVienList) {
+                throw new Error("Không tìm thấy phần tử để hiển thị danh sách nhân viên.");
+            }
+
+            nhanVienList.innerHTML = ''; // Xóa nội dung trước đó
+
+            nhanViens.forEach(nv => {
+
+                nhanVienList.innerHTML += `
+                    <tr>
+                        <td>${nv.maNv}</td>
+                        <td>${nv.tenNv}</td>
+                        <td>${nv.sdt}</td>
+                        <td>${nv.tendangnhap}</td>
+                        <td>${nv.taiKhoan ? nv.taiKhoan.password : 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editNhanVien('${nv.maNv}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteNhanVien('${nv.maNv}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+
+            // Khởi tạo DataTable sau khi thêm dữ liệu vào bảng
+            $('#nhanVienTable').DataTable({
+                "paging": true,
+                "ordering": true,
+                "info": true,
+                "searching": true,
+                "language": {
+                    "paginate": {
+                        "next": "Trang sau",
+                        "previous": "Trang trước"
+                    },
+                    "info": "Hiển thị từ _START_ đến _END_ của _TOTAL_ nhân viên",
+                    "search": "Tìm kiếm:"
+                }
+            });
+        } catch (error) {
+            console.error("Lỗi:", error);
+            document.getElementById('nhanVienContainer').innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
+        }
+    }
+    async function loadNhanVienById(maNv) {
+        const url = `https://localhost:7182/api/NhanVien/getbyid?id=${maNv}`;
+        try {
+            const token = sessionStorage.getItem("Token");
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("Không thể tải thông tin nhân viên.");
+            }
+
+            const nhanVien = await response.json();
+
+            // Kiểm tra nếu dữ liệu tồn tại, sau đó điền dữ liệu vào modal
+            if (nhanVien) {
+                document.getElementById('tennv1').value = nhanVien.tenNv;
+                document.getElementById('sdtnv1').value = nhanVien.sdt;
+                document.getElementById('usernv1').value = nhanVien.tendangnhap;
+                document.getElementById('passnv1').value = nhanVien.taiKhoan ? nhanVien.taiKhoan.password : '';
+
+                // Hiển thị modal chỉnh sửa
+                $('#updateNVModal').modal('show');
+            } else {
+                console.error("Không tìm thấy nhân viên.");
+            }
+        } catch (error) {
+            console.error("Lỗi:", error.message);
+            alert("Không thể tải thông tin nhân viên.");
+        }
+    }
+    // Hàm Sửa nhân viên
+    window.editNhanVien = function (maNv) {
+        loadNhanVienById(maNv); // Tải dữ liệu nhân viên
+
+        // Hiển thị modal chỉnh sửa nhân viên
+        $('#updateNVModal').modal('show');
+
+        // Gán `maNv` vào biến toàn cục để dùng khi cập nhật
+        window.currentMaNv = maNv;
+    };
+
+    // Hàm cập nhật nhân viên
+    async function updateEmployee() {
+        const tenNv1 = document.getElementById('tennv1').value;
+        const sdt1 = document.getElementById('sdtnv1').value;
+        const tenDangNhap1 = document.getElementById('usernv1').value;
+        const matKhau1 = document.getElementById('passnv1').value;
+
+        // Kiểm tra các trường không được để trống
+        if (!tenNv1 || !sdt1 || !tenDangNhap1 || !matKhau1) {
+            document.getElementById("messageerror1").textContent = "Vui lòng điền đầy đủ thông tin.";
+            document.getElementById("messageerror1").style.display = 'block';
+            return;
+        }
+
+        // Gọi API để cập nhật nhân viên
+        try {
+            const response = await fetch(`https://localhost:7182/api/NhanVien/update?id=${window.currentMaNv}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
+                },
+                body: JSON.stringify({
+                    tenNv: tenNv1,
+                    chucvu: "Nhân viên",
+                    sdt: sdt1,
+                    tendangnhap: tenDangNhap1,
+                    taiKhoan: {
+                        password: matKhau1,
+                        role: "NhanVien"
+                    }
+                })
+            });
+
+            if (response.ok) {
+                alert("Cập nhật thông tin nhân viên thành công!");
+                $('#updateNVModal').modal('hide'); // Đóng modal
+
+                // Hủy khởi tạo DataTable trước đó nếu có
+                if ($.fn.DataTable.isDataTable('#nhanVienTable')) {
+                    $('#nhanVienTable').DataTable().destroy();
+                }
+
+                loadNhanViens(); // Tải lại danh sách nhân viên
+            } else {
+                let errorMessage = "Có lỗi xảy ra trong quá trình cập nhật.";
+                const result = await response.text();
+
+                if (result) {
+                    if (result.includes("Tài khoản đã tồn tại.")) {
+                        errorMessage = "Tên đăng nhập đã tồn tại.";
+                    } else if (result.includes("Số điện thoại đã tồn tại.")) {
+                        errorMessage = "Số điện thoại đã tồn tại.";
+                    } else {
+                        errorMessage = result;
+                    }
+                }
+
+                document.getElementById("messageerror1").textContent = errorMessage;
+                document.getElementById("messageerror1").style.display = 'block';
+            }
+        } catch (error) {
+            document.getElementById("messageerror1").textContent = "Có lỗi xảy ra khi cập nhật nhân viên.";
+            document.getElementById("messageerror1").style.display = 'block';
+        }
+    }
+
+
+    // Hàm Xóa nhân viên
+    window.deleteNhanVien = function (maNv) {
+        if (confirm("Bạn có chắc chắn muốn xóa nhân viên này?")) {
+            const url = `https://localhost:7182/api/NhanVien/delete?id=${maNv}`;
+            fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Xóa nhân viên thành công!");
+
+                        // Hủy khởi tạo DataTable trước đó nếu có
+                        if ($.fn.DataTable.isDataTable('#nhanVienTable')) {
+                            $('#nhanVienTable').DataTable().destroy();
+                        }
+                        loadNhanViens(); // Tải lại danh sách nhân viên
+                    } else {
+                        throw new Error("Xóa nhân viên thất bại.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi:", error);
+                    alert(error.message);
+                });
+        }
+    }
+</script>

@@ -1,0 +1,141 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+<div class="container mt-5">
+    <div class="card">
+        <div class="d-flex justify-content-end mb-3">
+            <!-- Căn phải cho nút -->
+            <button class="btn btn-success mt-2 " onclick="openAddEmployeeModal()">Thêm nhân viên mới</button> <!-- Nút thêm nhân viên -->
+        </div>
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">Danh sách nhân viên</h3> <!-- Tiêu đề danh sách -->
+        </div>
+        <div class="card-body">
+            <div id="nhanVienContainer">
+                @Html.Partial("_NhanVienList") <!-- Chèn Partial View -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addNVModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Thêm nhân viên mới</h2>
+                <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="tennv" class="form-label">Tên</label>
+                        <input type="text" class="form-control" id="tennv" placeholder="Tên nhân viên">
+                    </div>
+                    <div class="mb-3">
+                        <label for="sdtnv" class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" id="sdtnv" placeholder="Số điện thoại">
+                    </div>
+                    <div class="mb-3">
+                        <label for="usernv" class="form-label">Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="usernv" placeholder="Tên đăng nhập">
+                    </div>
+                    <div class="mb-3">
+                        <label for="passnv" class="form-label">Mật khẩu</label>
+                        <input type="password" class="form-control" id="passnv" placeholder="Mật khẩu">
+                    </div>
+                    <p id="messageerror" style="color: red; display: none;"></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addnv" onclick="addEmployee()">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openAddEmployeeModal() {
+        // Hiển thị modal thêm nhân viên
+        $('#addNVModal').modal('show');
+    }
+
+    // Xóa thông tin trong các trường khi modal đóng
+    addNVModal.addEventListener("hidden.bs.modal", function () {
+        document.getElementById("tennv").value = '';
+        document.getElementById("sdtnv").value = '';
+        document.getElementById("usernv").value = '';
+        document.getElementById("passnv").value = '';
+        document.getElementById("messageerror").style.display = 'none'; // Ẩn thông báo lỗi
+    });
+
+    async function addEmployee() {
+        const tenNv = document.getElementById('tennv').value;
+        const sdt = document.getElementById('sdtnv').value;
+        const tenDangNhap = document.getElementById('usernv').value;
+        const matKhau = document.getElementById('passnv').value;
+
+        // Kiểm tra các trường không được để trống
+        if (!tenNv || !sdt || !tenDangNhap || !matKhau) {
+            document.getElementById("messageerror").textContent = "Vui lòng điền đầy đủ thông tin.";
+            document.getElementById("messageerror").style.display = 'block';
+            return;
+        }
+
+        // Gọi API để thêm nhân viên
+        try {
+            const response = await fetch(`https://localhost:7182/api/NhanVien/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
+                },
+                body: JSON.stringify({
+                    tenNv:tenNv,
+                    chucvu: "Nhân viên",
+                    sdt:sdt,
+                    tendangnhap: tenDangNhap,
+                    taiKhoan: {
+                        password: matKhau,
+                        role: "NhanVien"
+                    }
+                })
+            });
+
+            if (response.ok) {
+                // Hiển thị thông báo thành công
+                alert("Thêm nhân viên thành công!");
+                $('#addNVModal').modal('hide'); // Đóng modal
+
+                // Hủy khởi tạo DataTable trước đó nếu có
+                if ($.fn.DataTable.isDataTable('#nhanVienTable')) {
+                    $('#nhanVienTable').DataTable().destroy();
+                }
+
+                loadNhanViens(); // Tải lại danh sách nhân viên
+            } else {
+                let errorMessage = "Có lỗi xảy ra trong quá trình đăng ký."; // Thông điệp mặc định
+                const result = await response.text();
+
+                if (result) {
+                    if (result.includes("Tài khoản đã tồn tại.")) {
+                        errorMessage = "Tên đăng nhập đã tồn tại.";
+                    } else if (result.includes("Số điện thoại đã tồn tại.")) {
+                        errorMessage = "Số điện thoại đã tồn tại.";
+                    } else {
+                        errorMessage = result;
+                    }
+                }
+
+                // Hiển thị thông báo lỗi
+                document.getElementById("messageerror").textContent = errorMessage;
+                document.getElementById("messageerror").style.display = 'block';
+            }
+        } catch (error) {
+            document.getElementById("messageerror").textContent = "Có lỗi xảy ra khi thêm nhân viên.";
+            document.getElementById("messageerror").style.display = 'block';
+        }
+    }
+</script>
+

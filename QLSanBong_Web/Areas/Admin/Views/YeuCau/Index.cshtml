@@ -1,0 +1,16 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">Danh sách yêu cầu đặt sân</h3> <!-- Tiêu đề danh sách -->
+        </div>
+        <div class="card-body">
+            <div id="yeuCauContainer">
+                @Html.Partial("_YeuCauList") <!-- Chèn Partial View -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+﻿<!-- CSS cho trạng thái active -->
+<style>
+    /* Chỉnh sửa màu sắc khi nút active */
+    .btn-group .btn.active {
+        background-color: #343a40; /* Màu nền tối cho nút active */
+        color: white; /* Chữ màu trắng khi nút active */
+        border-color: #343a40; /* Đổi màu viền nút */
+    }
+
+    /* Màu cho nút khi hover */
+    .btn-group .btn:hover {
+        background-color: #495057; /* Màu nền xám đậm khi hover */
+        color: white; /* Màu chữ trắng khi hover */
+    }
+
+    /* Màu nền của các nút không active */
+    .btn-group .btn {
+        background-color: #6c757d; /* Nền màu xám cho các nút không active */
+        color: white; /* Màu chữ trắng */
+        border: 1px solid #6c757d; /* Đường viền màu xám */
+    }
+
+</style>
+
+
+
+<div class="btn-group btn-white btn-secondary mb-4" role="group" aria-label="Filter Options">
+    <button type="button" class="btn btn-white active" onclick="filterTable('', this)">Tất cả</button>
+    <button type="button" class="btn btn-white" onclick="filterTable('Chờ xác nhận', this)">Chờ xác nhận</button>
+    <button type="button" class="btn btn-white" onclick="filterTable('Đã xác nhận', this)">Đã xác nhận</button>
+    <button type="button" class="btn btn-white" onclick="filterTable('Đã từ chối', this)">Đã từ chối</button>
+    <button type="button" class="btn btn-white" onclick="filterTable('Đã hủy', this)">Đã hủy</button>
+</div>
+
+<table id="yeuCauTable" class="table table-striped table-bordered display" style="width:100%">
+    <thead class="thead-dark">
+        <tr>
+            <th style="width: 15%; text-align: center;">Tên khách hàng</th>
+            <th style="width: 10%; text-align: center;">SDT</th>
+            <th style="width: 15%; text-align: center;">Thời gian đặt</th>
+            <th style="width: 13%; text-align: center;">Ngày sử dụng</th>
+            <th style="width: 10%; text-align: center;">Giờ BD</th>
+            <th style="width: 10%; text-align: center;">Giờ KT</th>
+            <th style="width: 10%; text-align: center;">Mã SB</th>
+            <th style="width: 10%; text-align: center;">Trạng thái</th>
+            <th style="width: 7%; text-align: center;"></th>
+        </tr>
+    </thead>
+    <tbody id="yeuCauList"></tbody>
+</table>
+
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="yeuCauModal" tabindex="-1" role="dialog" aria-labelledby="yeuCauModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="yeuCauModalLabel">Chi tiết yêu cầu đặt sân</h5>
+                <button type="button" class="modalclose" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/admin/requestorder.js"></script>
