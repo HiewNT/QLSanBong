@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,18 +19,18 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyCors", builder =>
     {
-        builder.WithOrigins("https://localhost:7198", "https://localhost:7182") // URL của ứng dụng client
+        builder.WithOrigins("https://localhost:7198", "https://localhost:7182")
                .AllowAnyHeader()
                .AllowAnyMethod()
-               .AllowCredentials(); // Cho phép gửi cookies
+               .AllowCredentials();
     });
 });
 
-// Cấu hình xác thực sử dụng Cookie Authentication (tránh vấn đề bảo mật với xác thực không đủ mạnh)
+// Cấu hình Cookie Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login"; // Đảm bảo rằng người dùng phải đăng nhập trước khi truy cập các trang cần bảo mật
+        options.LoginPath = "/Account/Login";
     });
 
 // Cấu hình Authentication với JWT
@@ -46,9 +47,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],       // Cấu hình trong appsettings.json
-        ValidAudience = builder.Configuration["Jwt:Audience"],   // Cấu hình trong appsettings.json
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) // Khóa từ appsettings.json
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
 
@@ -60,27 +61,30 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireCustomerRole", policy => policy.RequireRole("KhachHang"));
 });
 
-// Đăng ký IHttpContextAccessor
-builder.Services.AddHttpContextAccessor();
+// Cấu hình Rate Limiting
+builder.Services.AddOptions();
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
 // Đăng ký các dịch vụ
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ISanBongService, SanBongService>();
+builder.Services.AddScoped<IGioHangService, GioHangService>();
 builder.Services.AddScoped<INhanVienService, NhanVienService>();
 builder.Services.AddScoped<IKhachHangService, KhachHangService>();
 builder.Services.AddScoped<IGiaGioThueService, GiaGioThueService>();
 builder.Services.AddScoped<IPhieuDatSanService, PhieuDatSanService>();
 builder.Services.AddScoped<IYeuCauDatSanService, YeuCauDatSanService>();
-builder.Services.AddScoped<IGioHangService, GioHangService>();
 
-// Đăng ký dịch vụ MVC
+// Đăng ký dịch vụ MVC và Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "QLSanBong API", Version = "v1" });
-
-    // Cấu hình để sử dụng Bearer Token
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
@@ -89,7 +93,6 @@ builder.Services.AddSwaggerGen(c =>
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
         Scheme = "bearer"
     });
-
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
@@ -106,18 +109,16 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Cấu hình MemoryCache cho Distributed Session
+// Cấu hình Session
 builder.Services.AddDistributedMemoryCache();
-
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);  // Thời gian hết hạn session
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-    options.Cookie.Domain = ".localhost"; // Chia sẻ session giữa các cổng
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Đảm bảo cookie chỉ gửi qua HTTPS
+    options.Cookie.Domain = ".localhost";
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
-
 
 var app = builder.Build();
 
@@ -128,22 +129,25 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "QLSanBong API v1");
-        c.RoutePrefix = string.Empty; // Đặt Swagger ở trang chính
+        c.RoutePrefix = string.Empty;
     });
 }
 
 // Áp dụng chính sách CORS
 app.UseCors("MyCors");
 
+// Cấu hình Rate Limiting
+app.UseIpRateLimiting();
+
 // Chuyển hướng HTTPS
 app.UseHttpsRedirection();
 
 // Sử dụng Authentication và Authorization
-app.UseAuthentication(); // Quan trọng: Sử dụng authentication trước authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
-// Sử dụng session
-app.UseSession();  // Đảm bảo session được sử dụng
+// Sử dụng Session
+app.UseSession();
 
 // Map các controller
 app.MapControllers();

@@ -56,10 +56,6 @@ function displaySanTrong(sanTrongs) {
                     <td>${san.giaGioThueVM1.gioketthuc}</td>
                     <td>${san.giaGioThueVM1.dongia.toLocaleString()} VND</td>
                     <td>
-                        <button class="btn btn-success open-modal" data-bs-toggle="modal" data-bs-target="#modalOrder"
-                                data-ma-san="${san.maSb}" data-ma-gio="${san.giaGioThueVM1.magio}" 
-                                data-ngay-dat-san="${san.ngaysudung}" data-gio-bat-dau="${san.giaGioThueVM1.giobatdau}"
-                                data-gio-ket-thuc="${san.giaGioThueVM1.gioketthuc}" id="order" name="order">Đặt sân</button>
                         <button class="btn btn-secondary" onclick="addToCart(
                             '${san.maSb}', '${san.sanBongVM1.tenSb}', '${san.sanBongVM1.diaChi}', '${san.ngaysudung}', 
                             '${san.magio}', '${san.giaGioThueVM1.giobatdau}', '${san.giaGioThueVM1.gioketthuc}', '${san.giaGioThueVM1.dongia}')">
@@ -74,6 +70,13 @@ function displaySanTrong(sanTrongs) {
     const sanTrongModal = new bootstrap.Modal(document.getElementById('sanTrongModal'));
     sanTrongModal.show();
 }
+
+/*
+    <button class="btn btn-success open-modal" data-bs-toggle="modal" data-bs-target="#modalOrder"
+            data-ma-san="${san.maSb}" data-ma-gio="${san.giaGioThueVM1.magio}" 
+            data-ngay-dat-san="${san.ngaysudung}" data-gio-bat-dau="${san.giaGioThueVM1.giobatdau}"
+            data-gio-ket-thuc="${san.giaGioThueVM1.gioketthuc}" id="order" name="order">Đặt sân</button>
+*/
 
 $(document).ready(function () {
     loadSanBongs(); // Gọi hàm tải danh sách sân bóng
