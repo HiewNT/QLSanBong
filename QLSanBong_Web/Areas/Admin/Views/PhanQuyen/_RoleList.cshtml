@@ -1,0 +1,54 @@
+﻿
+<table id="roleTable" class="table table-striped table-bordered display" style="width:100%">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Vai trò</th>
+            <th>Thông tin</th>
+            <th>Thao tác</th>
+        </tr>
+
+    </thead>
+    <tbody id="roleList"></tbody> <!-- Đảm bảo ID này chính xác -->
+</table>
+
+
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="roleModal" tabindex="-1" role="dialog" aria-labelledby="roleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roleModalLabel">Các người dùng của vai trò</h5>
+                <button type="button" class="modalclose" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="d-flex justify-content-end">
+                <!-- Căn phải cho nút -->
+                <button class="btn btn-success mt-2 " onclick="openAddUserModal()">Thêm người dùng mới</button> <!-- Nút thêm nhân viên -->
+            </div>
+            <div class="modal-body">
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="authModal" tabindex="-1" role="dialog" aria-labelledby="authModalLabel"  data-roleid="">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="authModalLabel">Quản lý quyền</h5>
+                <button type="button" class="modalclose" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="authTableContainer"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="saveAuth()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+</div>

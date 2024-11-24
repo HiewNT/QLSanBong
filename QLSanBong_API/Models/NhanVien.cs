@@ -9,8 +9,8 @@
         public string? Chucvu { get; set; }
 
         public string? Sdt { get; set; }
-        public string Tendangnhap { get; set; } = null!;
-        public virtual TaiKhoanVM? TaiKhoan { get; set; }
+        public string UserID { get; set; } = null!;
+        public virtual UserVM? User { get; set; }
     }
     public partial class NhanVien : NhanVienVM
     {

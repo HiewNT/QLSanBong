@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QLSanBong_API.Helpers;
 using QLSanBong_API.Models;
 using QLSanBong_API.Services.IService;
 
@@ -17,9 +18,28 @@ namespace QLSanBong_API.Controllers
         }
 
         // Lấy tất cả sân bóng
+        [HttpGet("usergetall")]
+        public IActionResult UserGetAll()
+        {
+            var sanBongs = _sanBongService.GetAll();
+            return Ok(sanBongs);
+        }
+        // Lấy tất cả sân bóng
         [HttpGet("getall")]
         public IActionResult GetAll()
         {
+            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, "sanbong_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var sanBongs = _sanBongService.GetAll();
             return Ok(sanBongs);
         }
@@ -28,6 +48,18 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbyid")]
         public IActionResult GetById([FromQuery] string id)
         {
+            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, "sanbong_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var sanBong = _sanBongService.GetById(id);
             if (sanBong == null)
             {
@@ -82,6 +114,18 @@ namespace QLSanBong_API.Controllers
         [Authorize(Policy = "RequireAdminRole")] // Chỉ cho phép admin thực hiện
         public IActionResult Add([FromForm] SanBongVM sanBongVM, IFormFile imageFile)
         {
+            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, "sanbong_add"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -96,6 +140,18 @@ namespace QLSanBong_API.Controllers
         [Authorize(Policy = "RequireAdminRole")] // Chỉ cho phép admin thực hiện
         public IActionResult Update([FromQuery] string id, [FromForm] SanBongVM sanBongVM, IFormFile? imageFile) // Đảm bảo `imageFile` có thể là null
         {
+            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, "sanbong_edit"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { message = "Dữ liệu không hợp lệ", errors = ModelState });
@@ -124,6 +180,18 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, "sanbong_delete"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _sanBongService.Delete(id);
                 return NoContent();
             }

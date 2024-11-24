@@ -15,6 +15,10 @@ public partial class QlsanBongContext : DbContext
     {
     }
 
+    public virtual DbSet<Action> Actions { get; set; }
+
+    public virtual DbSet<ActionService> ActionServices { get; set; }
+
     public virtual DbSet<ChiTietPd> ChiTietPds { get; set; }
 
     public virtual DbSet<ChiTietYcd> ChiTietYcds { get; set; }
@@ -27,9 +31,17 @@ public partial class QlsanBongContext : DbContext
 
     public virtual DbSet<PhieuDatSan> PhieuDatSans { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<RoleAuth> RoleAuths { get; set; }
+
     public virtual DbSet<SanBong> SanBongs { get; set; }
 
-    public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
+    public virtual DbSet<Service> Services { get; set; }
+
+    public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserRole> UserRoles { get; set; }
 
     public virtual DbSet<YeuCauDatSan> YeuCauDatSans { get; set; }
 
@@ -39,6 +51,45 @@ public partial class QlsanBongContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Action>(entity =>
+        {
+            entity.ToTable("Action");
+
+            entity.Property(e => e.ActionId)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasColumnName("ActionID");
+            entity.Property(e => e.ActionName).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<ActionService>(entity =>
+        {
+            entity.ToTable("ActionService");
+
+            entity.Property(e => e.Id)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasColumnName("ID");
+            entity.Property(e => e.ActionId)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasColumnName("ActionID");
+            entity.Property(e => e.ServiceId)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasColumnName("ServiceID");
+
+            entity.HasOne(d => d.Action).WithMany(p => p.ActionServices)
+                .HasForeignKey(d => d.ActionId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_ActionService_Action");
+
+            entity.HasOne(d => d.Service).WithMany(p => p.ActionServices)
+                .HasForeignKey(d => d.ServiceId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_ActionService_Service");
+        });
+
         modelBuilder.Entity<ChiTietPd>(entity =>
         {
             entity.HasKey(e => new { e.MaPds, e.MaSb, e.MaGio, e.Ngaysudung }).HasName("PK__ChiTietP__3AE048CAA0E04E9B");
@@ -107,7 +158,7 @@ public partial class QlsanBongContext : DbContext
 
         modelBuilder.Entity<GiaGioThue>(entity =>
         {
-            entity.HasKey(e => e.MaGio).HasName("PK__GiaGioTh__3CD3DE2C0EFE0A63");
+            entity.HasKey(e => e.MaGio).HasName("PK__GiaGioTh__3CD3DE2C276FF84D");
 
             entity.ToTable("GiaGioThue");
 
@@ -120,7 +171,7 @@ public partial class QlsanBongContext : DbContext
 
         modelBuilder.Entity<KhachHang>(entity =>
         {
-            entity.HasKey(e => e.MaKh).HasName("PK__KhachHan__2725CF1EC8ABA411");
+            entity.HasKey(e => e.MaKh).HasName("PK__KhachHan__2725CF1E6D7FDFA5");
 
             entity.ToTable("KhachHang");
 
@@ -137,19 +188,18 @@ public partial class QlsanBongContext : DbContext
             entity.Property(e => e.TenKh)
                 .HasMaxLength(30)
                 .HasColumnName("TenKH");
-            entity.Property(e => e.Tendangnhap)
-                .HasMaxLength(30)
-                .IsUnicode(false);
+            entity.Property(e => e.UserId)
+                .HasMaxLength(250)
+                .HasColumnName("UserID");
 
-            entity.HasOne(d => d.TendangnhapNavigation).WithMany(p => p.KhachHangs)
-                .HasForeignKey(d => d.Tendangnhap)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_KhachHang_TaiKhoan");
+            entity.HasOne(d => d.User).WithMany(p => p.KhachHangs)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_KhachHang_User");
         });
 
         modelBuilder.Entity<NhanVien>(entity =>
         {
-            entity.HasKey(e => e.MaNv).HasName("PK__NhanVien__2725D70AE35EEBAE");
+            entity.HasKey(e => e.MaNv).HasName("PK__NhanVien__2725D70A3BEA5D23");
 
             entity.ToTable("NhanVien");
 
@@ -165,14 +215,13 @@ public partial class QlsanBongContext : DbContext
             entity.Property(e => e.TenNv)
                 .HasMaxLength(30)
                 .HasColumnName("TenNV");
-            entity.Property(e => e.Tendangnhap)
-                .HasMaxLength(30)
-                .IsUnicode(false);
+            entity.Property(e => e.UserId)
+                .HasMaxLength(250)
+                .HasColumnName("UserID");
 
-            entity.HasOne(d => d.TendangnhapNavigation).WithMany(p => p.NhanViens)
-                .HasForeignKey(d => d.Tendangnhap)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_NhanVien_TaiKhoan");
+            entity.HasOne(d => d.User).WithMany(p => p.NhanViens)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_NhanVien_User");
         });
 
         modelBuilder.Entity<PhieuDatSan>(entity =>
@@ -209,6 +258,45 @@ public partial class QlsanBongContext : DbContext
                 .HasConstraintName("FK_PhieuDatSan_NhanVien");
         });
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.RoleId).HasName("PK__Role__8AFACE3A9EB09DB0");
+
+            entity.ToTable("Role");
+
+            entity.Property(e => e.RoleId)
+                .HasMaxLength(250)
+                .HasColumnName("RoleID");
+            entity.Property(e => e.RoleName)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.ThongTin).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<RoleAuth>(entity =>
+        {
+            entity.HasKey(e => new { e.RoleId, e.AuthId });
+
+            entity.ToTable("RoleAuth");
+
+            entity.Property(e => e.RoleId)
+                .HasMaxLength(250)
+                .HasColumnName("RoleID");
+            entity.Property(e => e.AuthId)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasColumnName("AuthID");
+            entity.Property(e => e.GhiChu).HasMaxLength(500);
+
+            entity.HasOne(d => d.Auth).WithMany(p => p.RoleAuths)
+                .HasForeignKey(d => d.AuthId)
+                .HasConstraintName("FK_RoleAuth_ActionService");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.RoleAuths)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK_RoleAuth_Role");
+        });
+
         modelBuilder.Entity<SanBong>(entity =>
         {
             entity.HasKey(e => e.MaSb).HasName("PK__SanBong__2725080EEA944BF7");
@@ -227,21 +315,53 @@ public partial class QlsanBongContext : DbContext
                 .HasColumnName("TenSB");
         });
 
-        modelBuilder.Entity<TaiKhoan>(entity =>
+        modelBuilder.Entity<Service>(entity =>
         {
-            entity.HasKey(e => e.Username);
+            entity.ToTable("Service");
 
-            entity.ToTable("TaiKhoan");
+            entity.Property(e => e.ServiceId)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasColumnName("ServiceID");
+            entity.Property(e => e.ServiceName).HasMaxLength(50);
+        });
 
-            entity.Property(e => e.Username)
-                .HasMaxLength(30)
-                .IsUnicode(false);
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("User");
+
+            entity.Property(e => e.UserId)
+                .HasMaxLength(250)
+                .HasColumnName("UserID");
             entity.Property(e => e.Password)
                 .HasMaxLength(250)
                 .IsUnicode(false);
-            entity.Property(e => e.Role)
-                .HasMaxLength(50)
+            entity.Property(e => e.Username)
+                .HasMaxLength(30)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.RoleId }).HasName("PK__User_Rol__AF27604F4C8FBC3E");
+
+            entity.ToTable("UserRole");
+
+            entity.Property(e => e.UserId)
+                .HasMaxLength(250)
+                .HasColumnName("UserID");
+            entity.Property(e => e.RoleId)
+                .HasMaxLength(250)
+                .HasColumnName("RoleID");
+            entity.Property(e => e.GhiChu).HasMaxLength(500);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.UserRoles)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK_UserRole_Role");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserRoles)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_UserRole_User");
         });
 
         modelBuilder.Entity<YeuCauDatSan>(entity =>
@@ -258,11 +378,6 @@ public partial class QlsanBongContext : DbContext
                 .HasColumnName("MaKH");
             entity.Property(e => e.Thoigiandat).HasColumnType("datetime");
             entity.Property(e => e.TongTien).HasColumnType("decimal(18, 0)");
-
-            entity.HasOne(d => d.MaKhNavigation).WithMany(p => p.YeuCauDatSans)
-                .HasForeignKey(d => d.MaKh)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_YeuCauDatSan_KhachHang");
         });
 
         OnModelCreatingPartial(modelBuilder);

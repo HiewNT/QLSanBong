@@ -83,7 +83,15 @@
             });
 
             if (!response.ok) {
-                throw new Error("Không thể tải danh sách khách hàng.");
+                // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+                const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+                const errorMessage = errorData?.message || "Không thể tải danh sách nhân viên.";
+
+                // Hiển thị thông báo warning với Toastr
+                alert(errorMessage);
+
+                document.getElementById('khachHangContainer').innerHTML = `<p class="text-danger text-center">${errorMessage}</p>`;
+                return;
             }
 
             const khachHangs = await response.json();
@@ -96,24 +104,22 @@
             khachHangList.innerHTML = ''; // Xóa nội dung trước đó
 
             khachHangs.forEach(kh => {
-
                 khachHangList.innerHTML += `
-                    <tr>
-                        <td>${kh.maKh}</td>
-                        <td>${kh.tenKh}</td>
-                        <td>${kh.sdt}</td>
-                        <td>${kh.gioitinh}</td>
-                        <td>${kh.diachi}</td>
-                        <td>${kh.tendangnhap}</td>
-                        <td>${kh.taiKhoan ? kh.taiKhoan.password : 'N/A'}</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="editKhachHang('${kh.maKh}')"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteKhachHang('${kh.maKh}')"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
+                        <tr>
+                            <td>${kh.maKh}</td>
+                            <td>${kh.tenKh}</td>
+                            <td>${kh.sdt}</td>
+                            <td>${kh.gioitinh}</td>
+                            <td>${kh.diachi}</td>
+                            <td>${kh.user ? kh.user.username : 'N/A'}</td>
+                            <td>${kh.user ? kh.user.password : 'N/A'}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editKhachHang('${kh.maKh}')"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteKhachHang('${kh.maKh}')"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
             });
-
 
             // Khởi tạo DataTable sau khi thêm dữ liệu vào bảng
             $('#khachHangTable').DataTable({
@@ -135,6 +141,7 @@
             document.getElementById('khachHangContainer').innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
         }
     }
+
     async function loadKhachHangById(maKh) {
         const url = `https://localhost:7182/api/KhachHang/getbyid?id=${maKh}`;
         try {
@@ -148,7 +155,14 @@
             });
 
             if (!response.ok) {
-                throw new Error("Không thể tải thông tin khách hàng.");
+                // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+                const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+                const errorMessage = errorData?.message || "Không thể tải danh sách nhân viên.";
+
+                // Hiển thị thông báo warning với Toastr
+                alert(errorMessage);
+
+                return;
             }
 
             const khachHang = await response.json();
@@ -159,8 +173,8 @@
                 document.getElementById('sdtkh1').value = khachHang.sdt;
                 document.getElementById('gtkh1').value = khachHang.gioitinh;
                 document.getElementById('dckh1').value = khachHang.diachi;
-                document.getElementById('userkh1').value = khachHang.tendangnhap;
-                document.getElementById('passkh1').value = khachHang.taiKhoan ? khachHang.taiKhoan.password : '';
+                document.getElementById('userkh1').value = khachHang.user ? khachHang.user.username : '';
+                document.getElementById('passkh1').value = khachHang.user ? khachHang.user.password : '';
 
                 // Hiển thị modal chỉnh sửa
                 $('#updateKHModal').modal('show');
@@ -172,6 +186,7 @@
             alert("Không thể tải thông tin khách hàng.");
         }
     }
+
     // Hàm Sửa khách hàng
     window.editKhachHang = function (maKh) {
         loadKhachHangById(maKh); // Tải dữ liệu khách hàng
@@ -212,8 +227,9 @@
                     sdt: sdtKh1,
                     gioitinh: gtkh1,
                     diachi: dckh1,
-                    tendangnhap: tenDangNhap1,
-                    taiKhoan: {
+                    userID: "",
+                    user: {
+                        username: tenDangNhap1,
                         password: matKhau1,
                         role: "KhachHang"  // Đặt role mặc định là KhachHang
                     }
@@ -231,18 +247,11 @@
 
                 loadkhachHangs(); // Tải lại danh sách khách hàng
             } else {
-                let errorMessage = "Có lỗi xảy ra trong quá trình cập nhật.";
-                const result = await response.text();
+                const errorData = await response.json(); // Đọc lỗi từ API nếu có
+                const errorMessage = errorData?.message || "Có lỗi xảy ra trong quá trình thêm.";
 
-                if (result) {
-                    if (result.includes("Tài khoản đã tồn tại.")) {
-                        errorMessage = "Tên đăng nhập đã tồn tại.";
-                    } else if (result.includes("Số điện thoại đã tồn tại.")) {
-                        errorMessage = "Số điện thoại đã tồn tại.";
-                    } else {
-                        errorMessage = result;
-                    }
-                }
+                // Hiển thị thông báo lỗi từ API với Toastr
+                alert(errorMessage);
 
                 document.getElementById("ermessage1").textContent = errorMessage;
                 document.getElementById("ermessage1").style.display = 'block';
@@ -253,35 +262,39 @@
         }
     }
 
-
     // Hàm Xóa khách hàng
-    window.deleteKhachHang = function (maKh) {
+    window.deleteKhachHang = async function (maKh) {
         if (confirm("Bạn có chắc chắn muốn xóa khách hàng này?")) {
             const url = `https://localhost:7182/api/KhachHang/delete?id=${maKh}`;
-            fetch(url, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
-                    "Content-Type": "application/json"
-                }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert("Xóa khách hàng thành công!");
-
-                        // Hủy khởi tạo DataTable trước đó nếu có
-                        if ($.fn.DataTable.isDataTable('#khachHangTable')) {
-                            $('#khachHangTable').DataTable().destroy();
-                        }
-                        loadkhachHangs(); // Tải lại danh sách khách hàng
-                    } else {
-                        throw new Error("Xóa khách hàng thất bại.");
+            try {
+                const response = await fetch(url, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                        "Content-Type": "application/json"
                     }
-                })
-                .catch(error => {
-                    console.error("Lỗi:", error);
-                    alert(error.message);
                 });
+
+                if (response.ok) {
+                    alert("Xóa khách hàng thành công!");
+
+                    // Hủy khởi tạo DataTable trước đó nếu có
+                    if ($.fn.DataTable.isDataTable('#khachHangTable')) {
+                        $('#khachHangTable').DataTable().destroy();
+                    }
+
+                    loadkhachHangs(); // Tải lại danh sách khách hàng
+                } else {
+                    const errorData = await response.json(); // Đọc lỗi từ API nếu có
+                    const errorMessage = errorData?.message || "Có lỗi xảy ra trong quá trình xóa.";
+
+                    // Hiển thị thông báo lỗi từ API với Toastr
+                    alert(errorMessage);
+                }
+            } catch (error) {
+                console.error("Lỗi khi xóa khách hàng:", error);
+                alert("Không thể xóa khách hàng. Vui lòng thử lại.");
+            }
         }
     }
 </script>

@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QLSanBong_API.Helpers;
 using QLSanBong_API.Models;
 
 namespace QLSanBong_API.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class NhanVienController : ControllerBase
@@ -21,14 +22,57 @@ namespace QLSanBong_API.Controllers
         [Authorize(Roles = "Admin,NhanVien")]
         public ActionResult<IEnumerable<NhanVien>> GetAll()
         {
-            var nhanVienList = _nhanVienService.GetAll(); // Gọi phương thức GetAll không tham số
-            return Ok(nhanVienList);
+            try
+            {
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, "nhanvien_read"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
+
+
+                // Lấy danh sách nhân viên từ service
+                var nhanVienList = _nhanVienService.GetAll();
+
+                // Lọc bỏ nhân viên có MaNv là "NV00000"
+                var filteredList = nhanVienList.Where(nv => nv.MaNv != "NV00000").ToList();
+
+                // Trả về danh sách đã lọc
+                return Ok(filteredList);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý ngoại lệ nếu xảy ra
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Đã xảy ra lỗi: {ex.Message}");
+            }
         }
+
+
         // GET: api/nhanvien/{id}
         [HttpGet("getbyid")]
         [Authorize(Roles = "Admin,NhanVien")]
         public ActionResult<NhanVien> GetById([FromQuery] string id)
         {
+            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, "nhanvien_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
+
             var nhanVien = _nhanVienService.GetById(id);
             if (nhanVien == null)
             {
@@ -39,13 +83,25 @@ namespace QLSanBong_API.Controllers
 
         // POST: api/nhanvien
         [HttpPost("add")]
-        [Authorize(Policy = "RequireAdminRole")] // Chỉ cho phép admin thực hiện
+        //[Authorize(Policy = "RequireAdminRole")] // Chỉ cho phép admin thực hiện
         public ActionResult<NhanVien> Add(NhanVienVM nhanVienVM)
         {
             try
             {
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, "nhanvien_add"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _nhanVienService.Add(nhanVienVM);
-                return CreatedAtAction(nameof(GetById), new { id = nhanVienVM.Tendangnhap }, nhanVienVM);
+                return CreatedAtAction(nameof(GetById), new { id = nhanVienVM.UserID }, nhanVienVM);
             }
             catch (InvalidOperationException ex)
             {
@@ -66,6 +122,18 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, "nhanvien_edit"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _nhanVienService.Update(id, nhanVienVM);
                 return Ok(nhanVienVM);
             }
@@ -88,6 +156,18 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, "nhanvien_delete"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _nhanVienService.Delete(id);
                 return NoContent();
             }

@@ -1,0 +1,110 @@
+﻿<table id="actionTable" class="table table-striped table-bordered display" style="width:100%">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Tên hành động</th>
+            <th>Thao tác</th>
+        </tr>
+
+    </thead>
+    <tbody id="actionList"></tbody> <!-- Đảm bảo ID này chính xác -->
+</table>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        await loadactions();
+    });
+    // Hàm tải danh sách hành động từ API
+async function loadactions() {
+    let url = `https://localhost:7182/api/Auth/getallaction`;
+    try {
+        const token = sessionStorage.getItem("Token");
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Không thể tải danh sách hành động.");
+        }
+
+        const actions = await response.json();
+        const actionList = document.getElementById('actionList');
+
+        if (!actionList) {
+            throw new Error("Không tìm thấy phần tử để hiển thị danh sách hành động.");
+        }
+
+        actionList.innerHTML = ''; // Xóa nội dung trước đó
+
+        actions.forEach(action => {
+            actionList.innerHTML += `
+                <tr>
+                    <td>${action.actionId}</td>
+                    <td>${action.actionName}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteAction('${action.actionId}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        // Hủy khởi tạo DataTable nếu đã có
+        if ($.fn.DataTable.isDataTable('#actionTable')) {
+            $('#actionTable').DataTable().destroy();
+        }
+
+        // Khởi tạo DataTable sau khi thêm dữ liệu vào bảng
+        $('#actionTable').DataTable({
+            "paging": true,
+            "ordering": true,
+            "info": true,
+            "searching": true,
+            "language": {
+                "paginate": {
+                    "next": "Trang sau",
+                    "previous": "Trang trước"
+                },
+                "info": "Hiển thị từ _START_ đến _END_ của _TOTAL_ hành động",
+                "search": "Tìm kiếm:"
+            }
+        });
+    } catch (error) {
+        console.error("Lỗi:", error);
+        document.getElementById('actionContainer').innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
+    }
+}
+
+
+
+    // Hàm xóa hành động
+    async function deleteAction(actionId) {
+        const confirmation = confirm("Bạn có chắc chắn muốn xóa hành động này?");
+        if (confirmation) {
+            const response = await fetch(`https://localhost:7182/api/Auth/deleteaction?id=${actionId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
+                }
+            });
+
+            if (response.ok) {
+                alert("Xóa hành động thành công!");
+
+                // Hủy khởi tạo DataTable trước đó nếu có
+                if ($.fn.DataTable.isDataTable('#actionTable')) {
+                    $('#actionTable').DataTable().destroy();
+                }
+                await loadactions(); // Tải lại danh sách hành động
+            } else {
+                alert("Có lỗi xảy ra khi xóa hành động.");
+            }
+        }
+    }
+
+
+</script>

@@ -69,7 +69,15 @@
             });
 
             if (!response.ok) {
-                throw new Error("Không thể tải danh sách nhân viên.");
+                // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+                const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+                const errorMessage = errorData?.message || "Không thể tải danh sách nhân viên.";
+
+                // Hiển thị thông báo warning với Toastr
+                alert(errorMessage);
+
+                document.getElementById('nhanVienContainer').innerHTML = `<p class="text-danger text-center">${errorMessage}</p>`;
+                return;
             }
 
             const nhanViens = await response.json();
@@ -88,8 +96,8 @@
                         <td>${nv.maNv}</td>
                         <td>${nv.tenNv}</td>
                         <td>${nv.sdt}</td>
-                        <td>${nv.tendangnhap}</td>
-                        <td>${nv.taiKhoan ? nv.taiKhoan.password : 'N/A'}</td>
+                        <td>${nv.user ? nv.user.username : 'N/A'}</td>
+                        <td>${nv.user ? nv.user.password : 'N/A'}</td>
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="editNhanVien('${nv.maNv}')"><i class="fas fa-edit"></i></button>
                             <button class="btn btn-danger btn-sm" onclick="deleteNhanVien('${nv.maNv}')"><i class="fas fa-trash"></i></button>
@@ -119,6 +127,8 @@
             document.getElementById('nhanVienContainer').innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
         }
     }
+
+
     async function loadNhanVienById(maNv) {
         const url = `https://localhost:7182/api/NhanVien/getbyid?id=${maNv}`;
         try {
@@ -132,7 +142,13 @@
             });
 
             if (!response.ok) {
-                throw new Error("Không thể tải thông tin nhân viên.");
+                // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+                const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+                const errorMessage = errorData?.message || "Không thể tải danh sách nhân viên.";
+
+                // Hiển thị thông báo warning với Toastr
+                alert(errorMessage);
+                return;
             }
 
             const nhanVien = await response.json();
@@ -141,8 +157,8 @@
             if (nhanVien) {
                 document.getElementById('tennv1').value = nhanVien.tenNv;
                 document.getElementById('sdtnv1').value = nhanVien.sdt;
-                document.getElementById('usernv1').value = nhanVien.tendangnhap;
-                document.getElementById('passnv1').value = nhanVien.taiKhoan ? nhanVien.taiKhoan.password : '';
+                document.getElementById('usernv1').value = nhanVien.user ? nhanVien.user.username : '';
+                document.getElementById('passnv1').value = nhanVien.user ? nhanVien.user.password : '';
 
                 // Hiển thị modal chỉnh sửa
                 $('#updateNVModal').modal('show');
@@ -191,16 +207,17 @@
                     tenNv: tenNv1,
                     chucvu: "Nhân viên",
                     sdt: sdt1,
-                    tendangnhap: tenDangNhap1,
-                    taiKhoan: {
+                    userID: "",
+                    user: {
+                        username: tenDangNhap1,
                         password: matKhau1,
-                        role: "NhanVien"
+                        role: "NhanVienDS"
                     }
                 })
             });
 
             if (response.ok) {
-                alert("Cập nhật thông tin nhân viên thành công!");
+                alert("Cập nhật thông tin nhân viên thành công!"); // Thông báo thành công
                 $('#updateNVModal').modal('hide'); // Đóng modal
 
                 // Hủy khởi tạo DataTable trước đó nếu có
@@ -210,27 +227,23 @@
 
                 loadNhanViens(); // Tải lại danh sách nhân viên
             } else {
-                let errorMessage = "Có lỗi xảy ra trong quá trình cập nhật.";
-                const result = await response.text();
+                const errorData = await response.json(); // Đọc lỗi từ API nếu có
+                const errorMessage = errorData?.message || "Có lỗi xảy ra trong quá trình cập nhật.";
 
-                if (result) {
-                    if (result.includes("Tài khoản đã tồn tại.")) {
-                        errorMessage = "Tên đăng nhập đã tồn tại.";
-                    } else if (result.includes("Số điện thoại đã tồn tại.")) {
-                        errorMessage = "Số điện thoại đã tồn tại.";
-                    } else {
-                        errorMessage = result;
-                    }
-                }
+                // Hiển thị thông báo lỗi từ API với Toastr
+                alert(errorMessage);
 
                 document.getElementById("messageerror1").textContent = errorMessage;
                 document.getElementById("messageerror1").style.display = 'block';
             }
         } catch (error) {
+            // Xử lý lỗi khi kết nối API
+            alert("Có lỗi xảy ra khi cập nhật nhân viên.");
             document.getElementById("messageerror1").textContent = "Có lỗi xảy ra khi cập nhật nhân viên.";
             document.getElementById("messageerror1").style.display = 'block';
         }
     }
+
 
 
     // Hàm Xóa nhân viên
@@ -254,7 +267,13 @@
                         }
                         loadNhanViens(); // Tải lại danh sách nhân viên
                     } else {
-                        throw new Error("Xóa nhân viên thất bại.");
+                        // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+                        response.json().then(errorData => {
+                            const errorMessage = errorData?.message || "Không thể tải danh sách nhân viên.";
+
+                            // Hiển thị thông báo warning với Toastr
+                            alert(errorMessage);
+                        });
                     }
                 })
                 .catch(error => {
@@ -263,4 +282,5 @@
                 });
         }
     }
+
 </script>

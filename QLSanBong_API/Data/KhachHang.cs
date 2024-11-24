@@ -15,11 +15,9 @@ public partial class KhachHang
 
     public string? Diachi { get; set; }
 
-    public string Tendangnhap { get; set; } = null!;
+    public string UserId { get; set; } = null!;
 
     public virtual ICollection<PhieuDatSan> PhieuDatSans { get; set; } = new List<PhieuDatSan>();
 
-    public virtual TaiKhoan TendangnhapNavigation { get; set; } = null!;
-
-    public virtual ICollection<YeuCauDatSan> YeuCauDatSans { get; set; } = new List<YeuCauDatSan>();
+    public virtual User User { get; set; } = null!;
 }

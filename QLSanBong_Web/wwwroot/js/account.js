@@ -98,12 +98,13 @@
         }
 
         const khachHangData = {
-            tenKh,
+            tenKh : tenKh,
             sdt: sdtKh,
             gioitinh: gtKh,
             diachi: dcKh,
-            tendangnhap: userKh,
-            taiKhoan: {
+            userID:"",
+            user: {
+                username: userKh,
                 password: passKh,
                 role: "KhachHang"
             }
@@ -121,6 +122,9 @@
             if (response.ok) {
                 alert("Đăng ký thành công!");
                 $('#addKHModal').modal('hide');
+
+                // Xóa lớp 'modal-backdrop' để tránh màn đen
+                $('.modal-backdrop').remove();
             } else {
                 let errorMessage = "Có lỗi xảy ra trong quá trình đăng ký.";
                 const result = await response.text();

@@ -11,8 +11,8 @@
         public string? Gioitinh { get; set; }
 
         public string? Diachi { get; set; }
-        public string Tendangnhap { get; set; } = null!;
-        public virtual TaiKhoanVM? TaiKhoan { get; set; }
+        public string UserID { get; set; } = null!;
+        public virtual UserVM? User { get; set; }
     }
     public partial class KhachHang : KhachHangVM
     {

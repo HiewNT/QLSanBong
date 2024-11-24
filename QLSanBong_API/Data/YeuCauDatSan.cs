@@ -16,6 +16,4 @@ public partial class YeuCauDatSan
     public decimal? TongTien { get; set; }
 
     public virtual ICollection<ChiTietYcd> ChiTietYcds { get; set; } = new List<ChiTietYcd>();
-
-    public virtual KhachHang MaKhNavigation { get; set; } = null!;
 }

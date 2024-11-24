@@ -62,8 +62,8 @@ namespace QLSanBong_API.Controllers
             if (khachHangVM == null ||
                 string.IsNullOrEmpty(khachHangVM.TenKh) ||  // Kiểm tra tên khách hàng
                 string.IsNullOrEmpty(khachHangVM.Sdt) ||   // Kiểm tra số điện thoại
-                string.IsNullOrEmpty(khachHangVM.Tendangnhap) ||
-                string.IsNullOrEmpty(khachHangVM.TaiKhoan?.Password))
+                string.IsNullOrEmpty(khachHangVM.User?.Username) ||
+                string.IsNullOrEmpty(khachHangVM.User?.Password))
             {
                 return BadRequest("Thiếu thông tin đăng ký.");
             }
@@ -71,7 +71,7 @@ namespace QLSanBong_API.Controllers
             try
             {
                 // Kiểm tra xem tên đăng nhập đã tồn tại
-                if (_loginService.IsUsernameTaken(khachHangVM.Tendangnhap))
+                if (_loginService.IsUsernameTaken(khachHangVM.UserID))
                 {
                     return BadRequest("Tài khoản đã tồn tại.");
                 }
@@ -86,7 +86,7 @@ namespace QLSanBong_API.Controllers
                 _khachHangService.Add(khachHangVM);
 
                 // Trả về kết quả thành công
-                return CreatedAtAction(nameof(Signup), new { id = khachHangVM.Tendangnhap }, khachHangVM);
+                return CreatedAtAction(nameof(Signup), new { id = khachHangVM.UserID }, khachHangVM);
             }
             catch (InvalidOperationException ex)
             {
@@ -97,7 +97,6 @@ namespace QLSanBong_API.Controllers
                 return StatusCode(500, "Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.");
             }
         }
-
 
     }
 }

@@ -91,10 +91,8 @@ function displaySanTrong(sanTrongs) {
 $(document).ready(function () {
     loadSanBongs(); // Gọi hàm tải danh sách sân bóng
     async function loadSanBongs() {
-        const url = `https://localhost:7182/api/SanBong/getall`;
-
         try {
-            const response = await fetch(url, {
+            const response = await fetch(`https://localhost:7182/api/SanBong/usergetall`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
@@ -102,7 +100,14 @@ $(document).ready(function () {
             });
 
             if (!response.ok) {
-                throw new Error("Không thể tải danh sách sân bóng.");
+                // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+                const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+                const errorMessage = errorData?.message || "Không thể tải danh sách nhân viên.";
+
+                // Hiển thị thông báo warning với Toastr
+                alert(errorMessage);
+
+                return;
             }
 
             const sanBongs = await response.json();

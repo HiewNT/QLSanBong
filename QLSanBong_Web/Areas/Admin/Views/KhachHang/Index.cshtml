@@ -73,7 +73,7 @@
     }
 
     // Xóa thông tin trong các trường khi modal đóng
-    addKHModal.addEventListener("hidden.bs.modal", function () {
+    $('#addKHModal').on('hidden.bs.modal', function () {
         document.getElementById("tenkh").value = '';
         document.getElementById("sdtkh").value = '';
         document.getElementById("gtkh").value = 'Nam';
@@ -111,8 +111,9 @@
                     sdt: sdtKh,
                     gioitinh: gtKh,
                     diachi: dcKh,
-                    tendangnhap: userKh,
-                    taiKhoan: {
+                    userID: "", // Cần điền userID hợp lệ nếu cần
+                    user: {
+                        username: userKh,
                         password: passKh,
                         role: "KhachHang"  // Đặt role mặc định là KhachHang
                     }
@@ -131,20 +132,12 @@
 
                 loadkhachHangs(); // Tải lại danh sách khách hàng
             } else {
-                let errorMessage = "Có lỗi xảy ra trong quá trình đăng ký."; // Thông điệp mặc định
-                const result = await response.text();
+                const errorData = await response.json(); // Đọc lỗi từ API nếu có
+                const errorMessage = errorData?.message || "Có lỗi xảy ra trong quá trình thêm.";
 
-                if (result) {
-                    if (result.includes("Tài khoản đã tồn tại.")) {
-                        errorMessage = "Tên đăng nhập đã tồn tại.";
-                    } else if (result.includes("Số điện thoại đã tồn tại.")) {
-                        errorMessage = "Số điện thoại đã tồn tại.";
-                    } else {
-                        errorMessage = result;
-                    }
-                }
+                // Hiển thị thông báo lỗi từ API với Toastr
+                alert(errorMessage);
 
-                // Hiển thị thông báo lỗi
                 document.getElementById("ermessage").textContent = errorMessage;
                 document.getElementById("ermessage").style.display = 'block';
             }

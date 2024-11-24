@@ -13,9 +13,9 @@ public partial class NhanVien
 
     public string? Sdt { get; set; }
 
-    public string Tendangnhap { get; set; } = null!;
+    public string UserId { get; set; } = null!;
 
     public virtual ICollection<PhieuDatSan> PhieuDatSans { get; set; } = new List<PhieuDatSan>();
 
-    public virtual TaiKhoan TendangnhapNavigation { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }
