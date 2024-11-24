@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QLSanBong_API.Helpers;
 using QLSanBong_API.Models; // Namespace chứa các lớp Models
 using QLSanBong_API.Services.IService; // Namespace chứa các interface dịch vụ
 
@@ -20,6 +21,17 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getall")]
         public ActionResult<IEnumerable<YeuCauDatSan>> GetAll()
         {
+            if (!PermissionHelper.HasPermission(User, "yeucau_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var result = _yeuCauDatSanService.GetAll();
             return Ok(result);
         }
@@ -27,6 +39,17 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbyid")]
         public ActionResult<YeuCauDatSan> GetById([FromQuery] int id)
         {
+            if (!PermissionHelper.HasPermission(User, "yeucau_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var result = _yeuCauDatSanService.GetByID(id);
             if (result == null)
             {
@@ -38,6 +61,17 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbykh")]
         public ActionResult<YeuCauDatSan> GetByKH([FromQuery] string makh)
         {
+            if (!PermissionHelper.HasPermission(User, "yeucau_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var result = _yeuCauDatSanService.GetByKH(makh);
             if (result == null)
             {
@@ -62,6 +96,17 @@ namespace QLSanBong_API.Controllers
         [HttpPost("add")]
         public ActionResult Add([FromBody] YeuCauDatSanAdd yeuCauDatSanAdd)
         {
+            if (!PermissionHelper.HasPermission(User, "yeucau_add"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             // Gọi hàm Add từ service
             _yeuCauDatSanService.Add(yeuCauDatSanAdd);
             return CreatedAtAction(nameof(GetById), yeuCauDatSanAdd);
@@ -72,6 +117,17 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                if (!PermissionHelper.HasPermission(User, "yeucau_edit"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 // Gọi hàm Update từ service
                 _yeuCauDatSanService.Update(request);
                 return Ok("Success");
@@ -87,6 +143,17 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                if (!PermissionHelper.HasPermission(User, "yeucau_delete"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _yeuCauDatSanService.Delete(id);
                 return NoContent();
             }

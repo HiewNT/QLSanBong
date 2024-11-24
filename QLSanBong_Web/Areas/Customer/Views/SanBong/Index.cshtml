@@ -146,7 +146,12 @@
             headers: { "Authorization": `Bearer ${sessionStorage.getItem("Token")}` }
         });
 
-        if (!response.ok) throw new Error("Không thể lấy dữ liệu sân bóng.");
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert(errorData?.message || "Không thể tải danh sách sân bóng.");
+            return;
+        }
 
         const sanBong = await response.json();
 

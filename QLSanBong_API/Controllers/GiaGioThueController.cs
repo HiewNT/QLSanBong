@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QLSanBong_API.Helpers;
 using QLSanBong_API.Models;
 using QLSanBong_API.Services.IService;
 
@@ -20,6 +21,17 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getall")]
         public ActionResult<GiaGioThueVM> GetAll()
         {
+            if (!PermissionHelper.HasPermission(User, "giathue_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var giaThueList = _giaGioThueService.GetAll();
             return Ok(giaThueList);
         }
@@ -42,6 +54,17 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbyid")]
         public ActionResult<GiaGioThueVM> GetById([FromQuery] string id)
         {
+            if (!PermissionHelper.HasPermission(User, "giathue_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var giaGioThue = _giaGioThueService.GetById(id);
             if (giaGioThue == null)
             {
@@ -57,6 +80,17 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                if (!PermissionHelper.HasPermission(User, "giathue_add"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _giaGioThueService.Add(giaGioThueVM);
                 return CreatedAtAction(nameof(GetById), new { id = giaGioThueVM.MaGio }, giaGioThueVM);
             }
@@ -73,6 +107,17 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                if (!PermissionHelper.HasPermission(User, "giathue_edit"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _giaGioThueService.Update(id, giaGioThueVM1);
                 return NoContent();
             }
@@ -89,6 +134,17 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                if (!PermissionHelper.HasPermission(User, "giathue_delete"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _giaGioThueService.Delete(id);
                 return NoContent();
             }

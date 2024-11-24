@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "_AdminLayout";
+    Layout = "_EmployeeLayout";
 }
 <div class="container mt-5">
     <div class="card shadow-sm">
@@ -50,7 +50,7 @@
 <script>
     // Điều hướng đến trang danh sách
     function goToList() {
-        window.location.href = "/Admin/SanBong/Index";
+        window.location.href = "/Employee/SanBong/Index";
     }
 
     // Hàm saveChanges được khai báo là async
@@ -96,7 +96,6 @@
                         alert("Không thể thêm sân bóng. Lỗi không xác định.");
                     });
                 }
-                return;
             }
         } catch (error) {
             console.error("Lỗi khi thêm sân bóng:", error);

@@ -329,22 +329,8 @@ function saveAuth() {
     // Thực hiện các lời hứa
     Promise.all(promises)
         .then(() => {
-            // Sau khi lưu quyền thành công, làm mới token của người dùng
-            return fetch('https://localhost:7182/api/Account/refreshtokens', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('Token')}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-        })
-        .then(response => {
-            if (response.ok) {
-                alert('Cập nhật quyền thành công!');
-                $('#authModal').modal('show'); // Tải lại modal sau khi lưu
-            } else {
-                alert('Lỗi làm mới token!');
-            }
+            alert('Cập nhật quyền thành công!');
+            $('#authModal').modal('show'); // Đóng modal sau khi lưu
         })
         .catch(error => {
             console.error('Error updating role permissions:', error);

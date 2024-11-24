@@ -12,14 +12,16 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Mini    </title>
+    <title>SB Mini </title>
 
     <!-- Custom fonts for this template-->
     <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
     <!-- Thêm jQuery trước -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link href="~/css/site.css" rel="stylesheet" >
+    <link href="~/css/site.css" rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
@@ -32,20 +34,22 @@
 </head>
 
 <body id="page-top">
-        <script>
+    <script>
         // Kiểm tra token ngay lập tức
         const token = sessionStorage.getItem("Token");
 
         if (!token) {
-            // Nếu không có token, điều hướng về Home/Index
+            // Nếu không có token, điều hướng về trang đăng nhập hoặc mặc định
             window.location.href = "/";
         } else {
             const payload = JSON.parse(atob(token.split('.')[1]));
-            if (payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] == "Admin") {
-                window.location.href = "Admin/";
-            }
-            if (payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] == "KhachHang") {
-                window.location.href = "Customer/";
+            const userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+            // Kiểm tra vai trò và điều hướng đến trang chính tương ứng
+            if (userRole === "Admin") {
+                window.location.href = "/Admin";
+            } else if (userRole === "KhachHang") {
+                window.location.href = "/Customer";
             }
         }
 
@@ -87,9 +91,52 @@
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index", "Home", new { area = "Employee" })">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Tổng quan</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Quản lý hệ thống
+            </div>
+            <!-- Nav Item - Customer -->
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index","KhachHang", new { area = "Employee" })">
+                    <i class="fas fa-solid fa-users"></i>
+                    <span>Khách hàng</span>
+                </a>
+            </li>
+            <!-- Nav Item - Stadium -->
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index","SanBong", new { area = "Employee" })">
+                    <i class="fas fa-solid fa-futbol"></i>
+                    <span>Sân bóng</span>
+                </a>
+            </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Quản lý đặt sân
+            </div>
+            <!-- Nav Item - Customer -->
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index","GiaGioThue", new { area = "Employee" })">
+                    <i class="fas fa-solid fa-clipboard"></i>
+                    <span>Bảng giá thuê sân</span>
+                </a>
+            </li>
+
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Index", "YeuCau", new { area = "Employee" })">
+                <a class="nav-link" href="@Url.Action("Index","YeuCau", new { area = "Employee" })">
                     <i class="fas fa-solid fa-futbol"></i>
                     <span>Yêu cầu đặt sân</span>
                 </a>
@@ -97,7 +144,7 @@
 
             <!-- Nav Item - Stadium -->
             <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Index", "HoaDon", new { area = "Employee" })">
+                <a class="nav-link" href="@Url.Action("Index","HoaDon", new { area = "Employee" })">
                     <i class="fas fa-solid fa-clipboard"></i>
                     <span>Hóa đơn</span>
                 </a>
@@ -122,12 +169,16 @@
                         <ul class="navbar-nav ml-auto">
                             <!-- Nav Item - User Information -->
                             <li class="nav-item dropdown no-arrow">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span id="userNameDisplay" class="d-none d-lg-inline text-dark font-weight-medium">Khách hàng</span>
-                                    <img class="img-profile rounded-circle ml-2" src="/img/users.png" style="height: 30px; width: 30px;">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span id="userNameDisplay"
+                                        class="d-none d-lg-inline text-dark font-weight-medium">Khách hàng</span>
+                                    <img class="img-profile rounded-circle ml-2" src="/img/users.png"
+                                        style="height: 30px; width: 30px;">
                                 </a>
                                 <!-- Dropdown - User Information -->
-                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                    aria-labelledby="userDropdown">
                                     <a class="dropdown-item" href="#">
                                         <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Thông tin
                                     </a>
@@ -170,7 +221,8 @@
     </a>
 
     <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -190,15 +242,15 @@
         </div>
     </div>
     <script>
-    document.getElementById('logoutButton').addEventListener('click', function () {
-        // Xóa token khỏi localStorage hoặc sessionStorage
-        localStorage.removeItem('Token'); // Nếu bạn đang lưu token ở localStorage
-        sessionStorage.removeItem('Token'); // Hoặc nếu bạn lưu token ở sessionStorage
+        document.getElementById('logoutButton').addEventListener('click', function () {
+            // Xóa token khỏi localStorage hoặc sessionStorage
+            localStorage.removeItem('Token'); // Nếu bạn đang lưu token ở localStorage
+            sessionStorage.removeItem('Token'); // Hoặc nếu bạn lưu token ở sessionStorage
 
-        // Chuyển hướng đến trang đăng xuất hoặc trang chủ
-        window.location.href = '/'; // Địa chỉ URL bạn muốn chuyển hướng
-    });
-</script>
+            // Chuyển hướng đến trang đăng xuất hoặc trang chủ
+            window.location.href = '/'; // Địa chỉ URL bạn muốn chuyển hướng
+        });
+    </script>
 
     <!-- Bootstrap core JavaScript-->
     <script src="~/vendor/jquery/jquery.min.js"></script>
@@ -214,7 +266,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <!-- Custom scripts for all pages-->
     <script src="~/js/sb-admin-2.min.js"></script>
-    
+
 
     <script>
         // Lấy đường dẫn hiện tại
@@ -238,4 +290,5 @@
     @RenderSection("scripts", false)
 
 </body>
+
 </html>

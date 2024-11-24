@@ -33,9 +33,17 @@ async function loadYeuCaus() {
       },
     });
 
-    if (!response.ok) {
-      throw new Error("Không thể tải danh sách yêu cầu đặt sân.");
-    }
+      if (!response.ok) {
+          // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+          const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+          const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+          document.getElementById('yeuCauContainer').innerHTML = `<p class="text-danger text-center">${errorMessage}</p>`;
+
+          // Hiển thị thông báo warning với Toastr
+          alert(errorMessage);
+
+          return;
+      }
 
     yeuCaus = await response.json();
     populateTable(yeuCaus);
@@ -127,9 +135,16 @@ async function loadYeuCauDetail(request) {
       body: JSON.stringify(request),
     });
 
-    if (!response.ok) {
-      throw new Error("Không thể tải thông tin chi tiết yêu cầu đặt sân.");
-    }
+      if (!response.ok) {
+          // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+          const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+          const errorMessage = errorData?.message || "Không thể chỉnh sửa yêu cầu";
+
+          // Hiển thị thông báo warning với Toastr
+          alert(errorMessage);
+
+          return;
+      }
 
     const detailYeuCau = await response.json();
     populateDetailModal(detailYeuCau);
@@ -242,9 +257,16 @@ async function confirmAndAddPds(stt, maSb, magio, ngaysudung, status, maKh) {
         body: JSON.stringify(pdsData),
       });
 
-      if (!addPdsResponse.ok) {
-        throw new Error("Không thể thêm phiếu đặt sân.");
-      }
+        if (!addPdsResponse.ok) {
+            // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+            const errorData = await addPdsResponse.json(); // Nếu API trả về JSON chứa thông báo
+            const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+
+            // Hiển thị thông báo warning với Toastr
+            alert(errorMessage);
+
+            return;
+        }
     }
 
     const updateResponse = await fetch(updateUrl, {
@@ -256,9 +278,16 @@ async function confirmAndAddPds(stt, maSb, magio, ngaysudung, status, maKh) {
       body: JSON.stringify(requestData),
     });
 
-    if (!updateResponse.ok) {
-      throw new Error("Không thể cập nhật yêu cầu đặt sân.");
-    }
+      if (!updateResponse.ok) {
+          // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+          const errorData = await updateResponse.json(); // Nếu API trả về JSON chứa thông báo
+          const errorMessage = errorData?.message || "Không thể tạo hóa đơn";
+
+          // Hiển thị thông báo warning với Toastr
+          alert(errorMessage);
+
+          return;
+      }
     alert("Tạo hoá đơn thành công!");
 
     if ($.fn.DataTable.isDataTable("#yeuCauTable")) {

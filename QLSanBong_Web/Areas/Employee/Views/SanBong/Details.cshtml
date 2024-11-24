@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "_AdminLayout";
+    Layout = "_EmployeeLayout";
 }
 
 <div class="container mt-5">
@@ -38,12 +38,12 @@
 
 <script>
     function goBack() {
-        window.location.href = "/Admin/SanBong/Index";
+        window.location.href = "/Employee/SanBong/Index";
     }
 
     function updateSanBong() {
         const maSb = document.getElementById("maSb").innerText;
-        window.location.href = `/Admin/SanBong/Edit?id=${maSb}`; // Chuyển hướng đến trang cập nhật với ID
+        window.location.href = `/Employee/SanBong/Edit?id=${maSb}`; // Chuyển hướng đến trang cập nhật với ID
     }
 </script>
 
@@ -65,9 +65,9 @@
                     alert("Bạn không có quyền truy cập chức năng này.");
                 } else {
                     response.json().then(errorData => {
-                        alert(errorData?.message || "Không thể xem sân bóng.");
+                        alert(errorData?.message || "Không thể xóa sân bóng.");
                     }).catch(() => {
-                        alert("Không thể xem sân bóng. Lỗi không xác định.");
+                        alert("Không thể xóa sân bóng. Lỗi không xác định.");
                     });
                 }
                 return;

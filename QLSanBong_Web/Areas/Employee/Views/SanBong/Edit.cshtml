@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "_AdminLayout";
+    Layout = "_EmployeeLayout";
 }
 <div class="container mt-5">
     <div class="card shadow-sm">
@@ -62,13 +62,13 @@
 <script>
     // Điều hướng đến trang danh sách
     function goToList() {
-        window.location.href = "/Admin/SanBong/Index";
+        window.location.href = "/Employee/SanBong/Index";
     }
 
     // Điều hướng đến trang chi tiết với id hiện tại
     function viewDetail() {
         const maSb = document.getElementById("maSb").value;
-        window.location.href = `/Admin/SanBong/Details?id=${maSb}`;
+        window.location.href = `/Employee/SanBong/Details?id=${maSb}`;
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
@@ -82,16 +82,8 @@
 
 
             if (!response.ok) {
-                // Nếu API trả về lỗi, xử lý theo mã trạng thái
-                if (response.status === 403) {
-                    alert("Bạn không có quyền truy cập chức năng này.");
-                } else {
-                    response.json().then(errorData => {
-                        alert(errorData?.message || "Không thể sửa sân bóng.");
-                    }).catch(() => {
-                        alert("Không thể sửa sân bóng. Lỗi không xác định.");
-                    });
-                }
+                const errorData = await response.json();
+                alert(errorData?.message || "Không thể tải danh sách sân bóng.");
                 return;
             }
 
@@ -142,11 +134,17 @@
                 alert("Cập nhật thành công!");
                 window.location.reload(); // Tải lại trang sau khi cập nhật
             } else {
-
-                const errorData = await response.json();
-                alert(errorData?.message || "Không thể thêm sân bóng.");
+                // Nếu API trả về lỗi, xử lý theo mã trạng thái
+                if (response.status === 403) {
+                    alert("Bạn không có quyền truy cập chức năng này.");
+                } else {
+                    response.json().then(errorData => {
+                        alert(errorData?.message || "Không thể xóa sân bóng.");
+                    }).catch(() => {
+                        alert("Không thể xóa sân bóng. Lỗi không xác định.");
+                    });
+                }
                 return;
-
             }
         } catch (error) {
             console.error("Lỗi:", error);

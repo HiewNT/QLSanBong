@@ -32,7 +32,15 @@ async function loadYeuCaus() {
         });
 
         if (!response.ok) {
-            throw new Error("Không thể tải danh sách yêu cầu đặt sân.");
+            // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+            const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+            const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+            document.getElementById('yeuCauContainer').innerHTML = `<p class="text-danger text-center">${errorMessage}</p>`;
+
+            // Hiển thị thông báo warning với Toastr
+            alert(errorMessage);
+
+            return;
         }
 
         const yeuCaus = await response.json();
@@ -127,7 +135,14 @@ async function loadYeuCauDetail(request) {
         });
 
         if (!response.ok) {
-            throw new Error("Không thể tải thông tin chi tiết yêu cầu đặt sân.");
+            // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+            const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+            const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+
+            // Hiển thị thông báo warning với Toastr
+            alert(errorMessage);
+
+            return;
         }
 
         const detailYeuCau = await response.json();
@@ -214,7 +229,14 @@ async function updateYeuCau(requestData) {
         });
 
         if (!response.ok) {
-            throw new Error("Không thể cập nhật trạng thái yêu cầu.");
+            // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+            const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+            const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+
+            // Hiển thị thông báo warning với Toastr
+            alert(errorMessage);
+
+            return;
         }
 
         // Kiểm tra nếu phản hồi là một chuỗi thay vì JSON

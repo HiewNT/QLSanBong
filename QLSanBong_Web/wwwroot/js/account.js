@@ -59,7 +59,7 @@
             case "Admin":
                 window.location.href = "/Admin";
                 break;
-            case "NhanVien":
+            case "NhanVienDS":
                 window.location.href = "/Employee";
                 break;
             case "KhachHang":

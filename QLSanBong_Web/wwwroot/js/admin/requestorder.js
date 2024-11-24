@@ -19,7 +19,14 @@ async function loadYeuCaus() {
     });
 
     if (!response.ok) {
-      throw new Error("Không thể tải danh sách yêu cầu đặt sân.");
+        // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+        const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+        const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+
+        // Hiển thị thông báo warning với Toastr
+        alert(errorMessage);
+        document.getElementById("yeuCauContainer").innerHTML = `<p class="text-danger text-center">${errorMessage}</p>`;
+        return;
     }
 
     yeuCaus = await response.json();
@@ -113,8 +120,15 @@ async function loadYeuCauDetail(request) {
     });
 
     if (!response.ok) {
-      throw new Error("Không thể tải thông tin chi tiết yêu cầu đặt sân.");
-    }
+      // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+      const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+      const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+
+      // Hiển thị thông báo warning với Toastr
+      alert(errorMessage);
+
+      return;
+  }
 
     const detailYeuCau = await response.json();
     populateDetailModal(detailYeuCau);
@@ -228,8 +242,15 @@ async function confirmAndAddPds(stt, maSb, magio, ngaysudung, status, maKh) {
       });
 
       if (!addPdsResponse.ok) {
-        throw new Error("Không thể thêm phiếu đặt sân.");
-      }
+        // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+        const errorData = await addPdsResponse.json(); // Nếu API trả về JSON chứa thông báo
+        const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+
+        // Hiển thị thông báo warning với Toastr
+        alert(errorMessage);
+
+        return;
+    }
     }
 
     const updateResponse = await fetch(updateUrl, {
@@ -242,8 +263,15 @@ async function confirmAndAddPds(stt, maSb, magio, ngaysudung, status, maKh) {
     });
 
     if (!updateResponse.ok) {
-      throw new Error("Không thể cập nhật yêu cầu đặt sân.");
-    }
+      // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+      const errorData = await updateResponse.json(); // Nếu API trả về JSON chứa thông báo
+      const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+
+      // Hiển thị thông báo warning với Toastr
+      alert(errorMessage);
+
+      return;
+  }
     alert("Tạo hoá đơn thành công!");
 
     if ($.fn.DataTable.isDataTable("#yeuCauTable")) {

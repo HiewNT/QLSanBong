@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "_AdminLayout";
+    Layout = "_EmployeeLayout";
 }
 
 <div class="container mt-5">
@@ -106,15 +106,15 @@
         }
 
         window.viewDetails = function (maSb) {
-            window.location.href = `/Admin/SanBong/Details?id=${maSb}`;
+            window.location.href = `/Employee/SanBong/Details?id=${maSb}`;
         };
 
         window.editSanBong = function (maSb) {
-            window.location.href = `/Admin/SanBong/Edit?id=${maSb}`;
+            window.location.href = `/Employee/SanBong/Edit?id=${maSb}`;
         };
 
         window.AddStadium = function (maSb) {
-            window.location.href = `/Admin/SanBong/Add`;
+            window.location.href = `/Employee/SanBong/Add`;
         };
 
         // Hàm xóa sân bóng

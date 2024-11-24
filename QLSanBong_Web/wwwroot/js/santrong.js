@@ -1,4 +1,5 @@
 ﻿let debounceTimeout;
+
 function debounce(func, delay) {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(func, delay);
@@ -46,13 +47,12 @@ async function searchButton() {
     }, 500); // Chỉ gọi API sau khi dừng thao tác 500ms
 }
 
-
 function displaySanTrong(sanTrongs) {
     const modalTableBody = document.getElementById('modalTableBody');
     modalTableBody.innerHTML = ''; // Xóa dữ liệu cũ
 
     if (sanTrongs.length === 0) {
-        modalTableBody.innerHTML = '<tr><td colspan="12" class="text-center">Không có sân nào trống trong thời gian này.</td></tr>';
+        modalTableBody.innerHTML = '<tr><td colspan="8" class="text-center">Không có sân nào trống trong thời gian này.</td></tr>';
     } else {
         sanTrongs.forEach(san => {
             const row = document.createElement('tr');
@@ -77,12 +77,11 @@ function displaySanTrong(sanTrongs) {
                         Thêm vào chờ
                     </button>
                 </td>
-
             `;
             modalTableBody.appendChild(row);
         });
     }
-    
+
     // Hiển thị modal sau khi đã điền dữ liệu
     const sanTrongModal = new bootstrap.Modal(document.getElementById('sanTrongModal'));
     sanTrongModal.show();
@@ -90,9 +89,10 @@ function displaySanTrong(sanTrongs) {
 
 $(document).ready(function () {
     loadSanBongs(); // Gọi hàm tải danh sách sân bóng
+
     async function loadSanBongs() {
         try {
-            const response = await fetch(`https://localhost:7182/api/SanBong/usergetall`, {
+            const response = await fetch('https://localhost:7182/api/SanBong/usergetall', {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
@@ -100,13 +100,9 @@ $(document).ready(function () {
             });
 
             if (!response.ok) {
-                // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
-                const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
+                const errorData = await response.json();
                 const errorMessage = errorData?.message || "Không thể tải danh sách sân bóng.";
-
-                // Hiển thị thông báo warning với Toastr
                 alert(errorMessage);
-
                 return;
             }
 
@@ -114,34 +110,28 @@ $(document).ready(function () {
             const sanBongGrid = $('#sanBongGrid').empty(); // Làm sạch div trước khi thêm mới
             const selectSan = $('#idSan').empty(); // Làm sạch phần select trước khi thêm mới
 
-            // Thêm option "Chọn sân" vào select
             selectSan.append('<option value="">Chọn sân</option>');
 
-            // Thêm sân bóng vào grid và vào select
             sanBongs.forEach(sb => {
                 const sanBongCard = `
-                <div class="col-md-3 mb-6">
-                    <div class="card h-100">
-                        <img src="data:image/png;base64,${sb.hinhanh}" class="card-img-top" alt="${sb.tenSb}" style="height: 15rem; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title text-center">Sân bóng ${sb.tenSb}</h5>
-                            <p class="card-text">Diện tích: ${sb.dientich} m²</p>
-                            <p class="card-text">Địa chỉ: ${sb.diaChi}</p>
-                            <p class="card-text">${sb.ghichu}</p>
+                    <div class="col-md-3 mb-6">
+                        <div class="card h-100">
+                            <img src="data:image/png;base64,${sb.hinhanh}" class="card-img-top" alt="${sb.tenSb}" style="height: 15rem; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title text-center">Sân bóng ${sb.tenSb}</h5>
+                                <p class="card-text">Diện tích: ${sb.dientich} m²</p>
+                                <p class="card-text">Địa chỉ: ${sb.diaChi}</p>
+                                <p class="card-text">${sb.ghichu}</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
                 sanBongGrid.append(sanBongCard);
-
-                // Thêm option vào select
-                const option = `<option value="${sb.maSb}">${sb.tenSb}</option>`;
-                selectSan.append(option);
+                selectSan.append(`<option value="${sb.maSb}">${sb.tenSb}</option>`);
             });
         } catch (error) {
             console.error("Lỗi:", error);
             $('#sanBongGrid').html(`<div class="text-danger text-center">${error.message}</div>`);
         }
     }
-
 });

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QLSanBong_API.Helpers;
 using QLSanBong_API.Models;
 using QLSanBong_API.Services.IService;
 
@@ -21,6 +22,17 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getall")]
         public ActionResult<IEnumerable<Models.PhieuDatSan>> GetAll()
         {
+            if (!PermissionHelper.HasPermission(User, "hoadon_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var phieuDatSans = _phieuDatSanService.GetAll();
             return Ok(phieuDatSans);
         }
@@ -29,6 +41,17 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbykh")]
         public ActionResult<IEnumerable<PhieuDatSan>> GetByKH([FromQuery] string maKh)
         {
+            if (!PermissionHelper.HasPermission(User, "hoadon_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var phieuDatSan = _phieuDatSanService.GetByKH(maKh);
             if (phieuDatSan == null)
             {
@@ -40,6 +63,17 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbynv")]
         public ActionResult<IEnumerable<PhieuDatSan>> GetByNV([FromQuery] string maNv)
         {
+            if (!PermissionHelper.HasPermission(User, "hoadon_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var phieuDatSan = _phieuDatSanService.GetByNV(maNv);
             if (phieuDatSan == null)
             {
@@ -52,6 +86,17 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbyid")]
         public ActionResult<Models.PhieuDatSan> GetById([FromQuery] string id)
         {
+            if (!PermissionHelper.HasPermission(User, "hoadon_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var phieuDatSan = _phieuDatSanService.GetById(id);
             if (phieuDatSan == null)
             {
@@ -64,6 +109,17 @@ namespace QLSanBong_API.Controllers
         [HttpPost("add")]
         public ActionResult Add([FromBody] PDSAdd pDSAdd)
         {
+            if (!PermissionHelper.HasPermission(User, "hoadon_add"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền truy cập chức năng này."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             try
             {
                 _phieuDatSanService.Add(pDSAdd);
@@ -81,6 +137,17 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                if (!PermissionHelper.HasPermission(User, "hoadon_edit"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _phieuDatSanService.Update(id, pDSAdd);
                 return NoContent();
             }
@@ -100,6 +167,17 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                if (!PermissionHelper.HasPermission(User, "hoadon_delete"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền truy cập chức năng này."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 _phieuDatSanService.Delete(id);
                 return NoContent();
             }

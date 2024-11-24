@@ -35,7 +35,7 @@ namespace QLSanBong_API.Controllers
                 var errorResponse = new
                 {
                     success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
+                    message = "Bạn không có quyền xem danh sách sân bóng."
                 };
 
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
@@ -99,7 +99,6 @@ namespace QLSanBong_API.Controllers
 
         // Thêm sân bóng
         [HttpPost("add")]
-        [Authorize(Policy = "RequireAdminRole")] // Chỉ cho phép admin thực hiện
         public IActionResult Add([FromForm] SanBongVM sanBongVM, IFormFile imageFile)
         {
             // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
@@ -125,7 +124,6 @@ namespace QLSanBong_API.Controllers
 
         // Cập nhật sân bóng
         [HttpPut("update")]
-        [Authorize(Policy = "RequireAdminRole")] // Chỉ cho phép admin thực hiện
         public IActionResult Update([FromQuery] string id, [FromForm] SanBongVM sanBongVM, IFormFile? imageFile) // Đảm bảo `imageFile` có thể là null
         {
             // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
@@ -163,7 +161,6 @@ namespace QLSanBong_API.Controllers
 
         // Xóa sân bóng
         [HttpDelete("delete")]
-        [Authorize(Policy = "RequireAdminRole")] // Chỉ cho phép admin thực hiện
         public IActionResult Delete([FromQuery] string id)
         {
             try
