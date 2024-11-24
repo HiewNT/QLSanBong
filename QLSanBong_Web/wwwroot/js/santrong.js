@@ -102,7 +102,7 @@ $(document).ready(function () {
             if (!response.ok) {
                 // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
                 const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
-                const errorMessage = errorData?.message || "Không thể tải danh sách nhân viên.";
+                const errorMessage = errorData?.message || "Không thể tải danh sách sân bóng.";
 
                 // Hiển thị thông báo warning với Toastr
                 alert(errorMessage);

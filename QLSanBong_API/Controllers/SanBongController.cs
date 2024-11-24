@@ -21,7 +21,7 @@ namespace QLSanBong_API.Controllers
         [HttpGet("usergetall")]
         public IActionResult UserGetAll()
         {
-            var sanBongs = _sanBongService.GetAll();
+            var sanBongs = _sanBongService.UserGetAll();
             return Ok(sanBongs);
         }
         // Lấy tất cả sân bóng
@@ -48,18 +48,6 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbyid")]
         public IActionResult GetById([FromQuery] string id)
         {
-            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-            if (!PermissionHelper.HasPermission(User, "sanbong_read"))
-            {
-                // Tạo đối tượng thông báo dưới dạng JSON
-                var errorResponse = new
-                {
-                    success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
-                };
-
-                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
-            }
             var sanBong = _sanBongService.GetById(id);
             if (sanBong == null)
             {

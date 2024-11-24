@@ -85,7 +85,7 @@
             if (!response.ok) {
                 // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
                 const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
-                const errorMessage = errorData?.message || "Không thể tải danh sách nhân viên.";
+                const errorMessage = errorData?.message || "Không thể tải danh sách khách hàng.";
 
                 // Hiển thị thông báo warning với Toastr
                 alert(errorMessage);
@@ -157,7 +157,7 @@
             if (!response.ok) {
                 // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
                 const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
-                const errorMessage = errorData?.message || "Không thể tải danh sách nhân viên.";
+                const errorMessage = errorData?.message || "Không thể tải danh sách khách hàng.";
 
                 // Hiển thị thông báo warning với Toastr
                 alert(errorMessage);
@@ -248,7 +248,7 @@
                 loadkhachHangs(); // Tải lại danh sách khách hàng
             } else {
                 const errorData = await response.json(); // Đọc lỗi từ API nếu có
-                const errorMessage = errorData?.message || "Có lỗi xảy ra trong quá trình thêm.";
+                const errorMessage = errorData?.message || "Có lỗi xảy ra trong quá trình cập nhật.";
 
                 // Hiển thị thông báo lỗi từ API với Toastr
                 alert(errorMessage);

@@ -6,6 +6,7 @@ namespace QLSanBong_API.Services.IService
     {
         // Phương thức lấy tất cả các sân bóng
         IEnumerable<SanBong> GetAll();
+        IEnumerable<SanBong> UserGetAll();
 
         // Phương thức lấy sân bóng theo ID
         SanBong GetById(string id);

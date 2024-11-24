@@ -13,6 +13,18 @@ namespace QLSanBong_API.Services
             _context = context;
         }
 
+        public IEnumerable<Models.SanBong> UserGetAll()
+        {
+            return _context.SanBongs.Select(sb => new Models.SanBong
+            {
+                MaSb = sb.MaSb,
+                TenSb = sb.TenSb,
+                Dientich = sb.Dientich,
+                Ghichu = sb.Ghichu,
+                Hinhanh = ConvertImageToBase64(sb.Hinhanh), // Chuyển đổi hình ảnh sang Base64
+                DiaChi = sb.DiaChi,
+            }).ToList();
+        }
         public IEnumerable<Models.SanBong> GetAll()
         {
             return _context.SanBongs.Select(sb => new Models.SanBong
