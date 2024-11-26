@@ -24,24 +24,28 @@ namespace QLSanBong_API.Services
                 Sdt = nv.Sdt,
                 UserID = nv.UserId,
                 User = _context.Users
-                                .Where(u => u.UserId == nv.UserId)
-                                .Select(u => new Models.User
-                                {
-                                    UserID = u.UserId,
-                                    Username = u.Username,
-                                    Password = u.Password,
-                                    RoleName = _context.UserRoles
-                                                .Where(ur => ur.UserId == u.UserId)
-                                                .Join(
-                                                    _context.Roles,
-                                                    ur => ur.RoleId,
-                                                    r => r.RoleId,
-                                                    (ur, r) => r.RoleName
-                                                )
-                                                .FirstOrDefault()
-                                })
-                                .FirstOrDefault()
+                .Where(u => u.UserId == nv.UserId)
+                .Select(u => new Models.User
+                {
+                    UserID = u.UserId,
+                    Username = u.Username,
+                    Password = u.Password,
+                    RoleVM = _context.UserRoles
+                                .Where(ur => ur.UserId == u.UserId)
+                                .Join(
+                                    _context.Roles,
+                                    ur => ur.RoleId,
+                                    r => r.RoleId,
+                                    (ur, r) => new RoleVM
+                                    {
+                                        RoleName = r.RoleName,
+                                        ThongTin = r.ThongTin // Gán giá trị ThongTin từ bảng Roles
+                                    })
+                                .ToList() // Lấy tất cả các vai trò cho người dùng
+                })
+                .FirstOrDefault()
             }).ToList();
+
 
             return nhanViensModels;
         }
@@ -62,24 +66,28 @@ namespace QLSanBong_API.Services
                 Sdt = NhanVien.Sdt,
                 UserID = NhanVien.UserId,
                 User = _context.Users
-                                .Where(u => u.UserId == NhanVien.UserId)
-                                .Select(u => new Models.User
-                                {
-                                    UserID = u.UserId,
-                                    Username = u.Username,
-                                    Password = u.Password,
-                                    RoleName = _context.UserRoles
-                                                .Where(ur => ur.UserId == u.UserId)
-                                                .Join(
-                                                    _context.Roles,
-                                                    ur => ur.RoleId,
-                                                    r => r.RoleId,
-                                                    (ur, r) => r.RoleName
-                                                )
-                                                .FirstOrDefault()
-                                })
-                                .FirstOrDefault()
+                    .Where(u => u.UserId == NhanVien.UserId)
+                    .Select(u => new Models.User
+                    {
+                        UserID = u.UserId,
+                        Username = u.Username,
+                        Password = u.Password,
+                        RoleVM = _context.UserRoles
+                                    .Where(ur => ur.UserId == u.UserId)
+                                    .Join(
+                                        _context.Roles,
+                                        ur => ur.RoleId,
+                                        r => r.RoleId,
+                                        (ur, r) => new RoleVM
+                                        {
+                                            RoleName = r.RoleName,  // Lấy tên vai trò
+                                            ThongTin = r.ThongTin  // Thêm thông tin về vai trò nếu cần
+                                        })
+                                    .ToList()  // Lấy tất cả vai trò của người dùng
+                    })
+                    .FirstOrDefault()
             };
+
         }
 
         public void Add(NhanVienVM NhanVienVM)

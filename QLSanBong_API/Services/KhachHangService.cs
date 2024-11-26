@@ -26,24 +26,28 @@ namespace QLSanBong_API.Services
                 Diachi = kh.Diachi,
                 UserID = kh.UserId,
                 User = _context.Users
-                                .Where(u => u.UserId == kh.UserId)
-                                .Select(u => new Models.User
-                                {
-                                    UserID = u.UserId,
-                                    Username = u.Username,
-                                    Password = u.Password,
-                                    RoleName = _context.UserRoles
-                                                .Where(ur => ur.UserId == u.UserId)
-                                                .Join(
-                                                    _context.Roles,
-                                                    ur => ur.RoleId,
-                                                    r => r.RoleId,
-                                                    (ur, r) => r.RoleName
-                                                )
-                                                .FirstOrDefault()
-                                })
-                                .FirstOrDefault()
+                .Where(u => u.UserId == kh.UserId)
+                .Select(u => new Models.User
+                {
+                    UserID = u.UserId,
+                    Username = u.Username,
+                    Password = u.Password,
+                    RoleVM = _context.UserRoles
+                                .Where(ur => ur.UserId == u.UserId)
+                                .Join(
+                                    _context.Roles,
+                                    ur => ur.RoleId,
+                                    r => r.RoleId,
+                                    (ur, r) => new RoleVM
+                                    {
+                                        RoleName = r.RoleName,  // Lấy tên vai trò
+                                        ThongTin = r.ThongTin  // Lấy thông tin thêm nếu cần
+                                    })
+                                .ToList()  // Lấy tất cả vai trò của người dùng
+                })
+                .FirstOrDefault()
             }).ToList();
+
 
             return khachHangsModels;
         }
@@ -66,24 +70,28 @@ namespace QLSanBong_API.Services
                 Diachi = KhachHang.Diachi,
                 UserID = KhachHang.UserId,
                 User = _context.Users
-                                .Where(u => u.UserId == KhachHang.UserId)
-                                .Select(u => new Models.User
-                                {
-                                    UserID = u.UserId,
-                                    Username = u.Username,
-                                    Password = u.Password,
-                                    RoleName = _context.UserRoles
-                                                .Where(ur => ur.UserId == u.UserId)
-                                                .Join(
-                                                    _context.Roles,
-                                                    ur => ur.RoleId,
-                                                    r => r.RoleId,
-                                                    (ur, r) => r.RoleName
-                                                )
-                                                .FirstOrDefault()
-                                })
-                                .FirstOrDefault()
+                    .Where(u => u.UserId == KhachHang.UserId)
+                    .Select(u => new Models.User
+                    {
+                        UserID = u.UserId,
+                        Username = u.Username,
+                        Password = u.Password,
+                        RoleVM = _context.UserRoles
+                                    .Where(ur => ur.UserId == u.UserId)
+                                    .Join(
+                                        _context.Roles,
+                                        ur => ur.RoleId,
+                                        r => r.RoleId,
+                                        (ur, r) => new RoleVM
+                                        {
+                                            RoleName = r.RoleName,  // Lấy tên vai trò
+                                            ThongTin = r.ThongTin  // Lấy thông tin thêm nếu cần
+                                        })
+                                    .ToList()  // Lấy tất cả vai trò của người dùng
+                    })
+                    .FirstOrDefault()
             };
+
         }
 
 

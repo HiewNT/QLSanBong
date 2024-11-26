@@ -39,17 +39,21 @@
         const token = sessionStorage.getItem("Token");
 
         if (!token) {
-            // Nếu không có token, điều hướng về trang đăng nhập hoặc mặc định
-            window.location.href = "/";
+            // Nếu không có token, điều hướng về trang Home/Index
+            window.location.href = "/Home/Index";
         } else {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
 
-            // Kiểm tra vai trò và điều hướng đến trang chính tương ứng
-            if (userRole === "Admin") {
-                window.location.href = "/Admin";
-            } else if (userRole === "KhachHang") {
-                window.location.href = "/Customer";
+                // Kiểm tra nếu userRole không chứa "Customer"
+                if (!userRole.includes("NhanVienDS")) {
+                    window.location.href = "/Home/Index";
+                }
+            } catch (error) {
+                console.error("Lỗi khi xử lý token:", error);
+                // Nếu có lỗi, điều hướng về trang Home/Index
+                window.location.href = "/Home/Index";
             }
         }
 

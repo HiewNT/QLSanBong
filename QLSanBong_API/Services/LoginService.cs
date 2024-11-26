@@ -41,18 +41,16 @@ namespace QLSanBong_API.Services
                 }
 
                 // Lấy RoleId của người dùng từ UserRoles
-                var roleId = _context.UserRoles
-                    .Where(ur => ur.UserId == taiKhoanData.UserId)
-                    .Select(ur => ur.RoleId)
-                    .FirstOrDefault();
+                var userRole = _context.UserRoles
+                    .FirstOrDefault(ur => ur.UserId == taiKhoanData.UserId);
 
-                if (roleId == null)
+                if (userRole == null)
                 {
                     throw new UnauthorizedAccessException("Người dùng không có vai trò hợp lệ.");
                 }
 
                 // Lấy thông tin vai trò từ bảng Roles
-                var role = _context.Roles.SingleOrDefault(r => r.RoleId == roleId);
+                var role = _context.Roles.SingleOrDefault(r => r.RoleId == userRole.RoleId);
                 if (role == null)
                 {
                     throw new UnauthorizedAccessException("Vai trò người dùng không tồn tại.");
@@ -62,9 +60,17 @@ namespace QLSanBong_API.Services
                 var user = new Models.User
                 {
                     Username = username,
-                    RoleName = role.RoleName,
-                    UserID = taiKhoanData.UserId // Đảm bảo có UserId ở đây
+                    UserID = taiKhoanData.UserId, // Đảm bảo có UserId ở đây
+                    RoleVM = new List<RoleVM> // Khởi tạo danh sách RoleVM
+                    {
+                        new RoleVM
+                        {
+                            RoleName = role.RoleName, // Cập nhật thông tin vai trò
+                            ThongTin = role.ThongTin // Cập nhật thông tin chi tiết của vai trò
+                        }
+                    }
                 };
+
 
                 // Tạo JWT token
                 return GenerateJwtToken(user);
@@ -105,29 +111,40 @@ namespace QLSanBong_API.Services
                     }
                 }
 
-                var roleid = _context.UserRoles
-                            .Where(ro => ro.UserId == taiKhoan.UserID)
-                            .Select(ro => ro.RoleId)
-                            .FirstOrDefault();
+                // Lấy danh sách RoleId của người dùng từ UserRoles
+                var roleIds = _context.UserRoles
+                                    .Where(ro => ro.UserId == taiKhoan.UserID)
+                                    .Select(ro => ro.RoleId)
+                                    .ToList();
 
-                // Lấy danh sách AuthID từ bảng UserAuth dựa trên UserID
+                // Lấy danh sách các vai trò từ bảng Roles dựa trên RoleIds
+                var roles = _context.Roles
+                                    .Where(r => roleIds.Contains(r.RoleId))
+                                    .ToList();
+
+                // Lấy danh sách AuthID từ bảng RoleAuths dựa trên RoleIds
                 var userAuths = _context.RoleAuths
-                    .Where(ua => ua.RoleId == roleid)
+                    .Where(ua => roleIds.Contains(ua.RoleId))
                     .Select(ua => ua.AuthId)
                     .ToList();
 
-                // Thêm quyền (permissions) vào claims
+                // Thêm các claim cơ bản
                 var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, taiKhoan.UserID),
-            new Claim(ClaimTypes.Role, taiKhoan.RoleName ?? "KhachHang"),
-            new Claim("Manguoidung", manguoidung)
-        };
+                {
+                    new Claim(ClaimTypes.Name, taiKhoan.UserID),
+                    new Claim("Manguoidung", manguoidung)
+                };
 
-                // Thêm từng quyền từ bảng RoleAuths vào claims
+                // Thêm các vai trò vào claims
+                foreach (var role in roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role.RoleName ?? "KhachHang")); // Thêm từng vai trò vào claims
+                }
+
+                // Thêm các quyền vào claims
                 foreach (var auth in userAuths)
                 {
-                    claims.Add(new Claim("Permission", auth.ToString()));
+                    claims.Add(new Claim("Permission", auth.ToString())); // Thêm quyền vào claims
                 }
 
                 // Lấy khóa bí mật từ cấu hình
@@ -152,6 +169,7 @@ namespace QLSanBong_API.Services
                 throw new InvalidOperationException("Đã xảy ra lỗi khi tạo token.");
             }
         }
+
 
 
         public LoginResponse DecodeJwtToken(string token)

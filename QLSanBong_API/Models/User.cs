@@ -6,7 +6,7 @@
         public string Username { get; set; } = null!;
         public string Password { get; set; } = null!;
 
-        public string? RoleName { get; set; }
+        public List<RoleVM>? RoleVM { get; set; }
 
     }
     public partial class User : UserVM
@@ -20,14 +20,13 @@
 
         public string? Name { get; set; }
         public string? SDT { get; set; }
-        public string? RoleName { get; set; }
-        public string? ThongTin { get; set; }
+
+        public List<Role>? Role { get; set; }
 
     }
     public partial class UserRole : UserRoleVM
     {
         public string UserID { get; set; } = null!;
-        public string RoleID { get; set; } = null!;
     }
     public class UserRoleAdd
     {

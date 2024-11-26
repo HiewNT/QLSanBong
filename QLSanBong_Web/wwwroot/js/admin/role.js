@@ -345,10 +345,13 @@ function infoRole(roleId) {
     loadRoleDetail(roleId);
 }
 
+
+let currentID = [];
 // Hàm tải chi tiết vai trò
 async function loadRoleDetail(roleId) {
     const url = `https://localhost:7182/api/Role/getuserbyrole?roleId=${roleId}`;
     try {
+        currentID = roleId;
         const token = sessionStorage.getItem("Token");
         const response = await fetch(url, {
             method: "GET",
@@ -364,7 +367,7 @@ async function loadRoleDetail(roleId) {
 
         const detailRole = await response.json();
         populateDetailModal(detailRole);
-    } catch (error) {
+    } catch (error) { 
         console.error("Lỗi:", error);
     }
 }
@@ -385,8 +388,6 @@ function populateDetailModal(detailRole) {
                     <th>Username</th>
                     <th>Tên người dùng</th>
                     <th>SDT</th>
-                    <th>Vai trò</th>
-                    <th>Thông tin</th>
                     <th></th>
                 </tr>
             </thead>
@@ -399,11 +400,9 @@ function populateDetailModal(detailRole) {
                 <tr>
                     <td>${detail.username || 'N/A'}</td>
                     <td>${detail.name || 'N/A'}</td>
-                    <td>${detail.sdt || 'N/A'}</td>
-                    <td>${detail.roleName || 'N/A'}</td>
-                    <td>${detail.thongTin || 'N/A'}</td>
+                    <td>${detail.sdt }</td>
                     <td>
-                        <button class="btn btn-danger btn-sm" onclick="deleteUserFromRole('${detail.username}', '${detail.roleName}')">
+                        <button class="btn btn-danger btn-sm" onclick="deleteUserFromRole('${detail.userID}')">
                             <i class="fas fa-trash-alt"></i> Xóa người dùng
                         </button>
                     </td>
@@ -420,7 +419,37 @@ function populateDetailModal(detailRole) {
     $('#roleModal').modal('show');
 }
 
+// Hàm xóa vai trò của người dùng
+async function deleteUserFromRole(userID) {
+    // Hiển thị cảnh báo xác nhận trước khi xóa
+    const confirmation = confirm("Bạn có chắc chắn muốn xóa người này?");
+    if (!confirmation) {
+        return; // Nếu người dùng không xác nhận, không thực hiện hành động xóa
+    }
 
+    const url = `https://localhost:7182/api/Role/deleteuserrole`;
+    try {
+        const token = sessionStorage.getItem("Token");
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userID, roleID: currentID }) // Chuyển thông tin cần thiết vào body
+        });
+
+        if (!response.ok) throw new Error('Không thể xóa vai trò này.');
+
+        alert('Xóa vai trò thành công.');
+
+        loadRoleDetail(currentID);
+        // Thực hiện lại thao tác như cập nhật UI nếu cần
+    } catch (error) {
+        console.error('Lỗi khi xóa vai trò:', error);
+        alert('Không thể xóa vai trò.');
+    }
+}
 $(".modalclose").on("click", function () {
     $("#roleModal").modal("hide");  // Đóng tất cả các modal
     $("#authModal").modal("hide");  // Đóng tất cả các modal

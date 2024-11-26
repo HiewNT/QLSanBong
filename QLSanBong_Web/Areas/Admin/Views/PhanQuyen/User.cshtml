@@ -1,0 +1,296 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">Danh sách người dùng</h3>
+        </div>
+        <div class="card-body">
+            <div id="userContainer">
+                <table id="userTable" class="table table-striped table-bordered" style="width:100%">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="width: 10%; text-align: center;">Username</th>
+                            <th style="width: 20%; text-align: center;">Tên</th>
+                            <th style="width: 10%; text-align: center;">SDT</th>
+                            <th style="width: 45%; text-align: center;">Vai trò</th>
+                            <th style="width: 12%; text-align: center;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="userList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal quản lý vai trò -->
+<div class="modal fade" id="roleModal" tabindex="-1" role="dialog" aria-labelledby="roleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roleModalLabel">Thêm vai trò cho người dùng</h5>
+                <button type="button" class="modalclose" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="roleSelectContainer">
+                    <!-- Vai trò sẽ được thêm động tại đây -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modalclose" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="saveRolesBtn">Thêm vai trò</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUsers();
+    });
+
+    // Gọi API để lấy danh sách người dùng
+    async function loadUsers() {
+        const url = 'https://localhost:7182/api/Role/getalluserrole';
+        try {
+            const token = sessionStorage.getItem("Token");
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) throw new Error("Không thể tải danh sách người dùng.");
+
+            const users = await response.json();
+            renderUserList(users);
+        } catch (error) {
+            console.error("Lỗi:", error);
+            document.getElementById('userContainer').innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
+        }
+    }
+
+    function renderUserList(users) {
+        const userList = document.getElementById('userList');
+        userList.innerHTML = ''; // Xóa nội dung cũ trước khi thêm mới
+
+        users.forEach(user => {
+            // Tạo các nút riêng cho từng vai trò
+            const rolesHtml = user.role && Array.isArray(user.role)
+                ? user.role.map(role => {
+                    return `
+                        <span class="role-item btn btn-light" style="display: inline-flex; padding: 0.3rem 0.3rem; align-items: center;">
+                            ${role.thongTin} <button class="btn btn-sm btn-outline-danger ms-1" style="cursor: pointer;padding: 0.1rem 0.4rem;" onclick="removeRole('${user.userID}', '${role.roleID}')"><i class="fa fa-regular fa-minus"></i></button>
+                        </span>
+                    `;
+                }).join(' ')
+                : 'Chưa có vai trò';
+
+            // Sử dụng encodeURIComponent để bảo vệ các ký tự đặc biệt
+            const roleJson = encodeURIComponent(JSON.stringify(user.role));
+            userList.innerHTML += `
+                <tr>
+                    <td>${user.username}</td>
+                    <td>${user.name}</td>
+                    <td>${user.sdt}</td>
+                    <td>
+                        ${rolesHtml}
+                        <button style="cursor: pointer;padding: 0.1rem 0.4rem;" class="btn btn-outline-primary btn-sm" onclick="showRoleModal('${user.userID}', '${roleJson}')">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </td>
+                    <td>
+                       
+                    </td>
+                </tr>`;
+        });
+
+        //<button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userID}')">Xóa người dùng</button>
+
+        // Hủy khởi tạo DataTable nếu đã có
+        if ($.fn.DataTable.isDataTable('#userTable')) {
+            $('#userTable').DataTable().destroy();
+        }
+        // Khởi tạo DataTable sau khi dữ liệu đã được chèn vào bảng
+        $('#userTable').DataTable();
+    }
+
+
+
+    // Hàm xóa vai trò của người dùng
+    async function removeRole(userID, roleID) {
+        // Hiển thị cảnh báo xác nhận trước khi xóa
+        const confirmation = confirm("Bạn có chắc chắn muốn xóa vai trò này?");
+        if (!confirmation) {
+            return; // Nếu người dùng không xác nhận, không thực hiện hành động xóa
+        }
+
+        const url = `https://localhost:7182/api/Role/deleteuserrole`;
+        try {
+            const token = sessionStorage.getItem("Token");
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userID, roleID }) // Chuyển thông tin cần thiết vào body
+            });
+
+            if (!response.ok) throw new Error('Không thể xóa vai trò.');
+
+            alert('Xóa vai trò thành công.');
+
+            // Hủy khởi tạo DataTable nếu đã có
+            if ($.fn.DataTable.isDataTable('#userTable')) {
+                $('#userTable').DataTable().destroy();
+            }
+            await loadUsers();
+            // Thực hiện lại thao tác như cập nhật UI nếu cần
+        } catch (error) {
+            console.error('Lỗi khi xóa vai trò:', error);
+            alert('Không thể xóa vai trò.');
+        }
+    }
+
+
+
+    // Hiển thị modal chỉnh sửa vai trò
+    function showRoleModal(userID, rolesEncoded) {
+        try {
+            // Giải mã URL và chuyển đổi chuỗi JSON thành mảng đối tượng
+            const roles = JSON.parse(decodeURIComponent(rolesEncoded));
+
+            if (Array.isArray(roles)) {
+                // Gọi API lấy danh sách vai trò cho modal
+                fetchRolesForModal(roles.map(role => role.roleID), userID);
+            } else {
+                console.error('Dữ liệu roles không phải là mảng:', roles);
+                alert('Dữ liệu vai trò không hợp lệ.');
+            }
+        } catch (error) {
+            console.error('Lỗi khi giải mã dữ liệu roles:', error);
+            alert('Không thể xử lý vai trò.');
+        }
+    }
+
+    // Gọi API lấy danh sách vai trò cho modal
+    async function fetchRolesForModal(roleIds, userID) {
+        const url = 'https://localhost:7182/api/Role/getallrole';
+        try {
+            const token = sessionStorage.getItem("Token");
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error('Không thể lấy danh sách vai trò.');
+
+            const allRoles = await response.json();
+            // Lọc các vai trò chưa được gán cho người dùng
+            const availableRoles = allRoles.filter(role => !roleIds.includes(role.roleID));
+            renderRoleModal(availableRoles, userID);
+        } catch (error) {
+            console.error('Lỗi:', error);
+            alert('Không thể lấy vai trò.');
+        }
+    }
+
+    // Hiển thị các vai trò trong modal
+    function renderRoleModal(availableRoles, userID) {
+        const roleSelectContainer = document.getElementById('roleSelectContainer');
+        roleSelectContainer.innerHTML = '';  // Reset nội dung trước khi thêm mới
+
+        availableRoles.forEach(role => {
+            const roleDiv = `
+                <div>
+                    <input type="checkbox" id="role_${role.roleID}" value="${role.roleID}">
+                    <label for="role_${role.roleID}">${role.thongTin}</label>
+                </div>`;
+            roleSelectContainer.innerHTML += roleDiv;
+        });
+
+        // Gắn sự kiện lưu vai trò
+        document.getElementById('saveRolesBtn').onclick = async () => {
+            const selectedRoles = Array.from(document.querySelectorAll('#roleSelectContainer input:checked'))
+                .map(checkbox => checkbox.value);
+
+            // Gọi API để thêm từng vai trò một
+            for (const roleID of selectedRoles) {
+                await addUserRole(userID, roleID);
+            }
+
+            $('#roleModal').modal('hide');
+            loadUsers();
+        };
+
+        // Hiển thị modal
+        $('#roleModal').modal('show');
+    }
+
+    // Cập nhật vai trò người dùng (Thêm 1 vai trò cho mỗi lần gọi API)
+    async function addUserRole(userID, roleID) {
+        const url = `https://localhost:7182/api/Role/adduserrole`;
+        try {
+            const token = sessionStorage.getItem("Token");
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({userID:userID, roleID: roleID })
+            });
+
+            if (!response.ok) throw new Error('Không thể thêm vai trò.');
+            // Hủy khởi tạo DataTable nếu đã có
+            if ($.fn.DataTable.isDataTable('#userTable')) {
+                $('#userTable').DataTable().destroy();
+            }
+            await loadUsers();
+        } catch (error) {
+            console.error('Lỗi khi thêm vai trò:', error);
+            alert('Không thể thêm vai trò.');
+        }
+    }
+
+
+
+
+    // Xóa người dùng
+    async function deleteUser(userID) {
+        const url = `https://localhost:7182/api/User/delete?id=${userID}`;
+        try {
+            const token = sessionStorage.getItem("Token");
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error('Không thể xóa người dùng.');
+            alert('Xóa người dùng thành công.');
+            loadUsers();
+        } catch (error) {
+            console.error('Lỗi khi xóa người dùng:', error);
+            alert('Không thể xóa người dùng.');
+        }
+    }
+
+    $(".modalclose").on("click", function () {
+        $("#roleModal").modal("hide");  // Đóng tất cả các modal
+    });
+
+</script>

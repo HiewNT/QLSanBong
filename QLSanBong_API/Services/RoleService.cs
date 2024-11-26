@@ -94,30 +94,44 @@ namespace QLSanBong_API.Services
 
         #region User
 
-
         public List<Models.User> GetAllUser()
         {
             var users = (from user in _context.Users
                          join userRole in _context.UserRoles on user.UserId equals userRole.UserId
                          join role in _context.Roles on userRole.RoleId equals role.RoleId
-                         select new Models.User
+                         select new
                          {
-                             UserID = user.UserId,
-                             Username = user.Username,
-                             Password = user.Password,
-                             RoleName = role.RoleName  // Lấy RoleName từ bảng Roles
-                         }).ToList();
+                             user.UserId,
+                             user.Username,
+                             user.Password,
+                             RoleName = role.RoleName,
+                             ThongTin = role.ThongTin
+                         })
+                         .GroupBy(u => u.UserId) // Nhóm theo UserId
+                         .Select(g => new Models.User
+                         {
+                             UserID = g.Key,
+                             Username = g.FirstOrDefault().Username,
+                             Password = g.FirstOrDefault().Password,
+                             RoleVM = g.Select(x => new RoleVM
+                             {
+                                 RoleName = x.RoleName,
+                                 ThongTin = x.ThongTin
+                             }).ToList()
+                         })
+                         .ToList();
 
             return users;
         }
 
 
-        public List<Models.UserRoleVM> GetUserByRole(string RoleID)
+        public List<Models.UserRole> GetUserByRole(string RoleID)
         {
             var userbyrole= _context.UserRoles
                 .Where(r => r.RoleId == RoleID)
-                .Select(r => new UserRoleVM
+                .Select(r => new Models.UserRole
             {
+                UserID = r.UserId,
                 Username = r.User.Username,
                 Name = _context.KhachHangs
                             .Where(kh => kh.UserId == r.UserId)
@@ -135,46 +149,63 @@ namespace QLSanBong_API.Services
                             .Where(nv => nv.UserId == r.UserId)
                             .Select(nv => nv.Sdt)
                             .FirstOrDefault(),
-                RoleName = r.Role.RoleName,
-                ThongTin = r.Role.ThongTin
-            }).ToList();
+                Role = new List<Models.Role>
+                {
+                    new Models.Role
+                    {
+                        RoleID = r.RoleId,
+                        RoleName = r.Role.RoleName,
+                        ThongTin = r.Role.ThongTin
+                    }
+
+                }
+                }).ToList();
 
             return userbyrole;
         }
         public List<Models.UserRole> GetAllUserRole()
         {
-            return _context.UserRoles.Select(r => new Models.UserRole
-            {
-                UserID = r.UserId,
-                RoleID = r.RoleId,
-                Username = r.User.Username,
-                Name = _context.KhachHangs
-                            .Where(kh => kh.UserId == r.UserId)
-                            .Select(kh => kh.TenKh)
-                            .FirstOrDefault()
-                        ?? _context.NhanViens
-                            .Where(nv => nv.UserId == r.UserId)
-                            .Select(nv => nv.TenNv)
-                            .FirstOrDefault(),
-                SDT = _context.KhachHangs
-                            .Where(kh => kh.UserId == r.UserId)
-                            .Select(kh => kh.Sdt)
-                            .FirstOrDefault()
-                        ?? _context.NhanViens
-                            .Where(nv => nv.UserId == r.UserId)
-                            .Select(nv => nv.Sdt)
-                            .FirstOrDefault(),
-                RoleName = r.Role.RoleName,
-                ThongTin = r.Role.ThongTin
-            }).ToList();
+            // Lấy danh sách người dùng và vai trò, nhóm theo UserId
+            var userRoles = _context.UserRoles
+                .GroupBy(r => r.UserId)
+                .Select(group => new Models.UserRole
+                {
+                    UserID = group.Key,
+                    Username = group.FirstOrDefault().User.Username,
+                    Name = _context.KhachHangs
+                                .Where(kh => kh.UserId == group.Key)
+                                .Select(kh => kh.TenKh)
+                                .FirstOrDefault()
+                            ?? _context.NhanViens
+                                .Where(nv => nv.UserId == group.Key)
+                                .Select(nv => nv.TenNv)
+                                .FirstOrDefault(),
+                    SDT = _context.KhachHangs
+                                .Where(kh => kh.UserId == group.Key)
+                                .Select(kh => kh.Sdt)
+                                .FirstOrDefault()
+                            ?? _context.NhanViens
+                                .Where(nv => nv.UserId == group.Key)
+                                .Select(nv => nv.Sdt)
+                                .FirstOrDefault(),
+                    Role = group.Select(r => new Models.Role
+                    {
+                        RoleID = r.RoleId,
+                        RoleName = r.Role.RoleName,
+                        ThongTin = r.Role.ThongTin
+                    }).ToList()
+                }).ToList();
+
+            return userRoles;
         }
 
-        public bool DeleteUserRole(string userId, string roleId)
+
+        public bool DeleteUserRole(UserRoleAdd request)
         {
             try
             {
                 // Tìm UserRole theo userId
-                var userRoles = _context.UserRoles.Where(ur => ur.UserId == userId && ur.RoleId == roleId).ToList();
+                var userRoles = _context.UserRoles.Where(ur => ur.UserId == request.UserID && ur.RoleId == request.RoleID).ToList();
 
                 if (!userRoles.Any())
                 {
@@ -192,18 +223,18 @@ namespace QLSanBong_API.Services
             }
         }
 
-        public string AddUserRole(string userId, string roleId)
+        public string AddUserRole(UserRoleAdd request)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleId))
+                if (string.IsNullOrWhiteSpace(request.UserID) || string.IsNullOrWhiteSpace(request.RoleID))
                 {
                     return "Dữ liệu UserRole không hợp lệ.";
                 }
 
                 // Kiểm tra xem UserRole đã tồn tại chưa
                 var existingUserRole = _context.UserRoles
-                    .FirstOrDefault(ur => ur.UserId == userId && ur.RoleId == roleId);
+                    .FirstOrDefault(ur => ur.UserId == request.UserID && ur.RoleId == request.RoleID);
 
                 if (existingUserRole != null)
                 {
@@ -213,8 +244,9 @@ namespace QLSanBong_API.Services
                 // Thêm mới UserRole
                 var newUserRole = new Data.UserRole
                 {
-                    UserId = userId,
-                    RoleId = roleId
+                    UserId = request.UserID,
+                    RoleId = request.RoleID,
+                    GhiChu = "" // Ghi chú mặc định rỗng
                 };
 
                 _context.UserRoles.Add(newUserRole);
@@ -225,10 +257,11 @@ namespace QLSanBong_API.Services
             catch (Exception ex)
             {
                 // Ghi log lỗi nếu cần
-                Console.WriteLine(ex.Message);
+                _logger.LogError($"Lỗi khi thêm UserRole: {ex.Message}", ex); // Sử dụng ILogger để ghi log thay vì Console.WriteLine
                 return "Có lỗi xảy ra khi thêm UserRole.";
             }
         }
+
 
         #endregion
 

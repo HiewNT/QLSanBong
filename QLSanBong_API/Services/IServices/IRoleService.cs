@@ -19,11 +19,11 @@ namespace QLSanBong_API.Services.IService
         #region User
         List<User> GetAllUser();
 
-        List<UserRoleVM> GetUserByRole(string RoleId);
+        List<UserRole> GetUserByRole(string RoleId);
         List<UserRole> GetAllUserRole();
 
-        string AddUserRole( string userId,string roleId);
-        bool DeleteUserRole(string userId, string roleId);
+        string AddUserRole(UserRoleAdd request);
+        bool DeleteUserRole(UserRoleAdd request);
 
         #endregion
 

@@ -21,7 +21,6 @@
         rel="stylesheet">
     <!-- Thêm jQuery trước -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link href="~/css/site.css" rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
@@ -39,20 +38,25 @@
         const token = sessionStorage.getItem("Token");
 
         if (!token) {
-            // Nếu không có token, điều hướng về trang đăng nhập hoặc mặc định
-            window.location.href = "/";
+            // Nếu không có token, điều hướng về trang Home/Index
+            window.location.href = "/Home/Index";
         } else {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
 
-            // Kiểm tra vai trò và điều hướng đến trang chính tương ứng
-            if (userRole === "NhanVienDS") {
-                window.location.href = "/Employee";
-            } else if (userRole === "KhachHang") {
-                window.location.href = "/Customer";
+                // Kiểm tra nếu userRole không chứa "Customer"
+                if (!userRole.includes("Admin")) {
+                    window.location.href = "/Home/Index";
+                }
+            } catch (error) {
+                console.error("Lỗi khi xử lý token:", error);
+                // Nếu có lỗi, điều hướng về trang Home/Index
+                window.location.href = "/Home/Index";
             }
         }
     </script>
+
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -144,6 +148,13 @@
             <!-- Nav Item - Customer -->
             <li class="nav-item">
                 <a class="nav-link" href="@Url.Action("Role","PhanQuyen")">
+                    <i class="fas fa-solid fa-user"></i>
+                    <span>Vai trò</span>
+                </a>
+            </li>
+            <!-- Nav Item - Customer -->
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("User","PhanQuyen")">
                     <i class="fas fa-solid fa-user"></i>
                     <span>Người dùng</span>
                 </a>

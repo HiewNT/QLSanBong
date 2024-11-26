@@ -5,7 +5,7 @@ namespace QLSanBong_Web.Areas.Admin.Controllers
     [Area("Admin")]
     public class PhanQuyenController : Controller
     {
-        public IActionResult Index()
+        public IActionResult User()
         {
             return View();
         }
@@ -21,6 +21,11 @@ namespace QLSanBong_Web.Areas.Admin.Controllers
         public IActionResult ActionList()
         {
             return PartialView("_ActionList"); // Tên của Partial View
+        }
+        // Phương thức trả về Partial View
+        public IActionResult UserList()
+        {
+            return PartialView("_UserList"); // Tên của Partial View
         }
         public IActionResult Service()
         {

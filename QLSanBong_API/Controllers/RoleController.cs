@@ -121,14 +121,14 @@ namespace QLSanBong_API.Controllers
         }
 
         [HttpDelete("deleteuserrole")]
-        public IActionResult DeleteUserRole(string userId, string roleId)
+        public IActionResult DeleteUserRole(UserRoleAdd request)
         {
-            if (string.IsNullOrWhiteSpace(userId))
+            if (string.IsNullOrWhiteSpace(request.UserID)||string.IsNullOrWhiteSpace(request.RoleID))
             {
-                return BadRequest("UserId không hợp lệ.");
+                return BadRequest("Thông tin không hợp lệ.");
             }
 
-            var result = _roleService.DeleteUserRole(userId,roleId);
+            var result = _roleService.DeleteUserRole(request);
             if (result)
             {
                 return Ok("Xóa UserRole thành công.");
@@ -140,16 +140,21 @@ namespace QLSanBong_API.Controllers
         }
 
         [HttpPost("adduserrole")]
-        public IActionResult AddUserRole(string userId, string roleId)
+        public IActionResult AddUserRole([FromBody] UserRoleAdd request)
         {
-            var result = _roleService.AddUserRole(roleId, userId);
+            if (request == null || string.IsNullOrWhiteSpace(request.UserID) || string.IsNullOrWhiteSpace(request.RoleID))
+            {
+                return BadRequest("Dữ liệu UserRole không hợp lệ.");
+            }
+
+            var result = _roleService.AddUserRole(request);
 
             if (result == "Thêm UserRole thành công.")
             {
-                return Ok(result);
+                return Ok(new { message = result });  // Trả về thông báo thành công
             }
 
-            return BadRequest(result);
+            return BadRequest(new { message = result });  // Trả về thông báo lỗi
         }
 
 
