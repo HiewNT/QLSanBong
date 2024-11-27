@@ -74,7 +74,6 @@
     addKHModal.addEventListener("hidden.bs.modal", function () {
         document.getElementById("tenkh").value = '';
         document.getElementById("sdtkh").value = '';
-        document.getElementById("gtkh").value = 'Nam';
         document.getElementById("dckh").value = '';
         document.getElementById("userkh").value = '';
         document.getElementById("passkh").value = '';
