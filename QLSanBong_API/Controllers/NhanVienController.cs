@@ -24,14 +24,17 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
                 // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-                if (!PermissionHelper.HasPermission(User, "nhanvien_read"))
+                if (!PermissionHelper.HasPermission(User,role, "nhanvien_read"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
                     {
                         success = false,
-                        message = "Bạn không có quyền truy cập chức năng này."
+                        message = "Bạn không có quyền xem danh sách nhân viên."
                     };
 
                     return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
@@ -42,7 +45,7 @@ namespace QLSanBong_API.Controllers
                 var nhanVienList = _nhanVienService.GetAll();
 
                 // Lọc bỏ nhân viên có MaNv là "NV00000"
-                var filteredList = nhanVienList.Where(nv => nv.MaNv != "NV00000").ToList();
+                var filteredList = nhanVienList.Where(nv => nv.User.Username != "admin").ToList();
 
                 // Trả về danh sách đã lọc
                 return Ok(filteredList);
@@ -60,18 +63,6 @@ namespace QLSanBong_API.Controllers
         [Authorize(Roles = "Admin,NhanVien")]
         public ActionResult<NhanVien> GetById([FromQuery] string id)
         {
-            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-            if (!PermissionHelper.HasPermission(User, "nhanvien_read"))
-            {
-                // Tạo đối tượng thông báo dưới dạng JSON
-                var errorResponse = new
-                {
-                    success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
-                };
-
-                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
-            }
 
             var nhanVien = _nhanVienService.GetById(id);
             if (nhanVien == null)
@@ -88,8 +79,10 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
                 // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-                if (!PermissionHelper.HasPermission(User, "nhanvien_add"))
+                if (!PermissionHelper.HasPermission(User, role,"nhanvien_add"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
@@ -101,7 +94,7 @@ namespace QLSanBong_API.Controllers
                     return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
                 }
                 _nhanVienService.Add(nhanVienVM);
-                return CreatedAtAction(nameof(GetById), new { id = nhanVienVM.UserID }, nhanVienVM);
+                return CreatedAtAction(nameof(GetById), new { id = nhanVienVM.User.Username }, nhanVienVM);
             }
             catch (InvalidOperationException ex)
             {
@@ -122,8 +115,10 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
                 // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-                if (!PermissionHelper.HasPermission(User, "nhanvien_edit"))
+                if (!PermissionHelper.HasPermission(User,role, "nhanvien_edit"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
@@ -156,8 +151,10 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
                 // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-                if (!PermissionHelper.HasPermission(User, "nhanvien_delete"))
+                if (!PermissionHelper.HasPermission(User,role, "nhanvien_delete"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new

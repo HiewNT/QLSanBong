@@ -89,7 +89,6 @@
 }
 
 .btn-small {
-    font-size: auto; /* Kích thước chữ nhỏ */
     padding: 0.4rem 1rem; /* Điều chỉnh padding để nút nhỏ hơn */
     height: auto;
 }

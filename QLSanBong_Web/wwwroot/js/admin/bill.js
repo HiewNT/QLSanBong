@@ -1,11 +1,28 @@
 ﻿let hoaDons = [];
 let dataTable;
+// Khai báo biến toàn cục
+let makh = "";
+
+// Hàm lấy mã khách hàng từ token
+function getMakhFromToken(token) {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload["Manguoidung"]; // Giả sử mã khách hàng lưu trong claim "makh"
+}
+
+if (!token) {
+    console.error("Token không tồn tại.");
+    document.getElementById('yeuCauContainer').innerHTML = `<p class="text-danger text-center">Token không tồn tại.</p>`;
+} else {
+    // Lấy mã khách hàng từ token và gán vào biến toàn cục makh
+    makh = getMakhFromToken(token);
+}
 
 document.addEventListener("DOMContentLoaded", async function () {
     await loadHoaDons();
 });
 
 async function loadHoaDons() {
+
     const url = `https://localhost:7182/api/PhieuDatSan/getall`;
     try {
         const token = sessionStorage.getItem("Token");
@@ -13,6 +30,7 @@ async function loadHoaDons() {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
+                'Role': 'Admin',  // Truyền role vào header
                 "Content-Type": "application/json"
             }
         });
@@ -20,7 +38,7 @@ async function loadHoaDons() {
         if (!response.ok) {
             // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
             const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
-            const errorMessage = errorData?.message || "Không thể tải danh sách hoá đơn";
+            const errorMessage = errorData?.message || "Không thể tải danh sách hóa đơn";
             document.getElementById('hoaDonContainer').innerHTML = `<p class="text-danger text-center">${errorMessage}</p>`;
 
             // Hiển thị thông báo warning với Toastr
@@ -72,10 +90,6 @@ function populateTable(hoaDons) {
                             onclick="infoHoaDon('${yc.maPds}')">
                         <i class="fas fa-info"></i> Chi tiết
                     </button>
-                    <button class="btn btn-danger btn-sm"
-                            onclick="deleteHoaDon('${yc.maPds}')">
-                        <i class="fas fa-trash"></i> Xóa
-                    </button>
                 </td>
             </tr>
         `;
@@ -96,6 +110,7 @@ async function loadHoaDonDetail(maPds) {
             method: "GET", // GET không cần body
             headers: {
                 "Authorization": `Bearer ${token}`,
+                'Role': 'Admin',  // Truyền role vào header
                 "Content-Type": "application/json"
             }
         });
@@ -103,7 +118,7 @@ async function loadHoaDonDetail(maPds) {
         if (!response.ok) {
             // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
             const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
-            const errorMessage = errorData?.message || "Không thể tải danh sách yêu cầu";
+            const errorMessage = errorData?.message || "Không thể tải danh sách hóa đơn";
 
             // Hiển thị thông báo warning với Toastr
             alert(errorMessage);
@@ -171,9 +186,3 @@ function populateDetailModal(detailHoaDon) {
     // Mở modal
     $('#hoaDonModal').modal('show');
 }
-
-
-// Sự kiện đóng modal
-document.querySelector('.modalclose').addEventListener('click', function () {
-    $('#hoaDonModal').modal('hide');
-});

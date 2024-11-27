@@ -25,14 +25,16 @@ namespace QLSanBong_API.Controllers
 
         public ActionResult<IEnumerable<KhachHang>> GetAll()
         {
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
             // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-            if (!PermissionHelper.HasPermission(User, "khachhang_read"))
+            if (!PermissionHelper.HasPermission(User,role, "khachhang_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
                 {
                     success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
+                    message = "Bạn không có quyền xem danh sách khách hàng."
                 };
 
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
@@ -45,19 +47,6 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbyid")]
         public ActionResult<KhachHang> GetById([FromQuery] string id)
         {
-            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-            if (!PermissionHelper.HasPermission(User, "khachhang_read"))
-            {
-                // Tạo đối tượng thông báo dưới dạng JSON
-                var errorResponse = new
-                {
-                    success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
-                };
-
-                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
-            }
-
             var khachHang = _khachHangService.GetById(id);
             if (khachHang == null)
             {
@@ -71,8 +60,10 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
                 // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-                if (!PermissionHelper.HasPermission(User, "khachhang_add"))
+                if (!PermissionHelper.HasPermission(User,role, "khachhang_add"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
@@ -85,7 +76,7 @@ namespace QLSanBong_API.Controllers
                 }
 
                 _khachHangService.Add(khachHangVM);
-                return CreatedAtAction(nameof(GetById), new { id = khachHangVM.UserID }, khachHangVM);
+                return CreatedAtAction(nameof(GetById), new { id = khachHangVM.User.Username }, khachHangVM);
             }
             catch (InvalidOperationException ex)
             {
@@ -106,8 +97,10 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
                 // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-                if (!PermissionHelper.HasPermission(User, "khachhang_edit"))
+                if (!PermissionHelper.HasPermission(User,role, "khachhang_edit"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
@@ -140,8 +133,10 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
                 // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-                if (!PermissionHelper.HasPermission(User, "khachhangdelete"))
+                if (!PermissionHelper.HasPermission(User,role, "khachhang_delete"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new

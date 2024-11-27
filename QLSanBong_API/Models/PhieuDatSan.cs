@@ -11,6 +11,7 @@
         public int? Sttds { get; set; }
         public List<ChiTietPds>? ChiTietPds { get; set; }
         public KhachHangDS KhachHangDS { get; set; }
+        public NhanVienDS NhanVienDS { get; set; }
     }
     public partial class PhieuDatSan : PhieuDatSanVM
     {

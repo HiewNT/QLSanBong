@@ -87,8 +87,6 @@ function displaySanTrong(sanTrongs) {
     sanTrongModal.show();
 }
 
-$(document).ready(function () {
-    loadSanBongs(); // Gọi hàm tải danh sách sân bóng
 
     async function loadSanBongs() {
         try {
@@ -133,5 +131,6 @@ $(document).ready(function () {
             console.error("Lỗi:", error);
             $('#sanBongGrid').html(`<div class="text-danger text-center">${error.message}</div>`);
         }
-    }
-});
+}
+
+document.addEventListener('DOMContentLoaded', loadSanBongs);

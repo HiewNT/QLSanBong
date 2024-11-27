@@ -46,10 +46,11 @@
 
             <div class="row col-6">
                 <div class="col-6 d-flex text-uppercase  align-items-center">
-                    <label class="form-label mb-0">Tổng tiền: <span class="ms-2" id="totalPrice" name="totalPrice">0</span> VND</label>
+                    <label class="form-label mb-0">Tổng tiền: <span class="ms-2" id="totalPrice"
+                            name="totalPrice">0</span> VND</label>
                 </div>
                 <div class="col-6">
-                    <button class="btn btn-success btn-small" onclick="requestOrd()" >Gửi yêu cầu</button>
+                    <button data-auth="yeucau_add" class="btn btn-success btn-small" onclick="requestOrd()">Gửi yêu cầu</button>
                 </div>
             </div>
         </div>
@@ -83,7 +84,8 @@
             .then(response => response.json())
             .then(data => {
                 const tennguoidung = data.tennguoidung;
-                const sdt=data.sdt;
+                const sdt = data.sdt;
+                console.log(data)
                 makh = data.manguoidung;
                 // Cập nhật phần tử hiển thị Tennguoidung
                 document.getElementById('nameorder').innerText = tennguoidung;
@@ -92,8 +94,8 @@
             .catch(error => console.error('Error fetching user info:', error));
     }
 
-    
-    function requestOrd() {
+
+    async function requestOrd() {
         const jwtToken = sessionStorage.getItem('Token');
         const cart = JSON.parse(sessionStorage.getItem('gioHang')) || [];
 
@@ -120,37 +122,41 @@
             ChiTietYcdsVM: chiTietYcdsVM
         };
 
-        // Gửi yêu cầu đến API
-        fetch('https://localhost:7182/api/YeuCauDatSan/Add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwtToken}`
-            },
-            body: JSON.stringify(requestPayload)
-        })
-        .then(response => {
-                if (!response.ok) {
-                    // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
-                    const errorData = await response.json(); // Nếu API trả về JSON chứa thông báo
-                    const errorMessage = errorData?.message || "Không thể gửi yêu cầu";
+        try {
+            // Gửi yêu cầu đến API
+            const response = await fetch('https://localhost:7182/api/YeuCauDatSan/Add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Role': 'KhachHang',  // Truyền role vào header
+                    'Authorization': `Bearer ${jwtToken}`
+                },
+                body: JSON.stringify(requestPayload)
+            });
 
-                    // Hiển thị thông báo warning với Toastr
-                    alert(errorMessage);
+            if (!response.ok) {
+                // Nếu response không thành công, lấy thông báo lỗi từ API (nếu có)
+                const errorData = await response.json(); // Sử dụng await tại đây
+                const errorMessage = errorData?.message || "Không thể gửi yêu cầu";
 
-                    return;
-                }
-            return response.json();
-        })
-        .then(data => {
+                // Hiển thị thông báo warning với Toastr
+                alert(errorMessage);
+                return;
+            }
+
+            const data = await response.json(); // Sử dụng await tại đây
             alert("Gửi yêu cầu thành công!");
             sessionStorage.removeItem('gioHang'); // Xóa giỏ hàng sau khi gửi
             loadCart(); // Cập nhật giỏ hàng trên giao diện
             updateCartCount();
             document.getElementById('ktratt').classList.add('d-none');
-        })
-        .catch(error => console.error('Error:', error));
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Đã xảy ra lỗi khi gửi yêu cầu.");
+        }
     }
+
 
 
     $(document).ready(function () {

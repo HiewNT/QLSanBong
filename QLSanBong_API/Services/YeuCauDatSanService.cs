@@ -22,7 +22,18 @@ namespace QLSanBong_API.Services
             var ycdsData = ycdsList.Select(ycds =>
             {
                 // Retrieve customer data
-                var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.MaKh == ycds.MaKh);
+
+                var khachHang = _context.Users
+                        .Join(_context.UserRoles,
+                              u => u.UserId,
+                              ur => ur.UserId,
+                              (u, ur) => new { User = u, UserRole = ur })
+                        .Join(_context.Roles,
+                              ur => ur.UserRole.RoleId,
+                              r => r.RoleId,
+                              (ur, r) => new { ur.User, Role = r })
+                        .FirstOrDefault(ur => ur.User.UserId == ycds.MaKh && ur.Role.RoleName == "KhachHang");
+
                 if (khachHang == null)
                 {
                     throw new Exception($"Không tìm thấy khách hàng với MaKH: {ycds.MaKh}");
@@ -61,10 +72,9 @@ namespace QLSanBong_API.Services
                     }).ToList(),
                     KhachHangDS = new KhachHangDS
                     {
-                        TenKh = khachHang.TenKh,
-                        Sdt = khachHang.Sdt,
-                        Gioitinh = khachHang.Gioitinh,
-                        Diachi = khachHang.Diachi
+                        TenKh = khachHang.User.Ten,
+                        Sdt = khachHang.User.Sdt,
+                        Diachi = khachHang.User.Diachi
                     }
                 };
 
@@ -85,8 +95,19 @@ namespace QLSanBong_API.Services
                 return null; // Hoặc throw exception nếu cần
             }
 
-            // Retrieve customer data
-            var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.MaKh == ycdsList.MaKh);
+
+            var khachHang = _context.Users
+                    .Join(_context.UserRoles,
+                          u => u.UserId,
+                          ur => ur.UserId,
+                          (u, ur) => new { User = u, UserRole = ur })
+                    .Join(_context.Roles,
+                          ur => ur.UserRole.RoleId,
+                          r => r.RoleId,
+                          (ur, r) => new { ur.User, Role = r })
+                    .FirstOrDefault(ur => ur.User.UserId == ycdsList.MaKh && ur.Role.RoleName == "KhachHang");
+
+
             if (khachHang == null)
             {
                 throw new Exception($"Không tìm thấy khách hàng với MaKH: {ycdsList.MaKh}");
@@ -126,10 +147,9 @@ namespace QLSanBong_API.Services
                 }).ToList(),
                 KhachHangDS = new KhachHangDS
                 {
-                    TenKh = khachHang.TenKh,
-                    Sdt = khachHang.Sdt,
-                    Gioitinh = khachHang.Gioitinh,
-                    Diachi = khachHang.Diachi
+                    TenKh = khachHang.User.Ten,
+                    Sdt = khachHang.User.Sdt,
+                    Diachi = khachHang.User.Diachi
                 }
             };
 
@@ -150,7 +170,19 @@ namespace QLSanBong_API.Services
             var ycdsData = ycdsList.Select(ycds =>
             {
                 // Retrieve customer data
-                var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.MaKh == ycds.MaKh);
+
+
+                var khachHang = _context.Users
+                        .Join(_context.UserRoles,
+                              u => u.UserId,
+                              ur => ur.UserId,
+                              (u, ur) => new { User = u, UserRole = ur })
+                        .Join(_context.Roles,
+                              ur => ur.UserRole.RoleId,
+                              r => r.RoleId,
+                              (ur, r) => new { ur.User, Role = r })
+                        .FirstOrDefault(ur => ur.User.UserId == ycds.MaKh && ur.Role.RoleName == "KhachHang");
+
                 if (khachHang == null)
                 {
                     throw new Exception($"Không tìm thấy khách hàng với MaKH: {ycds.MaKh}");
@@ -189,10 +221,9 @@ namespace QLSanBong_API.Services
                     }).ToList(),
                     KhachHangDS = new KhachHangDS
                     {
-                        TenKh = khachHang.TenKh,
-                        Sdt = khachHang.Sdt,
-                        Gioitinh = khachHang.Gioitinh,
-                        Diachi = khachHang.Diachi
+                        TenKh = khachHang.User.Ten,
+                        Sdt = khachHang.User.Sdt,
+                        Diachi = khachHang.User.Diachi
                     }
                 };
 
@@ -227,7 +258,19 @@ namespace QLSanBong_API.Services
             }
 
             // Retrieve customer data
-            var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.MaKh == ycdsList.MaKh);
+
+
+            var khachHang = _context.Users
+                    .Join(_context.UserRoles,
+                          u => u.UserId,
+                          ur => ur.UserId,
+                          (u, ur) => new { User = u, UserRole = ur })
+                    .Join(_context.Roles,
+                          ur => ur.UserRole.RoleId,
+                          r => r.RoleId,
+                          (ur, r) => new { ur.User, Role = r })
+                    .FirstOrDefault(ur => ur.User.UserId == ycdsList.MaKh && ur.Role.RoleName == "KhachHang");
+
             if (khachHang == null)
             {
                 throw new Exception($"Không tìm thấy khách hàng với MaKH: {ycdsList.MaKh}");
@@ -269,10 +312,9 @@ namespace QLSanBong_API.Services
                     }).ToList(),
                 KhachHangDS = new KhachHangDS
                 {
-                    TenKh = khachHang.TenKh,
-                    Sdt = khachHang.Sdt,
-                    Gioitinh = khachHang.Gioitinh,
-                    Diachi = khachHang.Diachi
+                    TenKh = khachHang.User.Ten,
+                    Sdt = khachHang.User.Sdt,
+                    Diachi = khachHang.User.Diachi
                 }
             };
 

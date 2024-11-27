@@ -14,201 +14,162 @@ namespace QLSanBong_API.Services
 
         public List<Models.NhanVien> GetAll()
         {
-            var nhanViensData = _context.NhanViens.ToList();
-
-            var nhanViensModels = nhanViensData.Select(nv => new Models.NhanVien
-            {
-                MaNv = nv.MaNv,
-                TenNv = nv.TenNv,
-                Chucvu = nv.Chucvu,
-                Sdt = nv.Sdt,
-                UserID = nv.UserId,
-                User = _context.Users
-                .Where(u => u.UserId == nv.UserId)
-                .Select(u => new Models.User
+            var nhanViens = _context.Users
+                .Join(_context.UserRoles,
+                    user => user.UserId,
+                    userRole => userRole.UserId,
+                    (user, userRole) => new { user, userRole })
+                .Join(_context.Roles,
+                    combined => combined.userRole.RoleId,
+                    role => role.RoleId,
+                    (combined, role) => new { combined.user, role })
+                .Where(x => x.role.RoleName == "NhanVienDS")
+                .Select(x => new Models.NhanVien
                 {
-                    UserID = u.UserId,
-                    Username = u.Username,
-                    Password = u.Password,
-                    RoleVM = _context.UserRoles
-                                .Where(ur => ur.UserId == u.UserId)
-                                .Join(
-                                    _context.Roles,
-                                    ur => ur.RoleId,
-                                    r => r.RoleId,
-                                    (ur, r) => new RoleVM
-                                    {
-                                        RoleName = r.RoleName,
-                                        ThongTin = r.ThongTin // Gán giá trị ThongTin từ bảng Roles
-                                    })
-                                .ToList() // Lấy tất cả các vai trò cho người dùng
+                    UserID = x.user.UserId,
+                    TenNv = x.user.Ten, // Giả sử `Username` đại diện cho tên nhân viên
+                    Chucvu = x.role.RoleName,
+                    Diachi = x.user.Diachi,
+                    Sdt = x.user.Sdt, // Thêm trường `Phone` trong Users nếu cần
+                    User = new Models.User
+                    {
+                        UserID = x.user.UserId,
+                        Username = x.user.Username,
+                        Password = x.user.Password,
+                        RoleVM = _context.UserRoles
+                            .Where(ur => ur.UserId == x.user.UserId)
+                            .Join(
+                                _context.Roles,
+                                ur => ur.RoleId,
+                                r => r.RoleId,
+                                (ur, r) => new RoleVM
+                                {
+                                    RoleName = r.RoleName,
+                                    ThongTin = r.ThongTin
+                                })
+                            .ToList()
+                    }
                 })
-                .FirstOrDefault()
-            }).ToList();
+                .ToList();
 
-
-            return nhanViensModels;
+            return nhanViens;
         }
 
         public Models.NhanVien? GetById(string id)
         {
-            var NhanVien = _context.NhanViens.SingleOrDefault(nv => nv.MaNv == id);
-            if (NhanVien == null)
-            {
-                return null;
-            }
+            var nhanVien = _context.Users
+                .Join(_context.UserRoles,
+                      u => u.UserId,
+                      ur => ur.UserId,
+                      (u, ur) => new { User = u, UserRole = ur })
+                .Join(_context.Roles,
+                      ur => ur.UserRole.RoleId,
+                      r => r.RoleId,
+                      (ur, r) => new { ur.User, Role = r })
+                .FirstOrDefault(ur => ur.User.UserId == id && ur.Role.RoleName == "NhanVienDS");
+
+            if (nhanVien == null) return null;
 
             return new Models.NhanVien
             {
-                MaNv = NhanVien.MaNv,
-                TenNv = NhanVien.TenNv,
-                Chucvu = NhanVien.Chucvu,
-                Sdt = NhanVien.Sdt,
-                UserID = NhanVien.UserId,
-                User = _context.Users
-                    .Where(u => u.UserId == NhanVien.UserId)
-                    .Select(u => new Models.User
+                UserID = nhanVien.User.UserId,
+                TenNv = nhanVien.User.Ten,
+                Sdt = nhanVien.User.Sdt,
+                Diachi = nhanVien.User.Diachi,
+                User = new Models.User
+                {
+                    UserID = nhanVien.User.UserId,
+                    Username = nhanVien.User.Username,
+                    Password = nhanVien.User.Password,
+                    RoleVM = new List<RoleVM>
                     {
-                        UserID = u.UserId,
-                        Username = u.Username,
-                        Password = u.Password,
-                        RoleVM = _context.UserRoles
-                                    .Where(ur => ur.UserId == u.UserId)
-                                    .Join(
-                                        _context.Roles,
-                                        ur => ur.RoleId,
-                                        r => r.RoleId,
-                                        (ur, r) => new RoleVM
-                                        {
-                                            RoleName = r.RoleName,  // Lấy tên vai trò
-                                            ThongTin = r.ThongTin  // Thêm thông tin về vai trò nếu cần
-                                        })
-                                    .ToList()  // Lấy tất cả vai trò của người dùng
-                    })
-                    .FirstOrDefault()
+                        new RoleVM
+                        {
+                            RoleName = nhanVien.Role.RoleName,
+                            ThongTin = nhanVien.Role.ThongTin
+                        }
+                    }
+                }
             };
-
         }
 
-        public void Add(NhanVienVM NhanVienVM)
+        public void Add(NhanVienVM nhanVienVM)
         {
-            if (_context.Users.Any(tk => tk.UserId == NhanVienVM.UserID))
-            {
+            if (_context.Users.Any(tk => tk.Username == nhanVienVM.User.Username))
                 throw new InvalidOperationException("Tài khoản đã tồn tại.");
-            }
 
-            string newMaNv = "NV00001";
-            if (_context.NhanViens.Any())
-            {
-                var maxMaNv = _context.NhanViens
-                    .Where(m => m.MaNv.StartsWith("NV"))
-                    .OrderByDescending(m => m.MaNv)
-                    .Select(m => m.MaNv)
-                    .FirstOrDefault();
+            if (_context.Users.Any(kh => kh.Sdt == nhanVienVM.Sdt))
+                throw new InvalidOperationException("Số điện thoại đã tồn tại.");
 
-                if (maxMaNv != null)
-                {
-                    int currentNumber = int.Parse(maxMaNv.Substring(2));
-                    newMaNv = $"NV{(currentNumber + 1):D5}";
-                }
-            }
-
-            // Tạo User mới
             var newUserId = Guid.NewGuid().ToString();
+
+            // Tạo người dùng mới
             var userEntity = new Data.User
             {
                 UserId = newUserId,
-                Username = NhanVienVM.User?.Username,
-                Password = HashPassword(NhanVienVM.User?.Password ?? string.Empty)
+                Username = nhanVienVM.User.Username,
+                Password = HashPassword(nhanVienVM.User?.Password ?? string.Empty),
+                Ten = nhanVienVM.TenNv,
+                Sdt = nhanVienVM.Sdt,
+                Diachi = nhanVienVM.Diachi
             };
 
-            // Tìm RoleID cho RoleName "NhanVien"
+            // Gán vai trò NhanVien
             var roleEntity = _context.Roles.SingleOrDefault(r => r.RoleName == "NhanVienDS");
             if (roleEntity == null)
-            {
-                throw new InvalidOperationException("Không tìm thấy vai trò NhanVien.");
-            }
+                throw new InvalidOperationException("Không tìm thấy vai trò NhanVienDS.");
 
-            // Tạo UserRole mới
             var userRoleEntity = new Data.UserRole
             {
                 UserId = newUserId,
                 RoleId = roleEntity.RoleId
             };
 
-            // Tạo NhanVien mới
-            var NhanVien = new Data.NhanVien
-            {
-                MaNv = newMaNv,
-                TenNv = NhanVienVM.TenNv,
-                Chucvu = NhanVienVM.Chucvu,
-                Sdt = NhanVienVM.Sdt,
-                UserId = newUserId
-            };
-
             _context.Users.Add(userEntity);
             _context.UserRoles.Add(userRoleEntity);
-            _context.NhanViens.Add(NhanVien);
             _context.SaveChanges();
         }
 
-        public void Update(string id, NhanVienVM NhanVienVM)
+        public void Update(string id, NhanVienVM nhanVienVM)
         {
-            // Tìm nhân viên trong cơ sở dữ liệu
-            var NhanVien = _context.NhanViens.SingleOrDefault(nv => nv.MaNv == id);
-            if (NhanVien == null)
-            {
-                throw new KeyNotFoundException("Nhân viên không tồn tại.");
-            }
+            var nhanVien = _context.Users.SingleOrDefault(kh => kh.UserId == id);
+            if (nhanVien == null)
+                throw new KeyNotFoundException("Khách hàng không tồn tại.");
 
-            // Cập nhật thông tin nhân viên: tên, chức vụ, số điện thoại
-            NhanVien.TenNv = NhanVienVM.TenNv;
-            NhanVien.Chucvu = NhanVienVM.Chucvu;
-            NhanVien.Sdt = NhanVienVM.Sdt;
+            // Kiểm tra trùng lặp tài khoản (username), ngoại trừ chính khách hàng này
+            if (_context.Users.Any(u => u.Username == nhanVienVM.User.Username && u.UserId != id))
+                throw new InvalidOperationException("Tài khoản đã tồn tại.");
 
-            // Cập nhật thông tin tài khoản người dùng
-            var taiKhoan = _context.Users.FirstOrDefault(tk => tk.UserId == NhanVien.UserId);
-            if (taiKhoan != null && NhanVienVM.User != null)
-            {
-                // Cập nhật tên đăng nhập nếu có thay đổi
-                if (NhanVienVM.User.Username != taiKhoan.Username)
-                {
-                    taiKhoan.Username = NhanVienVM.User.Username;
-                }
+            // Kiểm tra trùng lặp số điện thoại, ngoại trừ chính khách hàng này
+            if (_context.Users.Any(u => u.Sdt == nhanVienVM.Sdt && u.UserId != id))
+                throw new InvalidOperationException("Số điện thoại đã tồn tại.");
 
-                // Cập nhật mật khẩu nếu có thay đổi
-                if (!string.IsNullOrEmpty(NhanVienVM.User.Password))
-                {
-                    taiKhoan.Password = HashPassword(NhanVienVM.User.Password);
-                }
-            }
+            // Cập nhật thông tin khách hàng
+            nhanVien.Ten = nhanVienVM.TenNv;
+            nhanVien.Sdt = nhanVienVM.Sdt;
+            nhanVien.Diachi = nhanVienVM.Diachi;
+            nhanVien.Username = nhanVienVM.User.Username;
+
+            // Nếu có mật khẩu mới, băm mật khẩu và cập nhật
+            if (!string.IsNullOrEmpty(nhanVienVM.User?.Password))
+                nhanVien.Password = HashPassword(nhanVienVM.User.Password);
 
             // Lưu thay đổi vào cơ sở dữ liệu
             _context.SaveChanges();
         }
 
-
         public void Delete(string id)
         {
-            var NhanVien = _context.NhanViens.SingleOrDefault(nv => nv.MaNv == id);
-            if (NhanVien == null)
+            var user = _context.Users.SingleOrDefault(u => u.UserId == id);
+            if (user == null)
             {
                 throw new KeyNotFoundException("Nhân viên không tồn tại.");
             }
 
-            _context.NhanViens.Remove(NhanVien);
+            var userRoles = _context.UserRoles.Where(ur => ur.UserId == id).ToList();
+            _context.UserRoles.RemoveRange(userRoles);
 
-            var taiKhoan = _context.Users.SingleOrDefault(tk => tk.UserId == NhanVien.UserId);
-            if (taiKhoan != null)
-            {
-                _context.Users.Remove(taiKhoan);
-            }
-            var tkrole = _context.UserRoles.SingleOrDefault(tr => tr.UserId == NhanVien.UserId);
-            if (tkrole != null)
-            {
-                _context.UserRoles.Remove(tkrole);
-            }
-
+            _context.Users.Remove(user);
             _context.SaveChanges();
         }
 

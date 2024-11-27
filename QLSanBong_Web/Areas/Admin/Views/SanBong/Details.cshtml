@@ -25,9 +25,9 @@
                     <p>Thông tin: <span id="ghichu"></span></p>
                     <p>Địa chỉ: <span id="diaChi"></span></p>
 
-                    <div style="text-align: center;" class="mt-4">
-                        <button class="btn btn-success" onclick="goBack()">Danh sách sân bóng</button>
-                        <button class="btn btn-primary" onclick="updateSanBong()">Cập nhật sân bóng</button>
+                    <div class="d-flex justify-content-end" style="text-align: center;" class="mt-4">
+                        <button style="display: none;" data-auth="sanbong_read"  class="btn btn-success mr-4" onclick="goBack()">Danh sách sân bóng</button>
+                        <button style="display: none;" data-auth="sanbong_edit"  class="btn btn-primary mr-4" onclick="updateSanBong()">Cập nhật sân bóng</button>
                     </div>
                 </div>
             </div>
@@ -55,7 +55,9 @@
 
         try {
             const response = await fetch(`https://localhost:7182/api/SanBong/getbyid?id=${id}`, {
-                headers: { "Authorization": `Bearer ${sessionStorage.getItem("Token")}` }
+                headers: { "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                    'Role': 'Admin'  // Truyền role vào header
+                }
             });
 
 

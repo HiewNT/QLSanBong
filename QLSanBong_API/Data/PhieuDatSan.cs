@@ -20,8 +20,4 @@ public partial class PhieuDatSan
     public string MaKh { get; set; } = null!;
 
     public virtual ICollection<ChiTietPd> ChiTietPds { get; set; } = new List<ChiTietPd>();
-
-    public virtual KhachHang MaKhNavigation { get; set; } = null!;
-
-    public virtual NhanVien MaNvNavigation { get; set; } = null!;
 }

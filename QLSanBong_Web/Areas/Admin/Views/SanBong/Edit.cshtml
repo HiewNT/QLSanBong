@@ -43,13 +43,13 @@
                             <input type="text" id="diaChi" class="form-control" required>
                         </div><!-- Nút Lưu thay đổi ở góc dưới bên phải -->
                         <div class="text-end mt-4">
-                            <button type="button" class="btn btn-primary" onclick="saveChanges()">Lưu thay đổi</button>
+                            <button style="display: none;" data-auth="sanbong_edit"  type="button" class="btn btn-primary" onclick="saveChanges()">Lưu thay đổi</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Các nút điều khiển -->
-                <div class="mt-4 text-center">
+                <div style="display: none;" data-auth="sanbong_add"  class="mt-4 text-center">
                     <button type="button" class="btn btn-success me-2" onclick="goToList()">Danh sách sân bóng</button>
                     <button type="button" class="btn btn-info me-2" onclick="viewDetail()">Chi tiết sân bóng</button>
                 </div>
@@ -77,7 +77,10 @@
 
         try {
             const response = await fetch(`https://localhost:7182/api/SanBong/getbyid?id=${id}`, {
-                headers: { "Authorization": `Bearer ${sessionStorage.getItem("Token")}` }
+                headers: {
+                    "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                    'Role': 'Admin'  // Truyền role vào header
+                }
             });
 
 

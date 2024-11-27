@@ -22,13 +22,15 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getall")]
         public ActionResult<IEnumerable<Models.PhieuDatSan>> GetAll()
         {
-            if (!PermissionHelper.HasPermission(User, "hoadon_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "hoadon_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
                 {
                     success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
+                    message = "Bạn không có quyền xem danh sách hóa đơn."
                 };
 
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
@@ -41,7 +43,9 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbykh")]
         public ActionResult<IEnumerable<PhieuDatSan>> GetByKH([FromQuery] string maKh)
         {
-            if (!PermissionHelper.HasPermission(User, "hoadon_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "hoadon_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
@@ -63,7 +67,9 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbynv")]
         public ActionResult<IEnumerable<PhieuDatSan>> GetByNV([FromQuery] string maNv)
         {
-            if (!PermissionHelper.HasPermission(User, "hoadon_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "hoadon_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
@@ -86,7 +92,9 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbyid")]
         public ActionResult<Models.PhieuDatSan> GetById([FromQuery] string id)
         {
-            if (!PermissionHelper.HasPermission(User, "hoadon_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "hoadon_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
@@ -109,7 +117,9 @@ namespace QLSanBong_API.Controllers
         [HttpPost("add")]
         public ActionResult Add([FromBody] PDSAdd pDSAdd)
         {
-            if (!PermissionHelper.HasPermission(User, "hoadon_add"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "hoadon_add"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
@@ -137,7 +147,9 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
-                if (!PermissionHelper.HasPermission(User, "hoadon_edit"))
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+                if (!PermissionHelper.HasPermission(User,role, "hoadon_edit"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
@@ -167,7 +179,9 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
-                if (!PermissionHelper.HasPermission(User, "hoadon_delete"))
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+                if (!PermissionHelper.HasPermission(User,role, "hoadon_delete"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new

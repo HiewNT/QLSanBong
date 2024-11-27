@@ -5,14 +5,10 @@
 
 <head>
     <link rel="stylesheet" href="~/css/custom.css" />
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 </head>
 <body>
     
 <section id="dssan">
-    <div class="container-fluid pt-5">
         <div class="container-fluid pt-4 pt-md-5 ">
             <div class="container">
                 <form method="get">
@@ -79,39 +75,39 @@
 
             <div id="sanBongGrid" class="d-flex flex-column align-items-center"></div> <!-- Flexbox cho hàng dọc -->
         </div>
-    </div>
 </section>
 
 
-<div class="modal fade" id="sanTrongModal" tabindex="-1" aria-labelledby="sanTrongModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl custom-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="sanTrongModalLabel">Danh Sách Sân Trống</h5>
-                <button type="button" id="buttonclose" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Mã sân</th>
-                            <th>Tên sân bóng</th>
-                            <th>Địa chỉ</th>
-                            <th>Ngày sử dụng</th>
-                            <th>Giờ bắt đầu</th>
-                            <th>Giờ kết thúc</th>
-                            <th>Đơn giá</th>
-                            <th></th> <!-- Thêm tiêu đề cho cột hành động -->
-                        </tr>
-                    </thead>
-                    <tbody id="modalTableBody">
-                        <!-- Nội dung động sẽ hiển thị ở đây -->
-                    </tbody>
-                </table>
+    <div class="modal fade" id="sanTrongModal" tabindex="-1" aria-labelledby="sanTrongModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl custom-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sanTrongModalLabel">Danh Sách Sân Trống</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Mã sân</th>
+                                <th>Tên sân bóng</th>
+                                <th>Địa chỉ</th>
+                                <th>Ngày sử dụng</th>
+                                <th>Giờ bắt đầu</th>
+                                <th>Giờ kết thúc</th>
+                                <th>Đơn giá</th>
+                                <th></th> <!-- Thêm tiêu đề cho cột hành động -->
+                            </tr>
+                        </thead>
+                        <tbody id="modalTableBody">
+                            <!-- Nội dung động sẽ hiển thị ở đây -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
 
 <style>
     .card {

@@ -20,7 +20,7 @@ namespace QLSanBong_API.Controllers
 
         [HttpPost]
         [Route("login")]
-        public ActionResult<string> Login(LoginRequest request)
+        public ActionResult<string> Login([FromBody] LoginRequest request)
         {
             if (request == null || string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
             {
@@ -29,7 +29,7 @@ namespace QLSanBong_API.Controllers
 
             try
             {
-                var token = _loginService.Login(request.Username, request.Password);
+                var token = _loginService.Login(request);
                 return Ok(new { token });
             }
             catch (UnauthorizedAccessException ex)
@@ -62,6 +62,7 @@ namespace QLSanBong_API.Controllers
             if (khachHangVM == null ||
                 string.IsNullOrEmpty(khachHangVM.TenKh) ||  // Kiểm tra tên khách hàng
                 string.IsNullOrEmpty(khachHangVM.Sdt) ||   // Kiểm tra số điện thoại
+                string.IsNullOrEmpty(khachHangVM.Diachi) ||   // Kiểm tra số điện thoại
                 string.IsNullOrEmpty(khachHangVM.User?.Username) ||
                 string.IsNullOrEmpty(khachHangVM.User?.Password))
             {
@@ -71,7 +72,7 @@ namespace QLSanBong_API.Controllers
             try
             {
                 // Kiểm tra xem tên đăng nhập đã tồn tại
-                if (_loginService.IsUsernameTaken(khachHangVM.UserID))
+                if (_loginService.IsUsernameTaken(khachHangVM.User.Username))
                 {
                     return BadRequest("Tài khoản đã tồn tại.");
                 }
@@ -86,7 +87,7 @@ namespace QLSanBong_API.Controllers
                 _khachHangService.Add(khachHangVM);
 
                 // Trả về kết quả thành công
-                return CreatedAtAction(nameof(Signup), new { id = khachHangVM.UserID }, khachHangVM);
+                return CreatedAtAction(nameof(Signup), new { id = khachHangVM.User.Username }, khachHangVM);
             }
             catch (InvalidOperationException ex)
             {

@@ -17,9 +17,5 @@ public partial class ChiTietYcd
 
     public string? GhiChu { get; set; }
 
-    public virtual SanBong MaSbNavigation { get; set; } = null!;
-
-    public virtual GiaGioThue MagioNavigation { get; set; } = null!;
-
     public virtual YeuCauDatSan SttNavigation { get; set; } = null!;
 }

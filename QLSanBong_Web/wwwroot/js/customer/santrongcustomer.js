@@ -41,7 +41,7 @@ function displaySanTrong(sanTrongs) {
     modalTableBody.innerHTML = ''; // Làm sạch dữ liệu cũ
 
     if (sanTrongs.length === 0) {
-        modalTableBody.innerHTML = '<tr><td colspan="7" class="text-center">Không có sân nào trống trong thời gian này.</td></tr>';
+        modalTableBody.innerHTML = '<tr><td colspan="8" class="text-center">Không có sân nào trống trong thời gian này.</td></tr>';
     } else {
         const rows = sanTrongs.map(san => `
             <tr>
@@ -80,6 +80,7 @@ async function loadSanBongs() {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                'Role': 'KhachHang',  // Truyền role vào header
                 "Content-Type": "application/json",
             },
         });
@@ -94,34 +95,35 @@ async function loadSanBongs() {
 
         selectSan.innerHTML = '<option value="">Chọn sân</option>';
         sanBongGrid.innerHTML = sanBongs.map(item => `
-            <div class="col-lg-12 mb-4">
-                <div class="item">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div style="position: relative; width: 100%; padding-top: 56.25%; overflow: hidden;">
-                                <img src="data:image/png;base64,${item.hinhanh}" 
-                                     alt="${item.tenSb}" 
-                                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" 
-                                     class="img-thumbnail">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <h4 class="mb-4">Sân bóng ${item.tenSb}</h4>
-                            <p><i class="fa fa-map-marker-alt text-primary mr-3"></i>${item.diaChi}</p>
-                            <div class="row pt-2 pb-4">
-                                <div class="col-12">
-                                    <ul class="list-inline m-0">
-                                        <li class="py-2 border-top border-bottom"><i class="fa fa-check text-primary mr-3"></i>${item.ghichu}</li>
-                                        <li class="py-2 border-bottom"><i class="fa fa-check text-primary mr-3"></i>Diện tích: ${item.dientich} m<sup>2</sup></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <a onclick="Stadiumdetail('${item.maSb}')" class="btn btn-success px-4">Đặt sân</a>
-                        </div>
-                    </div>
-                    <hr class="my-4">
+           <div class="col-lg-12 mb-4">
+    <div class="item">
+        <div class="row">
+            <div class="col-lg-6">
+                <div style="position: relative; width: 100%; padding-top: 56.25%; overflow: hidden;">
+                    <img src="data:image/png;base64,${item.hinhanh}" 
+                         alt="${item.tenSb}" 
+                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" 
+                         class="img-thumbnail">
                 </div>
             </div>
+            <div class="col-lg-6">
+                <h4 class="mb-4">Sân bóng ${item.tenSb}</h4>
+                <p><i class="fa fa-map-marker-alt text-primary me-3"></i> ${item.diaChi}</p>
+                <div class="row pt-2 pb-4">
+                    <div class="col-12">
+                        <ul class="list-inline m-0">
+                            <li class="py-2 border-top border-bottom"><i class="fa fa-check text-primary me-3"></i> ${item.ghichu}</li>
+                            <li class="py-2 border-bottom"><i class="fa fa-check text-primary me-3"></i> Diện tích: ${item.dientich} m<sup>2</sup></li>
+                        </ul>
+                    </div>
+                </div>
+                <a onclick="Stadiumdetail('${item.maSb}')" class="btn btn-success px-4">Đặt sân</a>
+            </div>
+        </div>
+        <hr class="my-4">
+    </div>
+</div>
+
         `).join('');
 
         selectSan.innerHTML += sanBongs.map(item => `<option value="${item.maSb}">${item.tenSb}</option>`).join('');
@@ -136,17 +138,4 @@ function Stadiumdetail(maSb) {
     window.location.href = `/Customer/SanBong?id=${maSb}`;
 }
 
-document.addEventListener('click', event => {
-    const dropdown = document.querySelector('.dropdown-menu');
-    if (dropdown && !document.getElementById('userDropdown').contains(event.target)) {
-        dropdown.style.display = 'none';
-    }
-});
 
-document.getElementById('userDropdown')?.addEventListener('click', event => {
-    event.preventDefault();
-    const dropdownMenu = document.querySelector('.dropdown-menu');
-    if (dropdownMenu) {
-        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-    }
-});

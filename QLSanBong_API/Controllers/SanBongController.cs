@@ -28,10 +28,12 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getall")]
         public IActionResult GetAll()
         {
-            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-            if (!PermissionHelper.HasPermission(User, "sanbong_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+
+            // Kiểm tra quyền "sanbong_read" và role trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, role, "sanbong_read"))
             {
-                // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
                 {
                     success = false,
@@ -40,9 +42,11 @@ namespace QLSanBong_API.Controllers
 
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
             }
+
             var sanBongs = _sanBongService.GetAll();
             return Ok(sanBongs);
         }
+
 
         // Lấy sân bóng theo ID
         [HttpGet("getbyid")]
@@ -101,14 +105,16 @@ namespace QLSanBong_API.Controllers
         [HttpPost("add")]
         public IActionResult Add([FromForm] SanBongVM sanBongVM, IFormFile imageFile)
         {
-            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-            if (!PermissionHelper.HasPermission(User, "sanbong_add"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+
+            // Kiểm tra quyền "sanbong_read" và role trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, role, "sanbong_add"))
             {
-                // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
                 {
                     success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
+                    message = "Bạn không có quyền truy cập quyền này."
                 };
 
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
@@ -126,14 +132,16 @@ namespace QLSanBong_API.Controllers
         [HttpPut("update")]
         public IActionResult Update([FromQuery] string id, [FromForm] SanBongVM sanBongVM, IFormFile? imageFile) // Đảm bảo `imageFile` có thể là null
         {
-            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-            if (!PermissionHelper.HasPermission(User, "sanbong_edit"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+
+            // Kiểm tra quyền "sanbong_read" và role trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, role, "sanbong_edit"))
             {
-                // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
                 {
                     success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
+                    message = "Bạn không có quyền truy cập quyền này."
                 };
 
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
@@ -165,14 +173,16 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
-                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-                if (!PermissionHelper.HasPermission(User, "sanbong_delete"))
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
+                // Kiểm tra quyền "sanbong_read" và role trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, role, "sanbong_delete"))
                 {
-                    // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
                     {
                         success = false,
-                        message = "Bạn không có quyền truy cập chức năng này."
+                        message = "Bạn không có quyền truy cập quyền này."
                     };
 
                     return StatusCode(StatusCodes.Status403Forbidden, errorResponse);

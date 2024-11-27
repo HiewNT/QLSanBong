@@ -69,7 +69,13 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
 // Định nghĩa các route cho ứng dụng, đảm bảo phân quyền hợp lý cho từng khu vực
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}",
+    defaults: new { area = "" });
+
 app.MapControllerRoute(
     name: "Admin",
     pattern: "Admin/{controller=Home}/{action=Index}/{id?}",
@@ -84,9 +90,5 @@ app.MapControllerRoute(
     name: "Employee",
     pattern: "Employee/{controller=Home}/{action=Index}/{id?}",
     defaults: new { area = "Employee" });
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

@@ -34,10 +34,10 @@
                             <input type="file" id="imageFile" class="form-control" accept="image/*">
                         </div>
                         <!-- Các nút điều khiển -->
-                        <div class="mt-2 text-center">
-                            <button type="button" class="btn btn-success mr-5" onclick="goToList()">Danh sách sân
+                        <div class="d-flex mt-2 text-center">
+                            <button style="display: none;" data-auth="sanbong_read" type="button" class="btn btn-success mr-5" onclick="goToList()">Danh sách sân
                                 bóng</button>
-                            <button type="button" class="btn btn-primary mr-9" onclick="saveChanges()">Thêm mới</button>
+                            <button style="display: none;" data-auth="sanbong_add" type="button" class="btn btn-primary mr-9" onclick="saveChanges()">Thêm mới</button>
                         </div>
                     </div>
                 </div>
@@ -78,7 +78,10 @@
             // Gửi yêu cầu fetch API
             const response = await fetch(`https://localhost:7182/api/SanBong/add`, {
                 method: "POST",
-                headers: { "Authorization": `Bearer ${sessionStorage.getItem("Token")}` },
+                headers: {
+                    "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                         'Role': 'NhanVienDS'  // Truyền role vào header 
+                     },
                 body: formData
             });
 
@@ -96,6 +99,7 @@
                         alert("Không thể thêm sân bóng. Lỗi không xác định.");
                     });
                 }
+                return;
             }
         } catch (error) {
             console.error("Lỗi khi thêm sân bóng:", error);

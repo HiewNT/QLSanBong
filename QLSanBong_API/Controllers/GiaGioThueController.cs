@@ -21,13 +21,15 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getall")]
         public ActionResult<GiaGioThueVM> GetAll()
         {
-            if (!PermissionHelper.HasPermission(User, "giathue_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "giathue_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
                 {
                     success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
+                    message = "Bạn không có quyền xem danh sách giờ thuê."
                 };
 
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
@@ -54,7 +56,9 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbyid")]
         public ActionResult<GiaGioThueVM> GetById([FromQuery] string id)
         {
-            if (!PermissionHelper.HasPermission(User, "giathue_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "giathue_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
@@ -80,7 +84,9 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
-                if (!PermissionHelper.HasPermission(User, "giathue_add"))
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+                if (!PermissionHelper.HasPermission(User,role, "giathue_add"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
@@ -107,7 +113,9 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
-                if (!PermissionHelper.HasPermission(User, "giathue_edit"))
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+                if (!PermissionHelper.HasPermission(User,role, "giathue_edit"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
@@ -134,7 +142,9 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
-                if (!PermissionHelper.HasPermission(User, "giathue_delete"))
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+                if (!PermissionHelper.HasPermission(User,role, "giathue_delete"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new

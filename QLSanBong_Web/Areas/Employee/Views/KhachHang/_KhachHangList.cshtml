@@ -1,14 +1,13 @@
 ﻿<table id="khachHangTable" class="table table-striped table-bordered display" style="width:100%">
-    <thead class="thead-dark">
+    <thead class="table-secondary">
         <tr>
-            <th style="width: 8%; text-align: center;">Mã KH</th>
-            <th style="width: 18%; text-align: center;">Họ Tên</th>
+            <th style="width: 10%; text-align: center;">ID</th>
+            <th style="width: 20%; text-align: center;">Họ Tên</th>
             <th style="width: 10%; text-align: center;">SĐT</th>
-            <th style="width: 8%; text-align: center;">GT  </th>
-            <th style="width: 13%; text-align: center;">Địa chỉ</th>
-            <th style="width: 8%; text-align: center;">Tên ĐN</th>
-            <th style="width: 21%; text-align: center;">Mật khẩu</th>
-            <th style="width: 14%; text-align: center;"></th> <!-- Cột Hành động -->
+            <th style="width: 15%; text-align: center;">Địa chỉ</th>
+            <th style="width: 10%; text-align: center;">Tên ĐN</th>
+            <th style="width: 25%; text-align: center;">Mật khẩu</th>
+            <th style="width: 10%; text-align: center;"></th> <!-- Cột Hành động -->
         </tr>
 
     </thead>
@@ -36,13 +35,6 @@
                         <input type="text" class="form-control" id="sdtkh1" placeholder="Số điện thoại">
                     </div>
                     <div class="mb-3">
-                        <label for="gtkh1" class="form-label">Giới tính</label>
-                        <select class="form-control" id="gtkh1">
-                            <option value="Nam">Nam</option>
-                            <option value="Nữ">Nữ</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
                         <label for="dckh1" class="form-label">Địa chỉ</label>
                         <input type="text" class="form-control" id="dckh1" placeholder="Địa chỉ">
                     </div>
@@ -58,6 +50,7 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-primary" id="updateKH" onclick="updateCustomer()">Cập nhật</button>
             </div>
         </div>
@@ -72,12 +65,14 @@
 
     async function loadkhachHangs() {
         let url = `https://localhost:7182/api/KhachHang/getall`;
+        
         try {
             const token = sessionStorage.getItem("Token");
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
+                    'Role': 'NhanVienDS',  // Truyền role vào header
                     "Content-Type": "application/json"
                 }
             });
@@ -106,16 +101,15 @@
             khachHangs.forEach(kh => {
                 khachHangList.innerHTML += `
                         <tr>
-                            <td>${kh.maKh}</td>
+                            <td>${kh.userID}</td>
                             <td>${kh.tenKh}</td>
                             <td>${kh.sdt}</td>
-                            <td>${kh.gioitinh}</td>
                             <td>${kh.diachi}</td>
                             <td>${kh.user ? kh.user.username : 'N/A'}</td>
                             <td>${kh.user ? kh.user.password : 'N/A'}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="editKhachHang('${kh.maKh}')"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteKhachHang('${kh.maKh}')"><i class="fas fa-trash"></i></button>
+                                <td class="d-flex justify-content-start">
+                                <button style="display: none;" data-auth="khachhang_edit" class="btn btn-warning btn-sm" onclick="editKhachHang('${kh.userID}')"><i class="fas fa-edit"></i></button>
+                                <button style="display: none;"  data-auth="khachhang_delete" class="btn btn-danger btn-sm ml-2" onclick="deleteKhachHang('${kh.userID}')"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -136,20 +130,23 @@
                     "search": "Tìm kiếm:"
                 }
             });
+            // Gọi hàm xử lý quyền sau khi thêm dữ liệu vào giao diện
+            await handlePermissionsForFrontend();
         } catch (error) {
             console.error("Lỗi:", error);
             document.getElementById('khachHangContainer').innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
         }
     }
 
-    async function loadKhachHangById(maKh) {
-        const url = `https://localhost:7182/api/KhachHang/getbyid?id=${maKh}`;
+    async function loadKhachHangById(userID) {
+        const url = `https://localhost:7182/api/KhachHang/getbyid?id=${userID}`;
         try {
             const token = sessionStorage.getItem("Token");
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
+                    'Role': 'NhanVienDS',  // Truyền role vào header
                     "Content-Type": "application/json"
                 }
             });
@@ -171,11 +168,9 @@
             if (khachHang) {
                 document.getElementById('tenkh1').value = khachHang.tenKh;
                 document.getElementById('sdtkh1').value = khachHang.sdt;
-                document.getElementById('gtkh1').value = khachHang.gioitinh;
                 document.getElementById('dckh1').value = khachHang.diachi;
                 document.getElementById('userkh1').value = khachHang.user ? khachHang.user.username : '';
-                document.getElementById('passkh1').value = khachHang.user ? khachHang.user.password : '';
-
+                
                 // Hiển thị modal chỉnh sửa
                 $('#updateKHModal').modal('show');
             } else {
@@ -188,21 +183,18 @@
     }
 
     // Hàm Sửa khách hàng
-    window.editKhachHang = function (maKh) {
-        loadKhachHangById(maKh); // Tải dữ liệu khách hàng
+    window.editKhachHang = function (userID) {
+        loadKhachHangById(userID); // Tải dữ liệu khách hàng
 
         // Hiển thị modal chỉnh sửa khách hàng
         $('#updateKHModal').modal('show');
 
         // Gán `maNv` vào biến toàn cục để dùng khi cập nhật
-        window.currentMaKh = maKh;
+        window.currentMaKh = userID;
     };
-
-    // Hàm cập nhật khách hàng
     async function updateCustomer() {
         const tenKh1 = document.getElementById('tenkh1').value;
         const sdtKh1 = document.getElementById('sdtkh1').value;
-        const gtkh1 = document.getElementById('gtkh1').value;
         const dckh1 = document.getElementById('dckh1').value;
         const tenDangNhap1 = document.getElementById('userkh1').value;
         const matKhau1 = document.getElementById('passkh1').value;
@@ -220,18 +212,16 @@
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Role': 'NhanVienDS',  // Truyền role vào header
                     'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
                 },
                 body: JSON.stringify({
                     tenKh: tenKh1,
                     sdt: sdtKh1,
-                    gioitinh: gtkh1,
                     diachi: dckh1,
-                    userID: "",
                     user: {
                         username: tenDangNhap1,
-                        password: matKhau1,
-                        role: "KhachHang"  // Đặt role mặc định là KhachHang
+                        password: matKhau1
                     }
                 })
             });
@@ -262,15 +252,17 @@
         }
     }
 
+
     // Hàm Xóa khách hàng
-    window.deleteKhachHang = async function (maKh) {
+    window.deleteKhachHang = async function (userID) {
         if (confirm("Bạn có chắc chắn muốn xóa khách hàng này?")) {
-            const url = `https://localhost:7182/api/KhachHang/delete?id=${maKh}`;
+            const url = `https://localhost:7182/api/KhachHang/delete?id=${userID}`;
             try {
                 const response = await fetch(url, {
                     method: "DELETE",
                     headers: {
                         "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                        'Role': 'NhanVienDS',  // Truyền role vào header
                         "Content-Type": "application/json"
                     }
                 });

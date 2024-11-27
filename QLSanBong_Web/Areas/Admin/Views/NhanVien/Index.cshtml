@@ -3,11 +3,10 @@
 
     <link href="~/css/site.css" rel="stylesheet">
 }
-<div class="container mt-5">
     <div class="card">
         <div class="d-flex justify-content-end mb-3">
             <!-- Căn phải cho nút -->
-            <button class="btn btn-success mt-2 " onclick="openAddEmployeeModal()">Thêm nhân viên mới</button> <!-- Nút thêm nhân viên -->
+        <button style="display: none;" data-auth="nhanvien_add" class="btn btn-success mt-2 " onclick="openAddEmployeeModal()">Thêm nhân viên mới</button> <!-- Nút thêm nhân viên -->
         </div>
         <div class="card-header bg-primary text-white text-center">
             <h3 class="mb-0">Danh sách nhân viên</h3> <!-- Tiêu đề danh sách -->
@@ -18,7 +17,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <div class="modal fade" id="addNVModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-md">
@@ -40,6 +38,10 @@
                         <input type="text" class="form-control" id="sdtnv" placeholder="Số điện thoại">
                     </div>
                     <div class="mb-3">
+                        <label for="dcnv" class="form-label">Địa chỉ</label>
+                        <input type="text" class="form-control" id="dcnv" placeholder="Địa chỉ">
+                    </div>
+                    <div class="mb-3">
                         <label for="usernv" class="form-label">Tên đăng nhập</label>
                         <input type="text" class="form-control" id="usernv" placeholder="Tên đăng nhập">
                     </div>
@@ -51,6 +53,7 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-primary" id="addnv" onclick="addEmployee()">Thêm</button>
             </div>
         </div>
@@ -67,6 +70,7 @@
     addNVModal.addEventListener("hidden.bs.modal", function () {
         document.getElementById("tennv").value = '';
         document.getElementById("sdtnv").value = '';
+        document.getElementById("dcnv").value = '';
         document.getElementById("usernv").value = '';
         document.getElementById("passnv").value = '';
         document.getElementById("messageerror").style.display = 'none'; // Ẩn thông báo lỗi
@@ -75,15 +79,34 @@
     async function addEmployee() {
         const tenNv = document.getElementById('tennv').value;
         const sdt = document.getElementById('sdtnv').value;
+        const dcnv = document.getElementById('dcnv').value;
         const tenDangNhap = document.getElementById('usernv').value;
         const matKhau = document.getElementById('passnv').value;
 
         // Kiểm tra các trường không được để trống
-        if (!tenNv || !sdt || !tenDangNhap || !matKhau) {
+        if (!tenNv || !sdt || !dcnv || !tenDangNhap || !matKhau) {
             document.getElementById("messageerror").textContent = "Vui lòng điền đầy đủ thông tin.";
             document.getElementById("messageerror").style.display = 'block';
             return;
         }
+
+        
+        // Tạo JSON body
+        const employeeData = {
+            tenNv: tenNv,
+            sdt: sdt,
+            diachi: dcnv,
+            user: {
+                username: tenDangNhap,
+                password: matKhau,
+                roleVM: [
+                    {
+                        roleName: "NhanVienDS", // Đặt role mặc định là KhachHang
+                        thongTin: "Nhân viên đặt sân"
+                    }
+                ]
+            }
+        };
 
         // Gọi API để thêm nhân viên
         try {
@@ -91,19 +114,10 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Role': 'Admin',  // Truyền role vào header
                     'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
                 },
-                body: JSON.stringify({
-                    tenNv:tenNv,
-                    chucvu: "Nhân viên",
-                    sdt:sdt,
-                    userID:"",
-                    user: {
-                        username: tenDangNhap,
-                        password: matKhau,
-                        role: "NhanVienDS"
-                    }
-                })
+                body: JSON.stringify(employeeData)
             });
 
             if (response.ok) {

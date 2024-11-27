@@ -4,7 +4,7 @@ namespace QLSanBong_API.Services.IService
 {
     public interface ILoginService
     {
-        string Login(string Username, string Password);
+        string Login(LoginRequest login);
         string GenerateJwtToken(User taiKhoan);
         LoginResponse DecodeJwtToken(string token);
 

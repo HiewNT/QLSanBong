@@ -35,6 +35,7 @@ async function addRole() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+        'Role': 'Admin',  // Truyền role vào header
                 'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
             },
             body: JSON.stringify({

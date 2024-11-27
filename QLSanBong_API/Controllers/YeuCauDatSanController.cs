@@ -21,13 +21,15 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getall")]
         public ActionResult<IEnumerable<YeuCauDatSan>> GetAll()
         {
-            if (!PermissionHelper.HasPermission(User, "yeucau_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "yeucau_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
                 {
                     success = false,
-                    message = "Bạn không có quyền truy cập chức năng này."
+                    message = "Bạn không có quyền xem danh sách yêu cầu đặt sân."
                 };
 
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
@@ -39,7 +41,9 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbyid")]
         public ActionResult<YeuCauDatSan> GetById([FromQuery] int id)
         {
-            if (!PermissionHelper.HasPermission(User, "yeucau_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "yeucau_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
@@ -61,7 +65,9 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getbykh")]
         public ActionResult<YeuCauDatSan> GetByKH([FromQuery] string makh)
         {
-            if (!PermissionHelper.HasPermission(User, "yeucau_read"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "yeucau_read"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
@@ -96,7 +102,9 @@ namespace QLSanBong_API.Controllers
         [HttpPost("add")]
         public ActionResult Add([FromBody] YeuCauDatSanAdd yeuCauDatSanAdd)
         {
-            if (!PermissionHelper.HasPermission(User, "yeucau_add"))
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+            if (!PermissionHelper.HasPermission(User,role, "yeucau_add"))
             {
                 // Tạo đối tượng thông báo dưới dạng JSON
                 var errorResponse = new
@@ -117,7 +125,9 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
-                if (!PermissionHelper.HasPermission(User, "yeucau_edit"))
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+                if (!PermissionHelper.HasPermission(User,role, "yeucau_edit"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new
@@ -143,7 +153,9 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
-                if (!PermissionHelper.HasPermission(User, "yeucau_delete"))
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+                if (!PermissionHelper.HasPermission(User,role, "yeucau_delete"))
                 {
                     // Tạo đối tượng thông báo dưới dạng JSON
                     var errorResponse = new

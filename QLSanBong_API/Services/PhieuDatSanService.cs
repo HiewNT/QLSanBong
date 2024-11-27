@@ -23,8 +23,30 @@ namespace QLSanBong_API.Services
 
             var pdsData = pdsList.Select(pds =>
             {
+                var khachHang = _context.Users
+                .Join(_context.UserRoles,
+                      u => u.UserId,
+                      ur => ur.UserId,
+                      (u, ur) => new { User = u, UserRole = ur })
+                .Join(_context.Roles,
+                      ur => ur.UserRole.RoleId,
+                      r => r.RoleId,
+                      (ur, r) => new { ur.User, Role = r })
+                .FirstOrDefault(ur => ur.User.UserId == pds.MaKh && ur.Role.RoleName == "KhachHang");
+
+                var nhanVien = _context.Users
+                .Join(_context.UserRoles,
+                      u => u.UserId,
+                      ur => ur.UserId,
+                      (u, ur) => new { User = u, UserRole = ur })
+                .Join(_context.Roles,
+                      ur => ur.UserRole.RoleId,
+                      r => r.RoleId,
+                      (ur, r) => new { ur.User, Role = r })
+                .FirstOrDefault(ur => ur.User.UserId == pds.MaNv && ur.Role.RoleName == "NhanVienDS");
+
+
                 // Retrieve customer data
-                var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.MaKh == pds.MaKh);
                 if (khachHang == null)
                 {
                     throw new Exception($"Không tìm thấy khách hàng với MaKH: {pds.MaKh}");
@@ -64,10 +86,15 @@ namespace QLSanBong_API.Services
                     }).ToList(),
                     KhachHangDS = new KhachHangDS
                     {
-                        TenKh = khachHang.TenKh,
-                        Sdt = khachHang.Sdt,
-                        Gioitinh = khachHang.Gioitinh,
-                        Diachi = khachHang.Diachi
+                        TenKh = khachHang.User.Ten,
+                        Sdt = khachHang.User.Sdt,
+                        Diachi = khachHang.User.Diachi
+                    },
+                    NhanVienDS = new NhanVienDS
+                    {
+                        TenNv = nhanVien.User.Ten,
+                        Sdt = nhanVien.User.Sdt,
+                        Diachi = nhanVien.User.Diachi
                     }
                 };
             }).ToList();
@@ -85,8 +112,17 @@ namespace QLSanBong_API.Services
 
             var pdsData = pdsList.Select(pds =>
             {
-                // Retrieve customer data (No need to check if MaKh exists as we filter by MaKh)
-                var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.MaKh == pds.MaKh);
+                var khachHang = _context.Users
+                .Join(_context.UserRoles,
+                      u => u.UserId,
+                      ur => ur.UserId,
+                      (u, ur) => new { User = u, UserRole = ur })
+                .Join(_context.Roles,
+                      ur => ur.UserRole.RoleId,
+                      r => r.RoleId,
+                      (ur, r) => new { ur.User, Role = r })
+                .FirstOrDefault(ur => ur.User.UserId == pds.MaKh && ur.Role.RoleName == "KhachHang");
+
                 if (khachHang == null)
                 {
                     throw new Exception($"Không tìm thấy khách hàng với MaKH: {pds.MaKh}");
@@ -126,10 +162,9 @@ namespace QLSanBong_API.Services
                     }).ToList(),
                     KhachHangDS = new KhachHangDS
                     {
-                        TenKh = khachHang.TenKh,
-                        Sdt = khachHang.Sdt,
-                        Gioitinh = khachHang.Gioitinh,
-                        Diachi = khachHang.Diachi
+                        TenKh = khachHang.User.Ten,
+                        Sdt = khachHang.User.Sdt,
+                        Diachi = khachHang.User.Diachi
                     }
                 };
             }).ToList();
@@ -145,7 +180,28 @@ namespace QLSanBong_API.Services
 
             var pdsData = pdsList.Select(pds =>
             {
-                var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.MaKh == pds.MaKh);
+                var khachHang = _context.Users
+                .Join(_context.UserRoles,
+                      u => u.UserId,
+                      ur => ur.UserId,
+                      (u, ur) => new { User = u, UserRole = ur })
+                .Join(_context.Roles,
+                      ur => ur.UserRole.RoleId,
+                      r => r.RoleId,
+                      (ur, r) => new { ur.User, Role = r })
+                .FirstOrDefault(ur => ur.User.UserId == pds.MaKh && ur.Role.RoleName == "KhachHang");
+
+                var nhanVien = _context.Users
+                .Join(_context.UserRoles,
+                      u => u.UserId,
+                      ur => ur.UserId,
+                      (u, ur) => new { User = u, UserRole = ur })
+                .Join(_context.Roles,
+                      ur => ur.UserRole.RoleId,
+                      r => r.RoleId,
+                      (ur, r) => new { ur.User, Role = r })
+                .FirstOrDefault(ur => ur.User.UserId == pds.MaNv && ur.Role.RoleName == "NhanVienDS");
+
                 if (khachHang == null)
                 {
                     throw new Exception($"Không tìm thấy khách hàng với MaNV: {pds.MaNv}");
@@ -185,11 +241,17 @@ namespace QLSanBong_API.Services
                     }).ToList(),
                     KhachHangDS = new KhachHangDS
                     {
-                        TenKh = khachHang.TenKh,
-                        Sdt = khachHang.Sdt,
-                        Gioitinh = khachHang.Gioitinh,
-                        Diachi = khachHang.Diachi
+                        TenKh = khachHang.User.Ten,
+                        Sdt = khachHang.User.Sdt,
+                        Diachi = khachHang.User.Diachi
+                    },
+                    NhanVienDS = new NhanVienDS
+                    {
+                        TenNv = nhanVien.User.Ten,
+                        Sdt = nhanVien.User.Sdt,
+                        Diachi = nhanVien.User.Diachi
                     }
+                 
                 };
             }).ToList();
 
@@ -209,7 +271,30 @@ namespace QLSanBong_API.Services
             }
 
             // Lấy thông tin khách hàng
-            var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.MaKh == phieuDatSan.MaKh);
+            var khachHang = _context.Users
+                        .Join(_context.UserRoles,
+                              u => u.UserId,
+                              ur => ur.UserId,
+                              (u, ur) => new { User = u, UserRole = ur })
+                        .Join(_context.Roles,
+                              ur => ur.UserRole.RoleId,
+                              r => r.RoleId,
+                              (ur, r) => new { ur.User, Role = r })
+                        .FirstOrDefault(ur => ur.User.UserId == phieuDatSan.MaKh && ur.Role.RoleName == "KhachHang");
+
+            // Lấy thông tin khách hàng
+            var nhanVien = _context.Users
+                        .Join(_context.UserRoles,
+                              u => u.UserId,
+                              ur => ur.UserId,
+                              (u, ur) => new { User = u, UserRole = ur })
+                        .Join(_context.Roles,
+                              ur => ur.UserRole.RoleId,
+                              r => r.RoleId,
+                              (ur, r) => new { ur.User, Role = r })
+                        .FirstOrDefault(ur => ur.User.UserId == phieuDatSan.MaNv && ur.Role.RoleName == "NhanVienDS");
+
+
             if (khachHang == null)
             {
                 throw new Exception($"Không tìm thấy khách hàng với MaKh: {phieuDatSan.MaKh}");
@@ -250,10 +335,15 @@ namespace QLSanBong_API.Services
                 }).ToList(),
                 KhachHangDS = new KhachHangDS
                 {
-                    TenKh = khachHang.TenKh,
-                    Sdt = khachHang.Sdt,
-                    Gioitinh = khachHang.Gioitinh,
-                    Diachi = khachHang.Diachi
+                    TenKh = khachHang.User.Ten,
+                    Sdt = khachHang.User.Sdt,
+                    Diachi = khachHang.User.Diachi
+                },
+                NhanVienDS = new NhanVienDS
+                {
+                    TenNv = nhanVien.User.Ten,
+                    Sdt = nhanVien.User.Sdt,
+                    Diachi = nhanVien.User.Diachi
                 }
             };
         }

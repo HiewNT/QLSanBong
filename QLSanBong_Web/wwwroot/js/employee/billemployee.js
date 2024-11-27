@@ -23,11 +23,11 @@ async function loadHoaDons() {
 
     const url = `https://localhost:7182/api/PhieuDatSan/getbynv?maNv=${manv}`;
     try {
-        const token = sessionStorage.getItem("Token");
         const response = await fetch(url, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
+                'Role': 'NhanVienDS',  // Truyền role vào header
                 "Content-Type": "application/json"
             }
         });
@@ -62,6 +62,9 @@ async function loadHoaDons() {
                 "search": "Tìm kiếm:"
             }
         });
+        
+        // Gọi hàm xử lý quyền sau khi thêm dữ liệu vào giao diện
+        await handlePermissionsForFrontend();
     } catch (error) {
         console.error("Lỗi:", error);
         document.getElementById('hoaDonContainer').innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
@@ -83,7 +86,7 @@ function populateTable(hoaDons) {
                 <td>${new Intl.NumberFormat('vi-VN').format(yc.tongTien)} VND</td>
                 <td>${yc.ghiChu || 'Không có'}</td>
                 <td>
-                    <button class="btn btn-info btn-sm"
+                    <button style="display: none;" data-auth="hoadon_read" class="btn btn-info btn-sm"
                             onclick="infoHoaDon('${yc.maPds}')">
                         <i class="fas fa-info"></i> Chi tiết
                     </button>
@@ -91,6 +94,7 @@ function populateTable(hoaDons) {
             </tr>
         `;
     });
+    
 }
 
 // Hàm xử lý khi nhấn vào thông tin hóa đơn
@@ -102,11 +106,11 @@ function infoHoaDon(maPds) {
 async function loadHoaDonDetail(maPds) {
     const url = `https://localhost:7182/api/PhieuDatSan/getbyid?id=${maPds}`; // Truyền tham số qua URL
     try {
-        const token = sessionStorage.getItem("Token");
         const response = await fetch(url, {
             method: "GET", // GET không cần body
             headers: {
                 "Authorization": `Bearer ${token}`,
+                'Role': 'NhanVienDS',  // Truyền role vào header
                 "Content-Type": "application/json"
             }
         });
@@ -182,9 +186,3 @@ function populateDetailModal(detailHoaDon) {
     // Mở modal
     $('#hoaDonModal').modal('show');
 }
-
-
-// Sự kiện đóng modal
-document.querySelector('.modalclose').addEventListener('click', function () {
-    $('#hoaDonModal').modal('hide');
-});

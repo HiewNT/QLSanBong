@@ -1,6 +1,7 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
     // Lấy các phần tử cần thiết
     const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
     const addKHButton = document.getElementById("addKH");
     const addKHModal = document.getElementById("addKHModal");
     const errorMessageLogin = document.getElementById("errorMessage");
@@ -47,10 +48,25 @@
         }
     });
 
+    // Kiểm tra token ngay lập tức
+    const token1 = sessionStorage.getItem("Token");
+
+    // Lấy các phần tử DOM
+    const formAccount = document.querySelector(".formaccount");
+    const formUser = document.querySelector(".formuser");
+
+    if (!token1) {
+        document.querySelector(".formaccount").style.display = "flex";
+        document.querySelector(".formuser").style.display = "none";
+    } else {
+        document.querySelector(".formaccount").style.display = "none";
+        document.querySelector(".formuser").style.display = "flex";
+    }
+
     // Lấy vai trò từ token
     function getRoleFromToken(token) {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || "KhachHang";
+        return payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
     }
 
     // Chuyển hướng theo vai trò
@@ -80,32 +96,36 @@
         errorMessageSignup.style.display = 'none';
     });
 
-    // Khi nút "Sign up" được nhấn
-    addKHButton.addEventListener("click", async function () {
+    // Khi form đăng ký được submit
+    signupForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
         const tenKh = document.getElementById("tenkh").value;
         const sdtKh = document.getElementById("sdtkh").value;
-        const gtKh = document.getElementById("gtkh").value;
         const dcKh = document.getElementById("dckh").value;
         const userKh = document.getElementById("userkh").value;
         const passKh = document.getElementById("passkh").value;
 
         // Kiểm tra các trường không được để trống
-        if (!tenKh || !sdtKh || !gtKh || !dcKh || !userKh || !passKh) {
+        if (!tenKh || !sdtKh || !dcKh || !userKh || !passKh) {
             errorMessageSignup.textContent = "Vui lòng điền đầy đủ thông tin.";
             errorMessageSignup.style.display = 'block';
             return;
         }
 
         const khachHangData = {
-            tenKh : tenKh,
+            tenKh: tenKh,
             sdt: sdtKh,
-            gioitinh: gtKh,
             diachi: dcKh,
-            userID:"",
             user: {
                 username: userKh,
                 password: passKh,
-                role: "KhachHang"
+                roleVM: [
+                    {
+                        roleName: "KhachHang", // Đặt role mặc định là KhachHang
+                        thongTin: "Khách hàng"
+                    }
+                ]
             }
         };
 

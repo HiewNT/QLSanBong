@@ -19,7 +19,15 @@ function addToCart(maSan, tenSb, diaChi, ngayDatSan, maGio, gioBatDau, gioKetThu
     );
 
     if (isInCart) {
-        alert('Giờ thuê đã có trong danh sách chờ!');
+        Swal.fire({
+            toast: true, // Chế độ toast
+            position: 'top-end',
+            icon: 'error',
+            title: 'Giờ thuê đã tồn tại!',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true, // Hiển thị thanh tiến trình
+        });
         return;
     }
 
@@ -38,7 +46,15 @@ function addToCart(maSan, tenSb, diaChi, ngayDatSan, maGio, gioBatDau, gioKetThu
     sessionStorage.setItem('gioHang', JSON.stringify(cart));
     updateCartCount();
     toggleConfirmButton(); // Kiểm tra hiển thị nút xác nhận
-    alert('Giờ thuê đã được thêm vào danh sách chờ!');
+    Swal.fire({
+        toast: true, // Chế độ toast
+        position: 'top-end',
+        icon: 'success',
+        title: 'Thêm giờ thuê thành công!',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true, // Hiển thị thanh tiến trình
+    });
 }
 
 function updateCartCount() {
@@ -74,7 +90,16 @@ function removeFromCart(maSb, maGio, ngayDat) {
     updateCartCount();
     loadCart();
     toggleConfirmButton(); // Kiểm tra hiển thị nút xác nhận
-    alert("Xóa giờ thuê thành công!");
+    Swal.fire({
+        toast: true, // Chế độ toast
+        position: 'top-end',
+        icon: 'success',
+        title: 'Xóa giờ thuê thành công!',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true, // Hiển thị thanh tiến trình
+    });
+
 }
 
 function loadCart() {

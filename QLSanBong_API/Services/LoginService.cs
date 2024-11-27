@@ -23,19 +23,19 @@ namespace QLSanBong_API.Services
         }
 
         // Phương thức xác thực người dùng và tạo token
-        public string Login(string username, string password)
+        public string Login(LoginRequest login)
         {
             try
             {
                 // Tìm tài khoản trong cơ sở dữ liệu
-                var taiKhoanData = _context.Users.SingleOrDefault(x => x.Username == username);
+                var taiKhoanData = _context.Users.SingleOrDefault(x => x.Username == login.Username);
                 if (taiKhoanData == null)
                 {
                     throw new UnauthorizedAccessException("Tên đăng nhập hoặc mật khẩu không đúng.");
                 }
 
                 // Kiểm tra mật khẩu
-                if (!VerifyPassword(password, taiKhoanData.Password))
+                if (!VerifyPassword(login.Password, taiKhoanData.Password))
                 {
                     throw new UnauthorizedAccessException("Tên đăng nhập hoặc mật khẩu không đúng.");
                 }
@@ -59,7 +59,7 @@ namespace QLSanBong_API.Services
                 // Chuyển đổi đối tượng từ Data sang Models
                 var user = new Models.User
                 {
-                    Username = username,
+                    Username = login.Username,
                     UserID = taiKhoanData.UserId, // Đảm bảo có UserId ở đây
                     RoleVM = new List<RoleVM> // Khởi tạo danh sách RoleVM
                     {
@@ -93,58 +93,54 @@ namespace QLSanBong_API.Services
         {
             try
             {
-                // Truy xuất thông tin Manguoidung từ KhachHang hoặc NhanVien dựa vào UserID
-                var manguoidung = "";
 
-                // Kiểm tra nếu UserID tồn tại trong KhachHang hoặc NhanVien
-                var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.UserId == taiKhoan.UserID);
-                if (khachHang != null)
-                {
-                    manguoidung = khachHang.MaKh;
-                }
-                else
-                {
-                    var nhanVien = _context.NhanViens.FirstOrDefault(nv => nv.UserId == taiKhoan.UserID);
-                    if (nhanVien != null)
-                    {
-                        manguoidung = nhanVien.MaNv;
-                    }
-                }
+                var user = _context.Users.FirstOrDefault(kh => kh.UserId == taiKhoan.UserID);
 
                 // Lấy danh sách RoleId của người dùng từ UserRoles
                 var roleIds = _context.UserRoles
-                                    .Where(ro => ro.UserId == taiKhoan.UserID)
-                                    .Select(ro => ro.RoleId)
-                                    .ToList();
+                                        .Where(ro => ro.UserId == taiKhoan.UserID)
+                                        .Select(ro => ro.RoleId)
+                                        .ToList();
 
                 // Lấy danh sách các vai trò từ bảng Roles dựa trên RoleIds
                 var roles = _context.Roles
                                     .Where(r => roleIds.Contains(r.RoleId))
                                     .ToList();
 
-                // Lấy danh sách AuthID từ bảng RoleAuths dựa trên RoleIds
-                var userAuths = _context.RoleAuths
-                    .Where(ua => roleIds.Contains(ua.RoleId))
-                    .Select(ua => ua.AuthId)
-                    .ToList();
+                // Lấy quyền theo từng vai trò từ bảng RoleAuths
+                var permissions = new Dictionary<string, List<string>>();
+                foreach (var role in roles)
+                {
+                    var rolePermissions = _context.RoleAuths
+                        .Where(ua => ua.RoleId == role.RoleId)
+                        .Select(ua => ua.AuthId)
+                        .ToList();
+
+                    if (rolePermissions.Any())
+                    {
+                        permissions[role.RoleName] = rolePermissions;
+                    }
+                }
 
                 // Thêm các claim cơ bản
                 var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, taiKhoan.UserID),
-                    new Claim("Manguoidung", manguoidung)
-                };
+        {
+            new Claim(ClaimTypes.Name, taiKhoan.UserID),
+            new Claim("Manguoidung", user.UserId),
+            new Claim("Sdt", user.Sdt),
+            new Claim("Tennguoidung", user.Ten)
+        };
 
                 // Thêm các vai trò vào claims
                 foreach (var role in roles)
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, role.RoleName ?? "KhachHang")); // Thêm từng vai trò vào claims
+                    claims.Add(new Claim(ClaimTypes.Role, role.RoleName ?? "KhachHang"));
                 }
 
-                // Thêm các quyền vào claims
-                foreach (var auth in userAuths)
+                // Thêm quyền cho từng vai trò vào claims
+                foreach (var permission in permissions)
                 {
-                    claims.Add(new Claim("Permission", auth.ToString())); // Thêm quyền vào claims
+                    claims.Add(new Claim($"Permission_{permission.Key}", string.Join(",", permission.Value)));
                 }
 
                 // Lấy khóa bí mật từ cấu hình
@@ -156,7 +152,7 @@ namespace QLSanBong_API.Services
                     issuer: _configuration["Jwt:Issuer"],
                     audience: _configuration["Jwt:Audience"],
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(60), // Token có thời hạn 60 phút
+                    expires: DateTime.Now.AddMinutes(60), // Token có thời gian sống 60 phút
                     signingCredentials: creds
                 );
 
@@ -176,6 +172,7 @@ namespace QLSanBong_API.Services
         {
             try
             {
+                // Kiểm tra nếu token không hợp lệ
                 if (string.IsNullOrEmpty(token))
                 {
                     throw new ArgumentNullException(nameof(token), "Token không hợp lệ.");
@@ -183,7 +180,7 @@ namespace QLSanBong_API.Services
 
                 var handler = new JwtSecurityTokenHandler();
 
-                // Kiểm tra nếu token không hợp lệ
+                // Kiểm tra nếu token có thể được đọc
                 if (!handler.CanReadToken(token))
                 {
                     throw new InvalidOperationException("Token không hợp lệ.");
@@ -192,64 +189,48 @@ namespace QLSanBong_API.Services
                 // Giải mã token
                 var jwtToken = handler.ReadJwtToken(token);
 
-                // Truy xuất các claim từ token
+                // Lấy thông tin từ token
                 var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
                 var manguoidung = jwtToken.Claims.FirstOrDefault(c => c.Type == "Manguoidung")?.Value;
-                var role = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                var sdt = jwtToken.Claims.FirstOrDefault(c => c.Type == "Sdt")?.Value;
+                var roleClaims = jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role).ToList();
 
                 if (string.IsNullOrEmpty(userId))
                 {
                     throw new InvalidOperationException("Không tìm thấy thông tin người dùng trong token.");
                 }
 
-                var tennguoidung = "";
-                var sdt = "";
+                // Lấy các vai trò (roles)
+                var roles = roleClaims.Select(c => c.Value).ToList();
 
-                // Kiểm tra xem user là khách hàng hay nhân viên
-                var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.UserId == userId);
-                if (khachHang != null)
+                // Lấy quyền theo từng vai trò từ các claims
+                var permissions = new Dictionary<string, List<string>>();
+                foreach (var role in roles)
                 {
-                    tennguoidung = khachHang.TenKh;
-                    sdt = khachHang.Sdt;
-                }
-                else
-                {
-                    var nhanVien = _context.NhanViens.FirstOrDefault(nv => nv.UserId == userId);
-                    if (nhanVien != null)
+                    var rolePermissions = jwtToken.Claims
+                        .Where(c => c.Type == $"Permission_{role}")
+                        .Select(c => c.Value)
+                        .ToList();
+
+                    if (rolePermissions.Any())
                     {
-                        tennguoidung = nhanVien.TenNv;
-                        sdt = nhanVien.Sdt;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("Người dùng không tồn tại trong hệ thống.");
+                        permissions[role] = rolePermissions;
                     }
                 }
 
-                // Xác định chức vụ dựa trên role
-                string chucvu = role switch
-                {
-                    "NhanVien" => "Nhân Viên",
-                    "Admin" => "Quản Trị Viên",
-                    _ => "Khách Hàng" // Mặc định là khách hàng
-                };
+                // Lấy thông tin người dùng từ các claim
+                var tennguoidung = jwtToken.Claims.FirstOrDefault(c => c.Type == "Tennguoidung")?.Value;
 
-                // Lấy quyền từ claims
-                var permissions = jwtToken.Claims
-                    .Where(c => c.Type == "Permission")
-                    .Select(c => c.Value)
-                    .ToList();
-
-                // Trả về đối tượng LoginResponse với quyền (permissions)
+                // Trả về đối tượng LoginResponse với thông tin người dùng, quyền và roles
                 return new LoginResponse
                 {
                     UserID = userId,
-                    Manguoidung = manguoidung,
                     Tennguoidung = tennguoidung,
+                    Manguoidung = manguoidung,
                     Sdt = sdt,
-                    Chucvu = chucvu,
-                    Token = token,
-                    Permissions = permissions // Thêm quyền vào response
+                    Roles = roles,
+                    Permissions = permissions, // Quyền của từng vai trò
+                    Token = token
                 };
             }
             catch (Exception ex)
@@ -259,6 +240,8 @@ namespace QLSanBong_API.Services
                 throw new InvalidOperationException("Đã xảy ra lỗi khi giải mã token.");
             }
         }
+
+
 
 
         // Kiểm tra mật khẩu có khớp với mật khẩu đã mã hóa hay không
@@ -282,7 +265,7 @@ namespace QLSanBong_API.Services
         public bool IsSdtTaken(string sdt)
         {
             // Kiểm tra xem tên người dùng đã tồn tại trong cơ sở dữ liệu chưa
-            return _context.KhachHangs.Any(x => x.Sdt == sdt);
+            return _context.Users.Any(x => x.Sdt == sdt);
         }
         // Phương thức để kiểm tra mật khẩu có khớp với mật khẩu đã mã hóa hay không
     }

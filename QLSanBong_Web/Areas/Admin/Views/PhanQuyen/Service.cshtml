@@ -1,7 +1,6 @@
 ﻿@{
     Layout = "_AdminLayout";
 }
-<div class="container mt-5">
     <div class="row">
         <!-- Cột bên trái: Danh sách các hành động -->
         <div class="col-md-6">
@@ -39,7 +38,6 @@
             </div>
         </div>
     </div>
-</div>
 
 
 <div class="modal fade" id="addSeModal" tabindex="-1" aria-hidden="true">
@@ -65,6 +63,7 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-primary" id="addSe" onclick="addService()">Thêm dịch vụ</button>
             </div>
         </div>
@@ -94,6 +93,7 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-primary" id="addAc" onclick="addAction()">Thêm hành động</button>
             </div>
         </div>

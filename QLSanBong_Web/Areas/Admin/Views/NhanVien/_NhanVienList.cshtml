@@ -1,17 +1,19 @@
 ﻿@* _NhanVienList.cshtml *@
-<table id="nhanVienTable" class="table table-striped table-bordered display" style="width:100%">
-    <thead class="thead-dark">
+<table id="nhanVienTable" class="table table-striped table-bordered" style="width:100%">
+    <thead class="table-secondary">
         <tr>
-            <th style="width: 10%; text-align: center;">Mã NV</th>
-            <th style="width: 22%; text-align: center;">Họ Tên</th>
+            <th style="width: 10%; text-align: center;">ID</th>
+            <th style="width: 20%; text-align: center;">Họ Tên</th>
             <th style="width: 10%; text-align: center;">SĐT</th>
-            <th style="width: 16%; text-align: center;">Tên đăng nhập</th>
-            <th style="width: 30%; text-align: center;">Mật khẩu</th>
-            <th style="width: 12%"></th> <!-- Cột Hành động -->
+            <th style="width: 15%; text-align: center;">Địa chỉ</th>
+            <th style="width: 10%; text-align: center;">Tên ĐN</th>
+            <th style="width: 25%; text-align: center;">Mật khẩu</th>
+            <th style="width: 10%; text-align: center;"></th> <!-- Cột Hành động -->
         </tr>
     </thead>
     <tbody id="nhanVienList"></tbody> <!-- Đảm bảo ID này chính xác -->
 </table>
+
 
 <div class="modal fade" id="updateNVModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-md">
@@ -33,6 +35,10 @@
                         <input type="text" class="form-control" id="sdtnv1" placeholder="Số điện thoại">
                     </div>
                     <div class="mb-3">
+                        <label for="dcnv1" class="form-label">Địa chỉ</label>
+                        <input type="text" class="form-control" id="dcnv1" placeholder="Địa chỉ">
+                    </div>
+                    <div class="mb-3">
                         <label for="usernv1" class="form-label">Tên đăng nhập</label>
                         <input type="text" class="form-control" id="usernv1" placeholder="Tên đăng nhập">
                     </div>
@@ -44,6 +50,7 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-primary" id="updatenv" onclick="updateEmployee()">Cập nhật</button>
             </div>
         </div>
@@ -64,6 +71,7 @@
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
+                    'Role': 'Admin',  // Truyền role vào header
                     "Content-Type": "application/json"
                 }
             });
@@ -93,14 +101,15 @@
 
                 nhanVienList.innerHTML += `
                     <tr>
-                        <td>${nv.maNv}</td>
+                        <td>${nv.userID}</td>
                         <td>${nv.tenNv}</td>
                         <td>${nv.sdt}</td>
+                        <td>${nv.diachi}</td>
                         <td>${nv.user ? nv.user.username : 'N/A'}</td>
                         <td>${nv.user ? nv.user.password : 'N/A'}</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="editNhanVien('${nv.maNv}')"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteNhanVien('${nv.maNv}')"><i class="fas fa-trash"></i></button>
+                        <td class="d-flex justify-content-start">
+                                    <button style="display: none;" data-auth="nhanvien_edit" class="btn btn-warning btn-sm" onclick="editNhanVien('${nv.userID}')"><i class="fas fa-edit"></i></button>
+                                    <button style="display: none;" data-auth="nhanvien_delete" class="btn btn-danger btn-sm ml-2" onclick="deleteNhanVien('${nv.userID}')"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -122,6 +131,8 @@
                     "search": "Tìm kiếm:"
                 }
             });
+            // Gọi hàm xử lý quyền sau khi thêm dữ liệu vào giao diện
+            await handlePermissionsForFrontend();
         } catch (error) {
             console.error("Lỗi:", error);
             document.getElementById('nhanVienContainer').innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
@@ -129,14 +140,15 @@
     }
 
 
-    async function loadNhanVienById(maNv) {
-        const url = `https://localhost:7182/api/NhanVien/getbyid?id=${maNv}`;
+    async function loadNhanVienById(userID) {
+        const url = `https://localhost:7182/api/NhanVien/getbyid?id=${userID}`;
         try {
             const token = sessionStorage.getItem("Token");
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
+                    'Role': 'Admin',  // Truyền role vào header
                     "Content-Type": "application/json"
                 }
             });
@@ -152,13 +164,14 @@
             }
 
             const nhanVien = await response.json();
-
+            console.log(nhanVien);
             // Kiểm tra nếu dữ liệu tồn tại, sau đó điền dữ liệu vào modal
             if (nhanVien) {
                 document.getElementById('tennv1').value = nhanVien.tenNv;
                 document.getElementById('sdtnv1').value = nhanVien.sdt;
+                document.getElementById('dcnv1').value = nhanVien.diachi;
                 document.getElementById('usernv1').value = nhanVien.user ? nhanVien.user.username : '';
-                document.getElementById('passnv1').value = nhanVien.user ? nhanVien.user.password : '';
+                
 
                 // Hiển thị modal chỉnh sửa
                 $('#updateNVModal').modal('show');
@@ -171,25 +184,26 @@
         }
     }
     // Hàm Sửa nhân viên
-    window.editNhanVien = function (maNv) {
-        loadNhanVienById(maNv); // Tải dữ liệu nhân viên
+    window.editNhanVien = function (userID) {
+        loadNhanVienById(userID); // Tải dữ liệu nhân viên
 
         // Hiển thị modal chỉnh sửa nhân viên
         $('#updateNVModal').modal('show');
 
-        // Gán `maNv` vào biến toàn cục để dùng khi cập nhật
-        window.currentMaNv = maNv;
+        // Gán `userID` vào biến toàn cục để dùng khi cập nhật
+        window.currentMaNv = userID;
     };
 
     // Hàm cập nhật nhân viên
     async function updateEmployee() {
         const tenNv1 = document.getElementById('tennv1').value;
         const sdt1 = document.getElementById('sdtnv1').value;
+        const dc1 = document.getElementById('dcnv1').value;
         const tenDangNhap1 = document.getElementById('usernv1').value;
         const matKhau1 = document.getElementById('passnv1').value;
 
         // Kiểm tra các trường không được để trống
-        if (!tenNv1 || !sdt1 || !tenDangNhap1 || !matKhau1) {
+        if (!tenNv1 || !sdt1 ||  !dc1 || !tenDangNhap1 || !matKhau1) {
             document.getElementById("messageerror1").textContent = "Vui lòng điền đầy đủ thông tin.";
             document.getElementById("messageerror1").style.display = 'block';
             return;
@@ -201,17 +215,16 @@
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Role': 'Admin',  // Truyền role vào header
                     'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
                 },
                 body: JSON.stringify({
                     tenNv: tenNv1,
-                    chucvu: "Nhân viên",
                     sdt: sdt1,
-                    userID: "",
+                    diachi: dc1,
                     user: {
                         username: tenDangNhap1,
-                        password: matKhau1,
-                        role: "NhanVienDS"
+                        password: matKhau1
                     }
                 })
             });
@@ -247,13 +260,14 @@
 
 
     // Hàm Xóa nhân viên
-    window.deleteNhanVien = function (maNv) {
+    window.deleteNhanVien = function (userID) {
         if (confirm("Bạn có chắc chắn muốn xóa nhân viên này?")) {
-            const url = `https://localhost:7182/api/NhanVien/delete?id=${maNv}`;
+            const url = `https://localhost:7182/api/NhanVien/delete?id=${userID}`;
             fetch(url, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                    'Role': 'Admin',  // Truyền role vào header
                     "Content-Type": "application/json"
                 }
             })

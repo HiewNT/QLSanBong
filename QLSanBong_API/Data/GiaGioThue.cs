@@ -14,8 +14,4 @@ public partial class GiaGioThue
     public decimal? Dongia { get; set; }
 
     public string? Ghichu { get; set; }
-
-    public virtual ICollection<ChiTietPd> ChiTietPds { get; set; } = new List<ChiTietPd>();
-
-    public virtual ICollection<ChiTietYcd> ChiTietYcds { get; set; } = new List<ChiTietYcd>();
 }

@@ -30,6 +30,7 @@ async function loadHoaDons() {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
+        'Role': 'KhachHang',  // Truyền role vào header
                 "Content-Type": "application/json"
             }
         });
@@ -109,6 +110,7 @@ async function loadHoaDonDetail(maPds) {
             method: "GET", // GET không cần body
             headers: {
                 "Authorization": `Bearer ${token}`,
+        'Role': 'KhachHang',  // Truyền role vào header
                 "Content-Type": "application/json"
             }
         });
@@ -184,9 +186,3 @@ function populateDetailModal(detailHoaDon) {
     // Mở modal
     $('#hoaDonModal').modal('show');
 }
-
-
-// Sự kiện đóng modal
-document.querySelector('.modalclose').addEventListener('click', function () {
-    $('#hoaDonModal').modal('hide');
-});

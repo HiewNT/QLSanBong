@@ -133,21 +133,13 @@ namespace QLSanBong_API.Services
             {
                 UserID = r.UserId,
                 Username = r.User.Username,
-                Name = _context.KhachHangs
+                Name = _context.Users
                             .Where(kh => kh.UserId == r.UserId)
-                            .Select(kh => kh.TenKh)
-                            .FirstOrDefault()
-                        ?? _context.NhanViens
-                            .Where(nv => nv.UserId == r.UserId)
-                            .Select(nv => nv.TenNv)
+                            .Select(kh => kh.Ten)
                             .FirstOrDefault(),
-                SDT = _context.KhachHangs
+                SDT = _context.Users
                             .Where(kh => kh.UserId == r.UserId)
                             .Select(kh => kh.Sdt)
-                            .FirstOrDefault()
-                        ?? _context.NhanViens
-                            .Where(nv => nv.UserId == r.UserId)
-                            .Select(nv => nv.Sdt)
                             .FirstOrDefault(),
                 Role = new List<Models.Role>
                 {
@@ -172,21 +164,13 @@ namespace QLSanBong_API.Services
                 {
                     UserID = group.Key,
                     Username = group.FirstOrDefault().User.Username,
-                    Name = _context.KhachHangs
+                    Name = _context.Users
                                 .Where(kh => kh.UserId == group.Key)
-                                .Select(kh => kh.TenKh)
-                                .FirstOrDefault()
-                            ?? _context.NhanViens
-                                .Where(nv => nv.UserId == group.Key)
-                                .Select(nv => nv.TenNv)
+                                .Select(kh => kh.Ten)
                                 .FirstOrDefault(),
-                    SDT = _context.KhachHangs
+                    SDT = _context.Users
                                 .Where(kh => kh.UserId == group.Key)
                                 .Select(kh => kh.Sdt)
-                                .FirstOrDefault()
-                            ?? _context.NhanViens
-                                .Where(nv => nv.UserId == group.Key)
-                                .Select(nv => nv.Sdt)
                                 .FirstOrDefault(),
                     Role = group.Select(r => new Models.Role
                     {

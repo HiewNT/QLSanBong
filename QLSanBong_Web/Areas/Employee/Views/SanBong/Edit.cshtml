@@ -43,13 +43,13 @@
                             <input type="text" id="diaChi" class="form-control" required>
                         </div><!-- Nút Lưu thay đổi ở góc dưới bên phải -->
                         <div class="text-end mt-4">
-                            <button type="button" class="btn btn-primary" onclick="saveChanges()">Lưu thay đổi</button>
+                            <button style="display:none;" data-auth="sanbong_add" type="button" class="btn btn-primary" onclick="saveChanges()">Lưu thay đổi</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Các nút điều khiển -->
-                <div class="mt-4 text-center">
+                <div style="display: none;" data-auth="sanbong_read"  class="mt-4 text-center">
                     <button type="button" class="btn btn-success me-2" onclick="goToList()">Danh sách sân bóng</button>
                     <button type="button" class="btn btn-info me-2" onclick="viewDetail()">Chi tiết sân bóng</button>
                 </div>
@@ -77,13 +77,24 @@
 
         try {
             const response = await fetch(`https://localhost:7182/api/SanBong/getbyid?id=${id}`, {
-                headers: { "Authorization": `Bearer ${sessionStorage.getItem("Token")}` }
+                headers: {
+                    "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
+                    'Role': 'NhanVienDS'  // Truyền role vào header
+                }
             });
 
 
             if (!response.ok) {
-                const errorData = await response.json();
-                alert(errorData?.message || "Không thể tải danh sách sân bóng.");
+                // Nếu API trả về lỗi, xử lý theo mã trạng thái
+                if (response.status === 403) {
+                    alert("Bạn không có quyền truy cập chức năng này.");
+                } else {
+                    response.json().then(errorData => {
+                        alert(errorData?.message || "Không thể sửa sân bóng.");
+                    }).catch(() => {
+                        alert("Không thể sửa sân bóng. Lỗi không xác định.");
+                    });
+                }
                 return;
             }
 
@@ -126,7 +137,9 @@
         try {
             const response = await fetch(`https://localhost:7182/api/SanBong/update?id=${sanBong.maSb}`, {
                 method: "PUT",
-                headers: { "Authorization": `Bearer ${sessionStorage.getItem("Token")}` },
+                headers: { "Authorization": `Bearer ${sessionStorage.getItem("Token")}` ,
+                    'Role': 'NhanVienDS'  // Truyền role vào header
+                    },
                 body: formData
             });
 
@@ -134,17 +147,11 @@
                 alert("Cập nhật thành công!");
                 window.location.reload(); // Tải lại trang sau khi cập nhật
             } else {
-                // Nếu API trả về lỗi, xử lý theo mã trạng thái
-                if (response.status === 403) {
-                    alert("Bạn không có quyền truy cập chức năng này.");
-                } else {
-                    response.json().then(errorData => {
-                        alert(errorData?.message || "Không thể xóa sân bóng.");
-                    }).catch(() => {
-                        alert("Không thể xóa sân bóng. Lỗi không xác định.");
-                    });
-                }
+
+                const errorData = await response.json();
+                alert(errorData?.message || "Không thể thêm sân bóng.");
                 return;
+
             }
         } catch (error) {
             console.error("Lỗi:", error);

@@ -11,9 +11,11 @@ public partial class User
 
     public string Password { get; set; } = null!;
 
-    public virtual ICollection<KhachHang> KhachHangs { get; set; } = new List<KhachHang>();
+    public string? Ten { get; set; }
 
-    public virtual ICollection<NhanVien> NhanViens { get; set; } = new List<NhanVien>();
+    public string? Sdt { get; set; }
+
+    public string? Diachi { get; set; }
 
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 }

@@ -27,6 +27,7 @@ async function loadYeuCaus() {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
+        'Role': 'KhachHang',  // Truyền role vào header
                 "Content-Type": "application/json"
             }
         });
@@ -129,6 +130,7 @@ async function loadYeuCauDetail(request) {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${token}`,
+        'Role': 'KhachHang',  // Truyền role vào header
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(request)
@@ -223,6 +225,7 @@ async function updateYeuCau(requestData) {
             method: "PUT",
             headers: {
                 "Authorization": `Bearer ${token}`,
+                 'Role': 'KhachHang',  // Truyền role vào header
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(requestData)
