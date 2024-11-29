@@ -97,15 +97,21 @@ namespace QLSanBong_API.Services
         public List<Models.User> GetAllUser()
         {
             var users = (from user in _context.Users
-                         join userRole in _context.UserRoles on user.UserId equals userRole.UserId
-                         join role in _context.Roles on userRole.RoleId equals role.RoleId
+                         join userRole in _context.UserRoles on user.UserId equals userRole.UserId into userRoles
+                         from userRole in userRoles.DefaultIfEmpty() // Left Join: Lấy tất cả User kể cả không có Role
+                         join role in _context.Roles on userRole.RoleId equals role.RoleId into roles
+                         from role in roles.DefaultIfEmpty() // Left Join: Lấy tất cả User kể cả không có Role
                          select new
                          {
                              user.UserId,
                              user.Username,
                              user.Password,
-                             RoleName = role.RoleName,
-                             ThongTin = role.ThongTin
+                             user.Ten,
+                             user.Sdt,
+                             user.Diachi,
+                             RoleID = role.RoleId,
+                             RoleName = role != null ? role.RoleName : null,
+                             ThongTin = role != null ? role.ThongTin : null
                          })
                          .GroupBy(u => u.UserId) // Nhóm theo UserId
                          .Select(g => new Models.User
@@ -113,11 +119,16 @@ namespace QLSanBong_API.Services
                              UserID = g.Key,
                              Username = g.FirstOrDefault().Username,
                              Password = g.FirstOrDefault().Password,
-                             RoleVM = g.Select(x => new RoleVM
-                             {
-                                 RoleName = x.RoleName,
-                                 ThongTin = x.ThongTin
-                             }).ToList()
+                             Name = g.FirstOrDefault().Ten, // Fixed missing Name assignment
+                             SDT = g.FirstOrDefault().Sdt, // Fixed missing SDT assignment
+                             Diachi = g.FirstOrDefault().Diachi, // Fixed missing Diachi assignment
+                             Role = g.Where(x => x.RoleName != null) // Chỉ lấy các role có giá trị
+                                       .Select(x => new Models.Role
+                                       {
+                                           RoleID=x.RoleID,
+                                           RoleName = x.RoleName,
+                                           ThongTin = x.ThongTin
+                                       }).ToList()
                          })
                          .ToList();
 
@@ -125,6 +136,87 @@ namespace QLSanBong_API.Services
         }
 
 
+
+        public void AddUser(UserAddVM user)
+        {
+            try
+            {
+                // Kiểm tra dữ liệu người dùng hợp lệ
+                if (string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Password))
+                {
+                    throw new InvalidOperationException("Dữ liệu người dùng không hợp lệ");
+                }
+
+                // Kiểm tra xem tài khoản đã tồn tại chưa
+                var existingUser = _context.Users
+                    .FirstOrDefault(ur => ur.Username == user.Username);
+
+                if (existingUser != null)
+                {
+                    throw new InvalidOperationException("Tài khoản đã tồn tại.");
+                }
+
+                // Kiểm tra số điện thoại đã tồn tại chưa
+                var existingPhone = _context.Users
+                    .FirstOrDefault(ur => ur.Sdt == user.Sdt);
+
+                if (existingPhone != null)
+                {
+                    throw new InvalidOperationException("Số điện thoại đã tồn tại.");
+                }
+
+                // Tạo người dùng mới
+                var newUser = new Data.User
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Username = user.Username,
+                    Password = HashPassword(user.Password), // Mã hóa mật khẩu
+                    Ten = user.Ten,
+                    Sdt = user.Sdt,
+                    Diachi = user.Diachi
+                };
+
+                // Thêm vào cơ sở dữ liệu
+                _context.Users.Add(newUser);
+                _context.SaveChanges(); // Lưu vào cơ sở dữ liệu
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu có
+                _logger.LogError($"Lỗi khi thêm người dùng: {ex.Message}", ex);
+                throw; // Ném lại ngoại lệ để controller có thể xử lý
+            }
+        }
+
+
+
+        private string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+        public bool DeleteUser(string userID)
+        {
+            try
+            {
+                // Tìm UserRole theo userId
+                var users = _context.Users.Where(ur => ur.UserId.ToString() == userID).ToList();
+
+                if (!users.Any())
+                {
+                    return false; // Không tìm thấy userId trong UserRole
+                }
+
+                // Xóa tất cả UserRole liên quan đến userId
+                _context.Users.RemoveRange(users);
+                _context.SaveChanges(); // Lưu thay đổi vào cơ sở dữ liệu
+                return true;
+            }
+            catch (Exception)
+            {
+                return false; // Xóa thất bại
+            }
+        }
         public List<Models.UserRole> GetUserByRole(string RoleID)
         {
             var userbyrole= _context.UserRoles

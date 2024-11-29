@@ -81,7 +81,6 @@ function populateTable(hoaDons) {
                 <td>${yc.maPds}</td>
                 <td>${yc.khachHangDS ? yc.khachHangDS.tenKh : 'N/A'}</td>
                 <td>${yc.khachHangDS ? yc.khachHangDS.sdt : 'N/A'}</td>
-                <td>${yc.maNv}</td>
                 <td>${yc.ngaylap}</td>
                 <td>${new Intl.NumberFormat('vi-VN').format(yc.tongTien)} VND</td>
                 <td>${yc.ghiChu || 'Không có'}</td>

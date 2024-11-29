@@ -8,6 +8,7 @@
     const errorMessageSignup = document.getElementById("errorMessagesignup");
 
     // Lắng nghe sự kiện submit của form login
+    // Lắng nghe sự kiện submit của form login
     loginForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
@@ -34,19 +35,32 @@
             const result = await response.json();
 
             if (response.ok) {
+                // Lưu token vào sessionStorage
                 const token = result.token;
                 sessionStorage.setItem("Token", token);
+
+                // Lấy role từ token (cần viết hàm getRoleFromToken)
                 const role = getRoleFromToken(token);
-                redirectToRoleBasedPage(role);
+                redirectToRoleBasedPage(role); // Chuyển hướng theo role
             } else {
-                errorMessageLogin.textContent = result.message || "Tên đăng nhập hoặc mật khẩu không đúng";
+                // Nếu response không thành công, lấy thông báo lỗi từ API
+                const errorData = result || {}; // Tránh lỗi nếu result không phải là đối tượng JSON
+                const errorMessage = errorData?.message || "Không thể đăng nhập. Vui lòng thử lại.";
+
+                // Hiển thị thông báo lỗi trên màn hình
+                errorMessageLogin.textContent = errorMessage;
                 errorMessageLogin.style.display = "block";
+
+                // Hiển thị thông báo lỗi bằng Toastr (nếu cần)
+                alert(errorMessage);
             }
         } catch (error) {
+            // Xử lý lỗi khi không thể kết nối đến API
             errorMessageLogin.textContent = "Không thể kết nối đến máy chủ. Vui lòng thử lại.";
             errorMessageLogin.style.display = "block";
         }
     });
+
 
     // Kiểm tra token ngay lập tức
     const token1 = sessionStorage.getItem("Token");

@@ -61,10 +61,11 @@ namespace QLSanBong_API.Services
                 {
                     Username = login.Username,
                     UserID = taiKhoanData.UserId, // Đảm bảo có UserId ở đây
-                    RoleVM = new List<RoleVM> // Khởi tạo danh sách RoleVM
+                    Role = new List<Models.Role> // Khởi tạo danh sách RoleVM
                     {
-                        new RoleVM
+                        new Models.Role
                         {
+                            RoleID = role.RoleId,
                             RoleName = role.RoleName, // Cập nhật thông tin vai trò
                             ThongTin = role.ThongTin // Cập nhật thông tin chi tiết của vai trò
                         }

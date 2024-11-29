@@ -39,10 +39,11 @@ namespace QLSanBong_API.Services
                     UserID = kh.User.UserId,
                     Username = kh.User.Username,
                     Password = kh.User.Password,
-                    RoleVM = new List<RoleVM>
+                    Role = new List<Models.Role>
                     {
-                        new RoleVM
+                        new Models.Role
                         {
+                            RoleID=kh.Role.RoleId,
                             RoleName = kh.Role.RoleName,
                             ThongTin = kh.Role.ThongTin
                         }
@@ -80,10 +81,11 @@ namespace QLSanBong_API.Services
                     UserID = khachHang.User.UserId,
                     Username = khachHang.User.Username,
                     Password = khachHang.User.Password,
-                    RoleVM = new List<RoleVM>
+                    Role = new List<Models.Role>
                     {
-                        new RoleVM
-                        {
+                        new Models.Role
+                        {   
+                            RoleID = khachHang.Role.RoleId,
                             RoleName = khachHang.Role.RoleName,
                             ThongTin = khachHang.Role.ThongTin
                         }

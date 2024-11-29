@@ -36,14 +36,15 @@ namespace QLSanBong_API.Services
                         UserID = x.user.UserId,
                         Username = x.user.Username,
                         Password = x.user.Password,
-                        RoleVM = _context.UserRoles
+                        Role = _context.UserRoles
                             .Where(ur => ur.UserId == x.user.UserId)
                             .Join(
                                 _context.Roles,
                                 ur => ur.RoleId,
                                 r => r.RoleId,
-                                (ur, r) => new RoleVM
+                                (ur, r) => new Models.Role
                                 {
+                                    RoleID=r.RoleId,
                                     RoleName = r.RoleName,
                                     ThongTin = r.ThongTin
                                 })
@@ -81,10 +82,11 @@ namespace QLSanBong_API.Services
                     UserID = nhanVien.User.UserId,
                     Username = nhanVien.User.Username,
                     Password = nhanVien.User.Password,
-                    RoleVM = new List<RoleVM>
+                    Role = new List<Models.Role>
                     {
-                        new RoleVM
+                        new Models.Role
                         {
+                            RoleID = nhanVien.Role.RoleId,
                             RoleName = nhanVien.Role.RoleName,
                             ThongTin = nhanVien.Role.ThongTin
                         }

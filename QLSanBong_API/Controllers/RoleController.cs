@@ -84,7 +84,58 @@ namespace QLSanBong_API.Controllers
         public IActionResult GetAllUser()
         {
             var roles = _roleService.GetAllUser();
-            return Ok(roles);
+
+            // Lọc bỏ nhân viên có MaNv là "NV00000"
+            var filteredList = roles.Where(nv => nv.Username != "admin").ToList();
+            return Ok(filteredList);
+        }
+
+        [HttpPost("adduser")]
+        public IActionResult AddUser([FromBody] UserAddVM user)
+        {
+            try
+            {
+                // Gọi service để thêm người dùng
+                _roleService.AddUser(user);
+
+                // Nếu không có lỗi, trả về thông báo thành công
+                return Ok(new { message = "Thêm người dùng thành công." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Trả về lỗi với thông báo cụ thể
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Có lỗi xảy ra khi xử lý yêu cầu." });
+            }
+        }
+
+
+
+        [HttpDelete("deleteuser")]
+        public IActionResult DeleteUser([FromQuery] string userID)
+        {
+            try
+            {
+                // Gọi service để xóa người dùng
+                bool result = _roleService.DeleteUser(userID);
+
+                if (result)
+                {
+                    return Ok(new { message = "User deleted successfully." });
+                }
+                else
+                {
+                    return NotFound(new { message = "User not found." });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi và trả về thông báo lỗi
+                return StatusCode(500, new { message = "An error occurred while deleting the user.", error = ex.Message });
+            }
         }
 
         [HttpGet("getalluserrole")]

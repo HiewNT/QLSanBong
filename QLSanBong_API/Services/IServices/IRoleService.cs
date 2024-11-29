@@ -18,6 +18,9 @@ namespace QLSanBong_API.Services.IService
 
         #region User
         List<User> GetAllUser();
+        void AddUser(UserAddVM user);
+        bool DeleteUser(string userID);
+
 
         List<UserRole> GetUserByRole(string RoleId);
         List<UserRole> GetAllUserRole();
