@@ -7,7 +7,8 @@
     const errorMessageLogin = document.getElementById("errorMessage");
     const errorMessageSignup = document.getElementById("errorMessagesignup");
 
-    // Lắng nghe sự kiện submit của form login
+    let currentRole = sessionStorage.getItem("currentRole");
+
     // Lắng nghe sự kiện submit của form login
     loginForm.addEventListener("submit", async function (event) {
         event.preventDefault();
@@ -39,9 +40,21 @@
                 const token = result.token;
                 sessionStorage.setItem("Token", token);
 
-                // Lấy role từ token (cần viết hàm getRoleFromToken)
+                // Lấy role từ token
                 const role = getRoleFromToken(token);
-                redirectToRoleBasedPage(role); // Chuyển hướng theo role
+
+                // Kiểm tra nếu role là mảng
+                if (Array.isArray(role)) {
+                    currentRole = null;  // Nếu là mảng thì currentRole = null
+                } else {
+                    currentRole = role;  // Nếu có 1 giá trị, gán vào currentRole
+                }
+
+                // Lưu currentRole vào sessionStorage
+                sessionStorage.setItem("currentRole", currentRole);
+
+                // Chuyển hướng theo role
+                redirectToRoleBasedPage(currentRole);  // Chuyển hướng theo role
             } else {
                 // Nếu response không thành công, lấy thông báo lỗi từ API
                 const errorData = result || {}; // Tránh lỗi nếu result không phải là đối tượng JSON
@@ -60,7 +73,6 @@
             errorMessageLogin.style.display = "block";
         }
     });
-
 
     // Kiểm tra token ngay lập tức
     const token1 = sessionStorage.getItem("Token");
@@ -85,19 +97,19 @@
 
     // Chuyển hướng theo vai trò
     function redirectToRoleBasedPage(role) {
-        switch (role) {
-            case "Admin":
-                window.location.href = "/Admin";
-                break;
-            case "NhanVienDS":
-                window.location.href = "/Employee";
-                break;
-            case "KhachHang":
-                window.location.href = "/Customer";
-                break;
-            default:
-                window.location.href = "/";
+        let url = "/";
+        if (role === null) {
+            url = "/";
+        } else if (Array.isArray(role)) {
+            url = "/";
+        } else if (role === "KhachHang") {
+            url = "/Customer";
+        } else {
+            url = "/Admin";
         }
+        
+        // Chuyển hướng trang đến URL tương ứng
+        window.location.href = url;
     }
 
     // Xóa thông tin trong modal khi đóng

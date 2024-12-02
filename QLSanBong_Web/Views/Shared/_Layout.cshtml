@@ -59,28 +59,34 @@
             const formAccount = document.querySelector(".formaccount");
             const formUser = document.querySelector(".formuser");
 
-            if (!token) {
-            } else {
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    const userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            if (!sessionStorage.getItem("Token")) {
+            // Nếu không có token, có thể thực hiện một số hành động nếu cần (ví dụ, thông báo lỗi hoặc chuyển hướng về trang login)
+            console.log("Không tìm thấy token.");
+        } else {
+            // Lấy currentRole từ sessionStorage
+            const currentRole = sessionStorage.getItem("currentRole");
 
-                    switch (userRole) {
-                        case "Admin":
-                            window.location.href = "/Admin";
-                            break;
-                        case "NhanVienDS":
-                            window.location.href = "/Employee";
-                            break;
-                        case "KhachHang":
-                            window.location.href = "/Customer";
-                            break;
-                        default:
-                    }
-                } catch (error) {
-                    console.error("Lỗi khi xử lý token:", error);
+            if (currentRole) {
+                // Chuyển hướng theo vai trò hiện tại
+                switch (currentRole) {
+                    case "Admin":
+                        window.location.href = "/Admin";
+                        break;
+                    case "NhanVienDS":
+                        window.location.href = "/Employee";
+                        break;
+                    case "KhachHang":
+                        window.location.href = "/Customer";
+                        break;
+                    default:
+                        console.log("Chưa có vai trò nào!");
                 }
+            } else {
+                // Nếu không có currentRole, có thể xử lý lỗi hoặc không làm gì
+                console.log("Không tìm thấy currentRole trong sessionStorage.");
             }
+        }
+
 
         function confirmLogout() {
             // Thực hiện hành động đăng xuất ở đây

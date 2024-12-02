@@ -80,7 +80,7 @@
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
-                         'Role': 'Admin'  // Truyền role vào header 
+                         'Role': currentRole,  // Truyền role vào header 
                      },
                 body: formData
             });

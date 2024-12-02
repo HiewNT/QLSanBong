@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using QLSanBong_API.Helpers;
 using QLSanBong_API.Models;
 using QLSanBong_API.Services.IService;
 
@@ -23,6 +24,21 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getallrole")]
         public IActionResult GetAll()
         {
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+
+            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, role, "vaitro_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền xem danh sách nhân viên."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var roles = _roleService.GetAll();
             return Ok(roles);
         }
@@ -32,6 +48,21 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, role, "vaitro_add"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền xem danh sách nhân viên."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 var roleId = _roleService.AddRole(roleName); // Gọi service để thêm vai trò
                 return Ok(new { RoleId = roleId, Message = "Vai trò được thêm thành công." });
             }
@@ -50,6 +81,21 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, role, "vaitro_delete"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền xem danh sách nhân viên."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 var success = _roleService.DeleteRole(roleId);
                 return Ok(new { Success = success });
             }
@@ -64,6 +110,21 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, role, "vaitro_update"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền xem danh sách nhân viên."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 var success = _roleService.UpdateRole(roleId, newRole);
                 return Ok(new { Success = success });
             }
@@ -83,6 +144,21 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getalluser")]
         public IActionResult GetAllUser()
         {
+            // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User,role, "nguoidung_read"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền xem danh sách người dùng."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
             var roles = _roleService.GetAllUser();
 
             // Lọc bỏ nhân viên có MaNv là "NV00000"
@@ -95,6 +171,21 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User,role, "nguoidung_add"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền xem danh sách nhân viên."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 // Gọi service để thêm người dùng
                 _roleService.AddUser(user);
 
@@ -119,6 +210,21 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User,role, "nguoidung_delete"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền xem danh sách nhân viên."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 // Gọi service để xóa người dùng
                 bool result = _roleService.DeleteUser(userID);
 
@@ -212,9 +318,27 @@ namespace QLSanBong_API.Controllers
         #endregion
 
 
+
+        #region Authencation
+
         [HttpGet("getallroleauth")]
         public IActionResult GetAllRoleAuth()
         {
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+
+            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, role, "phanquyen_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền xem danh sách nhân viên."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             var roles = _roleService.GetAllRoleAuth();
             return Ok(roles);
         }
@@ -222,6 +346,21 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getauthbyrole")]
         public ActionResult<List<Models.RoleAuth>> GetAuthByRole([FromQuery] string roleId)
         {
+            // Lấy role từ header
+            var role = Request.Headers["Role"].ToString();
+
+            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+            if (!PermissionHelper.HasPermission(User, role, "phanquyen_read"))
+            {
+                // Tạo đối tượng thông báo dưới dạng JSON
+                var errorResponse = new
+                {
+                    success = false,
+                    message = "Bạn không có quyền xem danh sách nhân viên."
+                };
+
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+            }
             // Kiểm tra roleId có null hoặc rỗng
             if (string.IsNullOrEmpty(roleId))
             {
@@ -246,6 +385,21 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, role, "phanquyen_add"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền xem danh sách nhân viên."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 await _roleService.AddRoleAuthAsync(roleId, authId);
                 return Ok("Thêm quyền thành công.");
             }
@@ -261,6 +415,21 @@ namespace QLSanBong_API.Controllers
         {
             try
             {
+                // Lấy role từ header
+                var role = Request.Headers["Role"].ToString();
+
+                // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
+                if (!PermissionHelper.HasPermission(User, role, "phanquyen_delete"))
+                {
+                    // Tạo đối tượng thông báo dưới dạng JSON
+                    var errorResponse = new
+                    {
+                        success = false,
+                        message = "Bạn không có quyền xem danh sách nhân viên."
+                    };
+
+                    return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
+                }
                 // Gọi service để xóa RoleAuth
                 await _roleService.DeleteRoleAuthAsync(roleId, authId);
                 return Ok("Xóa RoleAuth thành công.");
@@ -278,3 +447,5 @@ namespace QLSanBong_API.Controllers
         }
     }
 }
+
+#endregion

@@ -44,6 +44,10 @@
 
     <script>
 
+        // Lấy vai trò từ sessionStorage
+        const currentRole = sessionStorage.getItem("currentRole");
+        console.log(currentRole)
+        
         if (!token) {
             // Nếu không có token, điều hướng về trang Home/Index
             window.location.href = "/Home/Index";
@@ -141,12 +145,12 @@
             <hr class="sidebar-divider">
 
             <!-- Heading -->
-            <div class="sidebar-heading">
+            <div style="display: none;" data-auth="phanquyen_read" class="sidebar-heading">
                 Phân quyền
             </div>
 
             <!-- Nav Item - Customer -->
-            <li class="nav-item">
+            <li style="display: none;" data-auth="vaitro_read" class="nav-item">
                 <a class="nav-link" href="@Url.Action("Role","PhanQuyen", new { area = "Admin" })">
                     <i class="fas fa-solid fa-user"></i>
                     <span>Vai trò</span>
@@ -154,20 +158,20 @@
             </li>
 
             <!-- Nav Item - Customer -->
-            <li class="nav-item">
+            <li style="display: none;" data-auth="nguoidung_read" class="nav-item">
                 <a class="nav-link" href="@Url.Action("User","PhanQuyen", new { area = "Admin" })">
                     <i class="fas fa-solid fa-user"></i>
                     <span>Người dùng</span>
                 </a>
             </li>
 
-            <!-- Nav Item - Stadium -->
+           @*  <!-- Nav Item - Stadium -->
             <li class="nav-item">
                 <a class="nav-link" href="@Url.Action("Service","PhanQuyen", new { area = "Admin" })">
                     <i class="fas fa-solid fa-clipboard"></i>
                     <span>Chức năng</span>
                 </a>
-            </li>
+            </li> *@
         </ul>
         <!-- End of Sidebar -->
 

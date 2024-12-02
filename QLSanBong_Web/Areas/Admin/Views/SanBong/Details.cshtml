@@ -56,7 +56,7 @@
         try {
             const response = await fetch(`https://localhost:7182/api/SanBong/getbyid?id=${id}`, {
                 headers: { "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
-                    'Role': 'Admin'  // Truyền role vào header
+                    'Role': currentRole  // Truyền role vào header
                 }
             });
 

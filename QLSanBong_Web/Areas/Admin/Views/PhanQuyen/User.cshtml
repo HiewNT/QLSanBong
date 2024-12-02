@@ -3,7 +3,7 @@
 }
 
 <div class="card">
-        <div class="d-flex justify-content-end mb-3">
+    <div style="display: none;" data-auth="nguoidung_add" class="d-flex justify-content-end mb-3">
             <!-- Căn phải cho nút -->
             <button class="btn btn-success mt-2 " onclick="openAddUserModal()">Thêm người dùng mới</button> <!-- Nút thêm nhân viên -->
         </div>
@@ -102,6 +102,7 @@
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
+                    "Role": currentRole,
                     "Content-Type": "application/json"
                 }
             });
@@ -116,7 +117,7 @@
         }
     }
 
-    function renderUserList(users) {
+   async function renderUserList(users) {
         const userList = document.getElementById('userList');
         userList.innerHTML = ''; // Xóa nội dung cũ trước khi thêm mới
         users.forEach(user => {
@@ -144,11 +145,12 @@
                         </button>
                     </td>
                     <td>
-                            <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userID}')"><i class="fas fa-trash"></i> Xóa người dùng</button>
+                                <button style="display: none;" data-auth="nguoidung_delete" class="btn btn-danger btn-sm" onclick="deleteUser('${user.userID}')"><i class="fas fa-trash"></i> Xóa người dùng</button>
                     </td>
                 </tr>`;
         });
 
+        await handlePermissionsForFrontend();
         //<button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userID}')">Xóa người dùng</button>
         // Hủy khởi tạo DataTable nếu đã có
         if ($.fn.DataTable.isDataTable('#userTable')) {
@@ -222,6 +224,7 @@
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    "Role": currentRole,
                     'Content-Type': 'application/json',
                 },
             });
@@ -314,6 +317,7 @@
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    "Role": currentRole,
                     'Content-Type': 'application/json',
                 },
             });
@@ -377,6 +381,7 @@ $('#addUserModal').on('hidden.bs.modal', function () {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    "Role": currentRole,
                     'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
                 },
                 body: JSON.stringify(userData)

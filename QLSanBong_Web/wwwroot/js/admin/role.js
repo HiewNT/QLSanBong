@@ -1,6 +1,4 @@
-﻿
-
-// Bắt đầu quá trình tải vai trò khi trang được tải
+﻿// Bắt đầu quá trình tải vai trò khi trang được tải
 document.addEventListener('DOMContentLoaded', loadRoles);
 
 // Mở modal thêm vai trò
@@ -35,7 +33,7 @@ async function addRole() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-        'Role': 'Admin',  // Truyền role vào header
+                'Role': currentRole,  // Truyền role vào header
                 'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
             },
             body: JSON.stringify({
@@ -82,6 +80,7 @@ async function loadRoles() {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
+                "Role": currentRole,
                 "Content-Type": "application/json"
             }
         });
@@ -105,15 +104,16 @@ async function loadRoles() {
                     <td>${role.roleID}</td>
                     <td>${role.roleName}</td>
                     <td>${role.thongTin}</td>
-                    <td>
+                    <td class="d-flex justify-content-start">
                         <button class="btn btn-info btn-sm" onclick="infoRole('${role.roleID}')"><i class="fas fa-users"></i> Người dùng</button>
-                        <button class="btn btn-primary btn-sm" onclick="authRole('${role.roleID}')"><i class="fas fa-atom"></i> Quyền</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteRole('${role.roleID}')"><i class="fas fa-trash"></i> Xóa vai trò</button>
+                        <button  style="display: none;" data-auth="phanquyen_read" class="btn btn-primary btn-sm ml-1" onclick="authRole('${role.roleID}')"><i class="fas fa-atom"></i> Quyền</button>
+                        <button  style="display: none;" data-auth="vaitro_delete" class="btn btn-danger btn-sm ml-1" onclick="deleteRole('${role.roleID}')"><i class="fas fa-trash"></i> Xóa vai trò</button>
                     </td>
                 </tr>
             `;
         });
 
+        await handlePermissionsForFrontend();
         // Hủy khởi tạo DataTable nếu đã có
         if ($.fn.DataTable.isDataTable('#roleTable')) {
             $('#roleTable').DataTable().destroy();
@@ -147,7 +147,8 @@ async function deleteRole(roleId) {
         const response = await fetch(`https://localhost:7182/api/Role/deleterole?roleId=${roleId}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
+                'Authorization': `Bearer ${sessionStorage.getItem("Token")}`,
+                'Role': currentRole, // currentRole phải được xác định ở đâu đó trong mã của bạn
             }
         });
 
@@ -166,179 +167,155 @@ async function deleteRole(roleId) {
     }
 }
 
+function renderAuthList(auths, actions, services) {
+                const authListContainer = document.createElement('div');
+                authListContainer.className = 'auth-list-container';
 
-// Hàm mở modal và lấy dữ liệu từ API
-function authRole(roleId) {
-    const roleApiUrl = `https://localhost:7182/api/Role/getauthbyrole?roleId=${roleId}`;
-    const actionsApiUrl = `https://localhost:7182/api/Auth/getallaction`;
-    const servicesApiUrl = `https://localhost:7182/api/Auth/getallservice`;
+                // Lặp qua các dịch vụ và tạo danh sách
+                services.forEach(service => {
+                    const serviceSection = document.createElement('div');
+                    serviceSection.className = 'service-section';
 
-    // Mở modal và gán roleId vào thuộc tính data-roleid
-    const modal = document.getElementById('authModal');
-    modal.setAttribute('data-roleid', roleId);
-    // Mở modal
-    $('#authModal').modal('show');
+                    // Tạo tiêu đề cho dịch vụ với biểu tượng mũi tên
+                    const serviceTitle = document.createElement('p');
+                    serviceTitle.classList.add('service-title');
 
-    // Xóa bảng cũ trước khi hiển thị bảng mới
-    const tableContainer = document.getElementById('authTableContainer');
-    if (tableContainer) {
-        tableContainer.innerHTML = ''; // Xóa nội dung cũ của bảng
-    }
+                    // Tạo mũi tên để mở/thu
+                    const arrowIcon = document.createElement('span');
+                    arrowIcon.classList.add('arrow-icon');
+                    arrowIcon.textContent = '▼'; // Mũi tên xuống ban đầu
+                    serviceTitle.appendChild(arrowIcon);
 
-    // Gọi API để lấy dữ liệu
-    Promise.all([
-        fetch(roleApiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    console.warn('Không tìm thấy dữ liệu quyền cho roleId:', roleId);
-                    return []; // Nếu không tìm thấy, trả về danh sách rỗng
+                    const serviceName = document.createElement('span');
+                    serviceName.textContent = service.serviceName; // Hiển thị tên dịch vụ
+                    serviceTitle.appendChild(serviceName);
+
+                    serviceSection.appendChild(serviceTitle);
+
+                    // Tạo danh sách quyền cho mỗi dịch vụ
+                    const actionsList = document.createElement('ul');
+                    actionsList.className = 'list-group actions-list hidden'; // Danh sách quyền sẽ ẩn ban đầu
+
+                    actions.forEach(action => {
+                        const actionItem = document.createElement('li');
+                        actionItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+
+                        // Tạo checkbox cho mỗi action
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'action-service-checkbox';
+                        checkbox.dataset.serviceId = service.serviceId;
+                        checkbox.dataset.actionId = action.actionId;
+
+                        // Kiểm tra xem role có quyền cho action-service này không
+                        const hasAuth = auths.some(
+                            auth =>
+                                auth.authInfo.serviceId === service.serviceId && // So sánh bằng serviceId
+                                auth.authInfo.actionId === action.actionId // So sánh bằng actionId
+                        );
+
+                        checkbox.checked = hasAuth;
+
+                        // Lưu trạng thái ban đầu vào data-initial-checked
+                        checkbox.dataset.initialChecked = checkbox.checked;
+
+                        // Tạo tên quyền (action)
+                        const actionLabel = document.createElement('span');
+                        actionLabel.textContent = action.actionName; // Tên quyền
+
+                        // Thêm checkbox và tên quyền vào phần tử li
+                        actionItem.appendChild(checkbox);
+                        actionItem.appendChild(actionLabel);
+
+                        // Thêm item vào danh sách
+                        actionsList.appendChild(actionItem);
+                    });
+
+                    // Thêm danh sách actions vào section của dịch vụ
+                    serviceSection.appendChild(actionsList);
+
+                    // Thêm sự kiện click để toggle (thu/mở) danh sách quyền và thay đổi biểu tượng mũi tên
+                    serviceTitle.addEventListener('click', () => {
+                        actionsList.classList.toggle('hidden');
+                        // Chuyển đổi mũi tên
+                        if (actionsList.classList.contains('hidden')) {
+                            arrowIcon.textContent = '▼'; // Mũi tên xuống khi ẩn
+                        } else {
+                            arrowIcon.textContent = '▲'; // Mũi tên lên khi hiển thị
+                        }
+                    });
+
+                    // Thêm section của dịch vụ vào container
+                    authListContainer.appendChild(serviceSection);
+                });
+
+                // Chèn vào container chính trong modal
+                const tableContainer = document.getElementById('authTableContainer');
+                if (tableContainer) {
+                    tableContainer.innerHTML = ''; // Xóa nội dung cũ của bảng
+                    tableContainer.appendChild(authListContainer);
                 }
-                return response.json();
-            }),
-        fetch(actionsApiUrl)
-            .then(response => response.json()),
-        fetch(servicesApiUrl)
-            .then(response => response.json())
-    ])
-        .then(([roleData, allActions, allServices]) => {
-            renderAuthTable(roleData || [], allActions, allServices);
-        })
-        .catch(error => console.error('Error fetching data:', error));
-}
+            }
 
-// Hàm render bảng dữ liệu vào trong modal
-function renderAuthTable(auths, actions, services) {
-    const authTable = document.createElement('table');
-    authTable.className = 'table table-bordered';
-    authTable.id = 'authTable';
-
-    // Tạo phần tiêu đề
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-
-    // Cột đầu tiên: Dịch vụ
-    const serviceHeader = document.createElement('th');
-    serviceHeader.textContent = 'Dịch vụ';
-    headerRow.appendChild(serviceHeader);
-
-    // Thêm tiêu đề cho mỗi action
-    actions.forEach(action => {
-        const actionHeader = document.createElement('th');
-        actionHeader.textContent = action.actionName;
-        headerRow.appendChild(actionHeader);
-    });
-
-    thead.appendChild(headerRow);
-    authTable.appendChild(thead);
-
-    // Tạo phần thân bảng
-    const tbody = document.createElement('tbody');
-
-    services.forEach(service => {
-        const row = document.createElement('tr');
-
-        // Cột dịch vụ
-        const serviceCell = document.createElement('td');
-        serviceCell.textContent = service.serviceName; // Hiển thị tên dịch vụ
-        row.appendChild(serviceCell);
-
-        // Tạo checkbox cho mỗi action
-        actions.forEach(action => {
-            const cell = document.createElement('td');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.className = 'action-service-checkbox';
-
-            // Gán dữ liệu serviceId và actionId vào checkbox để sử dụng trong saveAuth
-            checkbox.dataset.serviceId = service.serviceId;
-            checkbox.dataset.actionId = action.actionId;
-
-            // Kiểm tra xem role có quyền cho action-service này không
-            const hasAuth = auths.some(
-                auth =>
-                    auth.authInfo.serviceId === service.serviceId && // So sánh bằng serviceId
-                    auth.authInfo.actionId === action.actionId // So sánh bằng actionId
-            );
-
-            checkbox.checked = hasAuth;
-
-            // Lưu trạng thái ban đầu vào data-initial-checked
-            checkbox.dataset.initialChecked = checkbox.checked;
-
-            cell.appendChild(checkbox);
-            row.appendChild(cell);
-        });
-
-        tbody.appendChild(row);
-    });
-
-    authTable.appendChild(tbody);
-
-    // Chèn bảng vào container
-    const tableContainer = document.getElementById('authTableContainer');
-    if (tableContainer) {
-        tableContainer.appendChild(authTable);
-    }
-}
 
 function saveAuth() {
-    const modal = document.getElementById('authModal');
-    const roleId = modal.getAttribute('data-roleid'); // Lấy roleId từ modal
-    const checkboxes = document.querySelectorAll(".action-service-checkbox");
-    const promises = []; // Lưu trữ các lời hứa fetch API
+                const modal = document.getElementById('authModal');
+                const roleId = modal.getAttribute('data-roleid'); // Lấy roleId từ modal
+                const checkboxes = document.querySelectorAll(".action-service-checkbox");
+                const promises = []; // Lưu trữ các lời hứa fetch API
 
-    checkboxes.forEach(checkbox => {
-        const serviceId = checkbox.dataset.serviceId; // Lấy serviceId từ dataset
-        const actionId = checkbox.dataset.actionId; // Lấy actionId từ dataset
+                checkboxes.forEach(checkbox => {
+                    const serviceId = checkbox.dataset.serviceId; // Lấy serviceId từ dataset
+                    const actionId = checkbox.dataset.actionId; // Lấy actionId từ dataset
 
-        // Kiểm tra sự thay đổi so với trạng thái ban đầu
-        if (checkbox.checked !== (checkbox.dataset.initialChecked === 'true')) {
-            // Gọi API để lấy authId dựa trên serviceId và actionId
-            promises.push(
-                fetch(`https://localhost:7182/api/Auth/getauth?serviceId=${serviceId}&actionId=${actionId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            console.warn('Không tìm thấy authId cho dịch vụ và hành động này:', serviceId, actionId);
-                            return null; // Nếu không tìm thấy authId
-                        }
-                        return response.json();
+                    // Kiểm tra sự thay đổi so với trạng thái ban đầu
+                    if (checkbox.checked !== (checkbox.dataset.initialChecked === 'true')) {
+                        // Gọi API để lấy authId dựa trên serviceId và actionId
+                        promises.push(
+                            fetch(`https://localhost:7182/api/Auth/getauth?serviceId=${serviceId}&actionId=${actionId}`)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        console.warn('Không tìm thấy authId cho dịch vụ và hành động này:', serviceId, actionId);
+                                        return null; // Nếu không tìm thấy authId
+                                    }
+                                    return response.json();
+                                })
+                                .then(authData => {
+                                    if (authData && authData.authId) {
+                                        const authId = authData.authId; // Lấy authId từ dữ liệu API
+
+                                        // Nếu trạng thái thay đổi, thực hiện gọi API thêm hoặc xóa quyền
+                                        if (checkbox.checked) {
+                                            // Nếu được tick, gọi API thêm quyền
+                                            return fetch(`https://localhost:7182/api/Role/addroleauth?roleId=${roleId}&authId=${authId}`, {
+                                                method: 'POST'
+                                            });
+                                        } else {
+                                            // Nếu bỏ tick, gọi API xóa quyền
+                                            return fetch(`https://localhost:7182/api/Role/deleteroleauth?roleId=${roleId}&authId=${authId}`, {
+                                                method: 'DELETE'
+                                            });
+                                        }
+                                    } else {
+                                        return null; // Nếu không có authId, không thực hiện gì cả
+                                    }
+                                })
+                        );
+                    }
+                });
+
+                // Thực hiện các lời hứa
+                Promise.all(promises)
+                    .then(() => {
+                        alert('Cập nhật quyền thành công!');
+                        $('#authModal').modal('show'); // Đóng modal sau khi lưu
                     })
-                    .then(authData => {
-                        if (authData && authData.authId) {
-                            const authId = authData.authId; // Lấy authId từ dữ liệu API
-
-                            // Nếu trạng thái thay đổi, thực hiện gọi API thêm hoặc xóa quyền
-                            if (checkbox.checked) {
-                                // Nếu được tick, gọi API thêm quyền
-                                return fetch(`https://localhost:7182/api/Role/addroleauth?roleId=${roleId}&authId=${authId}`, {
-                                    method: 'POST'
-                                });
-                            } else {
-                                // Nếu bỏ tick, gọi API xóa quyền
-                                return fetch(`https://localhost:7182/api/Role/deleteroleauth?roleId=${roleId}&authId=${authId}`, {
-                                    method: 'DELETE'
-                                });
-                            }
-                        } else {
-                            return null; // Nếu không có authId, không thực hiện gì cả
-                        }
-                    })
-            );
-        }
-    });
-
-    // Thực hiện các lời hứa
-    Promise.all(promises)
-        .then(() => {
-            alert('Cập nhật quyền thành công!');
-            $('#authModal').modal('show'); // Đóng modal sau khi lưu
-        })
-        .catch(error => {
-            console.error('Error updating role permissions:', error);
-            alert('Có lỗi xảy ra khi cập nhật quyền!');
-        });
-}
-
+                    .catch(error => {
+                        console.error('Error updating role permissions:', error);
+                        alert('Có lỗi xảy ra khi cập nhật quyền!');
+                    });
+            }
+       
 
 
 // Hàm xử lý khi nhấn vào thông tin vai trò
@@ -373,7 +350,6 @@ async function loadRoleDetail(roleId) {
     }
 }
 
-// Hàm điền dữ liệu vào modal chi tiết hóa đơn
 function populateDetailModal(detailRole) {
     const modalContent = document.getElementById('modalContent');
     if (!modalContent) {

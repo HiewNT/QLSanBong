@@ -1,5 +1,5 @@
 ﻿<table id="actionTable" class="table table-striped table-bordered display" style="width:100%">
-    <thead class="table-secondary">">
+    <thead class="table-secondary">
         <tr>
             <th>ID</th>
             <th>Tên hành động</th>
@@ -23,7 +23,7 @@ async function loadactions() {
         const response = await fetch(url, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${token}`,
+                "Authorization": `Bearer ${token}`
                 "Content-Type": "application/json"
             }
         });

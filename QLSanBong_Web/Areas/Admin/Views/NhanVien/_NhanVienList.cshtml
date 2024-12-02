@@ -62,7 +62,6 @@
     document.addEventListener("DOMContentLoaded", async function () {
         await loadNhanViens();
     });
-
     async function loadNhanViens() {
         let url = `https://localhost:7182/api/NhanVien/getall`;
         try {
@@ -71,7 +70,7 @@
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
-                    'Role': 'Admin',  // Truyền role vào header
+                    'Role': currentRole,  // Truyền role vào header
                     "Content-Type": "application/json"
                 }
             });
@@ -148,7 +147,7 @@
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
-                    'Role': 'Admin',  // Truyền role vào header
+                    'Role': currentRole,  // Truyền role vào header
                     "Content-Type": "application/json"
                 }
             });
@@ -215,7 +214,7 @@
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Role': 'Admin',  // Truyền role vào header
+                    'Role': currentRole,  // Truyền role vào header
                     'Authorization': `Bearer ${sessionStorage.getItem("Token")}`
                 },
                 body: JSON.stringify({
@@ -267,7 +266,7 @@
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${sessionStorage.getItem("Token")}`,
-                    'Role': 'Admin',  // Truyền role vào header
+                    'Role': currentRole,  // Truyền role vào header
                     "Content-Type": "application/json"
                 }
             })

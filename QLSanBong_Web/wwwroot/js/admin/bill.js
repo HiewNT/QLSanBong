@@ -30,7 +30,7 @@ async function loadHoaDons() {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
-                'Role': 'Admin',  // Truyền role vào header
+                'Role': currentRole,  // Truyền role vào header
                 "Content-Type": "application/json"
             }
         });
@@ -109,7 +109,7 @@ async function loadHoaDonDetail(maPds) {
             method: "GET", // GET không cần body
             headers: {
                 "Authorization": `Bearer ${token}`,
-                'Role': 'Admin',  // Truyền role vào header
+                'Role': currentRole,  // Truyền role vào header
                 "Content-Type": "application/json"
             }
         });

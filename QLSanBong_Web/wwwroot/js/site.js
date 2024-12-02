@@ -1,7 +1,10 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
     // Kiểm tra token ngay lập tức
     const token = sessionStorage.getItem("Token");
-
+    if (!token) {
+        sessionStorage.removeItem("currentRole");  // Xóa currentRole khỏi sessionStorage
+        console.log("Token không tồn tại, currentRole đã bị xóa.");
+    }
     // Hàm lấy roles từ token
     function getRolesFromToken(token) {
         try {
@@ -17,42 +20,56 @@
 
     // Hàm trả về URL tương ứng với từng role
     function getRoleUrl(role) {
-        switch (role) {
-            case "Admin":
-                return "/Admin";
-            case "NhanVienDS":
-                return "/Employee";
-            case "KhachHang":
-                return "/Customer";
-            default:
-                return "/";
+        // Kiểm tra nếu role là mảng và không rỗng
+        if (Array.isArray(role) && role.length === 0) {
+            return "/";
+        } else if (Array.isArray(role)) {
+            // Kiểm tra nếu role là mảng và có giá trị
+            return "/";
+        } else if (role === "KhachHang") {
+            // Kiểm tra nếu role là "KhachHang"
+            return "/Customer";
+        } else {
+            // Trả về "/Admin" cho các trường hợp còn lại
+            return "/Admin";
         }
     }
 
     // Hàm trả về tên hiển thị của vai trò
-    function getRoleDisplayName(role) {
-        switch (role) {
-            case "Admin":
-                return "Quản trị hệ thống";
-            case "NhanVienDS":
-                return "Nhân viên đặt sân";
-            case "KhachHang":
-                return "Khách hàng";
-            default:
-                return "Trang chủ";
-        }
+function getRoleDisplayName(role) {
+    // Kiểm tra nếu role là mảng
+    if (Array.isArray(role)) {
+        return "Trang chủ";  // Nếu role là mảng, trả về "Trang chủ"
     }
 
-    // Hàm xác định vai trò hiện tại từ URL
-    function getCurrentRoleFromUrl(path) {
-        if (path.startsWith("/Admin")) return "Admin";
-        if (path.startsWith("/Employee")) return "NhanVienDS";
-        if (path.startsWith("/Customer")) return "KhachHang";
-        return "";
+    // Nếu không phải mảng, tiếp tục kiểm tra giá trị của role
+    switch (role) {
+        case "Admin":
+            return "Quản trị hệ thống";
+        case "NhanVienDS":
+            return "Nhân viên đặt sân";
+        case "KhachHang":
+            return "Khách hàng";
+        case null:
+            return "Trang chủ";  // Nếu role là null, trả về "Trang chủ"
+        default:
+            return role ;
+    }
+}
+
+
+    // Lấy currentRole từ sessionStorage (nếu có)
+    let currentRole = sessionStorage.getItem("currentRole");
+
+    // Nếu không có currentRole trong sessionStorage, lấy từ token hoặc mặc định là Admin
+    if (!currentRole && token) {
+        const roles = getRolesFromToken(token);
+        currentRole = roles.length > 0 ? roles[0] : "Admin"; // Chọn vai trò đầu tiên nếu có
+        sessionStorage.setItem("currentRole", currentRole); // Lưu vào sessionStorage
     }
 
     // Lấy roles từ token và lọc bỏ vai trò hiện tại
-    const roles = token ? getRolesFromToken(token).filter(role => role !== getCurrentRoleFromUrl(window.location.pathname)) : [];
+    const roles = token ? getRolesFromToken(token).filter(role => role !== currentRole) : [];
 
     // Xử lý menu thả xuống
     const dropdownMenu = document.querySelector(".dropdown-menu-role");
@@ -60,7 +77,6 @@
 
     if (dropdownLi) {
         // Tạo phần tử cho vai trò hiện tại
-        const currentRole = getCurrentRoleFromUrl(window.location.pathname);
         if (currentRole) {
             const currentRoleSpan = document.createElement("span");
             currentRoleSpan.classList.add("dropdown-item", "text-muted", "font-weight-bold");
@@ -80,6 +96,12 @@
                 link.classList.add("dropdown-item");
                 link.href = getRoleUrl(role);
                 link.innerHTML = `<i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> ${getRoleDisplayName(role)}`;
+                link.addEventListener("click", function (event) {
+                    event.preventDefault(); // Ngăn chặn việc chuyển trang ngay lập tức
+                    sessionStorage.setItem("currentRole", role); // Lưu vai trò mới vào sessionStorage
+                    console.log("Đã chọn vai trò:", role); // In ra console vai trò đã chọn
+                    location.href = getRoleUrl(role); // Chuyển hướng đến URL tương ứng
+                });
                 dropdownMenu.appendChild(link);
             });
         }

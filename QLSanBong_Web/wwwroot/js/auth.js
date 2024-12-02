@@ -6,15 +6,16 @@ async function handlePermissionsForFrontend() {
     return;
   }
 
-  // Xác định vai trò hiện tại từ URL
-  const role = getCurrentRoleFromUrl(window.location.pathname);
-  if (!role) {
+  // Lấy vai trò từ sessionStorage
+  const currentRole = sessionStorage.getItem("currentRole");
+  
+  if (!currentRole) {
     console.error("Không xác định được vai trò.");
     return;
   }
 
   // Lấy quyền từ API
-  const permissions = await getPermissionsFromApi(token, role);
+  const permissions = await getPermissionsFromApi(token, currentRole);
 
   // Xử lý quyền cho các phần tử có data-auth
   document.querySelectorAll("[data-auth]").forEach((el) => {
@@ -30,14 +31,6 @@ async function handlePermissionsForFrontend() {
       el.style.display = "none"; // Ẩn phần tử nếu không có quyền
     }
   });
-}
-
-// Hàm xác định vai trò hiện tại từ URL
-function getCurrentRoleFromUrl(path) {
-  if (path.startsWith("/Admin")) return "Admin";
-  if (path.startsWith("/Employee")) return "NhanVienDS";
-  if (path.startsWith("/Customer")) return "KhachHang";
-  return "";
 }
 
 // Hàm lấy quyền từ API dựa trên vai trò
@@ -65,5 +58,5 @@ async function getPermissionsFromApi(token, role) {
 
 // Gọi hàm xử lý quyền khi trang được tải
 document.addEventListener("DOMContentLoaded", function () {
-handlePermissionsForFrontend();
+  handlePermissionsForFrontend();
 });
