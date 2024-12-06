@@ -36,7 +36,33 @@
 
     <script src="~/js/auth.js"></script>
     <script src="~/js/site.js" defer></script>
+    <style>
+        /* Đặt body và html có chiều cao tối thiểu 100% */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
 
+        /* Đặt container chính là flexbox */
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Chiều cao tối thiểu của trang sẽ bằng 100% chiều cao của cửa sổ trình duyệt */
+        }
+
+        /* Phần nội dung */
+        .content {
+            flex: 1; /* Nội dung sẽ chiếm hết không gian còn lại */
+        }
+
+        /* Footer luôn ở dưới cùng */
+        footer.sticky-footer {
+            background-color: white;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: auto; /* Đẩy footer xuống dưới */
+        }
+    </style>
 
 </head>
 
@@ -48,23 +74,13 @@
         const currentRole = sessionStorage.getItem("currentRole");
         console.log(currentRole)
         
-        if (!token) {
+        if (currentRole==='null') {
             // Nếu không có token, điều hướng về trang Home/Index
-            window.location.href = "/Home/Index";
-        } else {
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-
-                // Kiểm tra nếu userRole không chứa "Customer"
-                if (!userRole.includes("Admin")) {
-                    window.location.href = "/Home/Index";
-                }
-            } catch (error) {
-                console.error("Lỗi khi xử lý token:", error);
-                // Nếu có lỗi, điều hướng về trang Home/Index
-                window.location.href = "/Home/Index";
-            }
+            window.location.href = "/";
+        } 
+        // Kiểm tra nếu userRole không chứa "Customer"
+        if (currentRole === "KhachHang") {
+            window.location.href = "/Customer";
         }
     </script>
     <!-- Page Wrapper -->
@@ -189,7 +205,7 @@
                         <li class="nav-item dropdown chooserole">
                             <a class="nav-link dropdown-toggle fw-bold" href="#" id="userDropdown" role="button"
                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="d-none d-lg-inline text-dark">Chọn vai trò</span>
+                                <span class="d-none d-lg-inline text-dark">Vai trò</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-role dropdown-menu-end shadow animated--grow-in"
                                  aria-labelledby="userDropdown">
@@ -219,18 +235,19 @@
 
             </div>
             <div>
-                @RenderBody();
+                @RenderBody()
             </div>
             <!-- End of Topbar -->
             <!-- End of Main Content -->
             <!-- Footer -->
-            <footer class="sticky-footer bg-white">
+            <footer class="sticky-footer">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; My Website 2024</span>
+                        <span>Copyright &copy; QL Sân Bóng 2024</span>
                     </div>
                 </div>
             </footer>
+        </div>
             <!-- End of Footer -->
 
         </div>
@@ -270,12 +287,9 @@
             window.location.href = '/'; // Điều hướng sau khi đăng xuất
         }
 
-        // Kiểm tra nếu token đã có trong sessionStorage hoặc localStorage
-        const jwtToken = sessionStorage.getItem('Token'); // Hoặc localStorage.getItem('Token');
-
-        if (jwtToken) {
+        if (token) {
             // Gọi API để lấy thông tin người dùng từ token
-            fetchUserInfo(jwtToken);
+            fetchUserInfo(token);
         }
 
         function fetchUserInfo(token) {

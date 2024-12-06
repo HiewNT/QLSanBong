@@ -100,12 +100,12 @@
         let url = "/";
         if (role === null) {
             url = "/";
-        } else if (Array.isArray(role)) {
-            url = "/";
-        } else if (role === "KhachHang") {
-            url = "/Customer";
         } else {
-            url = "/Admin";
+            if (role === "KhachHang") {
+                url = "/Customer";
+            } else {
+                url = "/Admin";
+            }
         }
         
         // Chuyển hướng trang đến URL tương ứng

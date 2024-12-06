@@ -1,9 +1,5 @@
 ﻿// Bắt đầu quá trình tải vai trò khi trang được tải
-document.addEventListener("DOMContentLoaded", function () {
-  // Mở modal thêm vai trò
-  async function openAddRoleModal() {
-    $("#addRoleModal").modal("show");
-  }
+document.addEventListener('DOMContentLoaded', loadRoles);
 
   // Xóa thông tin trong các trường khi modal đóng
   $("#addRoleModal").on("hidden.bs.modal", function () {
@@ -107,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>${role.thongTin}</td>
                     <td class="d-flex justify-content-start">
                         <button class="btn btn-info btn-sm" onclick="infoRole('${role.roleID}')"><i class="fas fa-users"></i> Người dùng</button>
-                        <button  style="display: none;" data-auth="phanquyen_read" class="btn btn-primary btn-sm ml-1" onclick="checkauthRole('${role.roleID}')"><i class="fas fa-atom"></i> Quyền</button>
+                        <button  style="display: none;" data-auth="phanquyen_read" class="btn btn-primary btn-sm ml-1" onclick="authRole('${role.roleID}')"><i class="fas fa-atom"></i> Quyền</button>
                         <button  style="display: none;" data-auth="vaitro_delete" class="btn btn-danger btn-sm ml-1" onclick="deleteRole('${role.roleID}')"><i class="fas fa-trash"></i> Xóa vai trò</button>
                     </td>
                 </tr>
@@ -117,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
       await handlePermissionsForFrontend();
       // Hủy khởi tạo DataTable nếu đã có
       if ($.fn.DataTable.isDataTable("#roleTable")) {
-        $("#roleTable").DataTable().destroy();
+        $("#roleTable").DataTable().clear().destroy();
       }
 
       // Khởi tạo DataTable sau khi thêm dữ liệu vào bảng
@@ -173,9 +169,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Hàm mở modal và lấy dữ liệu từ API
-  async function checkauthRole(roleId) {
+// Hàm mở modal và lấy dữ liệu từ API
+async function authRole(roleId) {
     const roleApiUrl = `https://localhost:7182/api/Role/getauthbyrole?roleId=${roleId}`;
+    const authApiUrl = `https://localhost:7182/api/Auth/getallactionservice`; // Lấy tất cả quyền từ API
     const actionsApiUrl = `https://localhost:7182/api/Auth/getallaction`;
     const servicesApiUrl = `https://localhost:7182/api/Auth/getallservice`;
 
@@ -185,123 +182,166 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const tableContainer = document.getElementById("authTableContainer");
     if (tableContainer) {
-      tableContainer.innerHTML = "";
+        tableContainer.innerHTML = "";
     }
 
     try {
-      const [roleResponse, actionsResponse, servicesResponse] =
-        await Promise.all([
-          fetch(roleApiUrl),
-          fetch(actionsApiUrl),
-          fetch(servicesApiUrl),
-        ]);
+        const [roleResponse, authResponse, actionsResponse, servicesResponse] =
+            await Promise.all([
+                fetch(roleApiUrl),
+                fetch(authApiUrl),
+                fetch(actionsApiUrl),
+                fetch(servicesApiUrl),
+            ]);
 
-      if (!roleResponse.ok) {
-        console.warn("Không tìm thấy dữ liệu quyền cho roleId:", roleId);
-        renderAuthList([], [], []); // Trả về mảng rỗng nếu không có dữ liệu
-        return;
-      }
+        if (!roleResponse.ok) {
+            console.warn("Không tìm thấy dữ liệu quyền cho roleId:", roleId);
+            renderAuthList([], [], [], []); // Trả về mảng rỗng nếu không có dữ liệu
+            return;
+        }
 
-      const roleData = await roleResponse.json();
-      const allActions = await actionsResponse.json();
-      const allServices = await servicesResponse.json();
+        const roleData = await roleResponse.json();
+        const allAuths = await authResponse.json();
+        const allActions = await actionsResponse.json();
+        const allServices = await servicesResponse.json();
 
-      renderAuthList(roleData, allActions, allServices);
+        renderAuthList(allAuths, roleData, allActions, allServices);
     } catch (error) {
-      console.error("Error fetching data:", error);
+        console.error("Error fetching data:", error);
     }
-  }
+}
 
-  async function renderAuthList(auths, actions, services) {
+async function renderAuthList(allAuths, roleAuths, actions, services) {
     const authListContainer = document.createElement("div");
     authListContainer.className = "auth-list-container";
 
-    // Lặp qua các dịch vụ và tạo danh sách
-    services.forEach((service) => {
-      const serviceSection = document.createElement("div");
-      serviceSection.className = "service-section";
+    // Tạo một map để tra cứu tên hành động và dịch vụ nhanh chóng
+    const actionMap = actions.reduce((map, action) => {
+        map[action.actionId] = action.actionName; // Ví dụ: { add: "Thêm", edit: "Sửa" }
+        return map;
+    }, {});
 
-      // Tạo tiêu đề cho dịch vụ với biểu tượng mũi tên
-      const serviceTitle = document.createElement("p");
-      serviceTitle.classList.add("service-title");
+    const serviceMap = services.reduce((map, service) => {
+        map[service.serviceId] = service.serviceName; // Ví dụ: { hoadon: "Hóa đơn" }
+        return map;
+    }, {});
 
-      // Tạo mũi tên để mở/thu
-      const arrowIcon = document.createElement("span");
-      arrowIcon.classList.add("arrow-icon");
-      arrowIcon.textContent = "▼"; // Mũi tên xuống ban đầu
-      serviceTitle.appendChild(arrowIcon);
+    // Tạo một map để kiểm tra các quyền mà role có
+    const roleAuthMap = new Set(roleAuths.map(auth => `${auth.authInfo.serviceId}-${auth.authInfo.actionId}`));
 
-      const serviceName = document.createElement("span");
-      serviceName.textContent = service.serviceName; // Hiển thị tên dịch vụ
-      serviceTitle.appendChild(serviceName);
+    // Tạo một đối tượng để nhóm các quyền theo serviceId
+    const groupedAuths = {};
 
-      serviceSection.appendChild(serviceTitle);
+    // Lặp qua tất cả các quyền và nhóm theo serviceId
+    allAuths.forEach((auth) => {
+        const serviceName = serviceMap[auth.serviceId];
+        const actionName = actionMap[auth.actionId];
 
-      // Tạo danh sách quyền cho mỗi dịch vụ
-      const actionsList = document.createElement("ul");
-      actionsList.className = "list-group actions-list hidden"; // Danh sách quyền sẽ ẩn ban đầu
+        if (serviceName && actionName) {
+            const serviceId = auth.serviceId;
+            const actionId = auth.actionId;
 
-      actions.forEach((action) => {
-        const actionItem = document.createElement("li");
-        actionItem.className =
-          "list-group-item d-flex justify-content-between align-items-center";
+            // Kiểm tra xem role có quyền này không
+            const hasRoleAuth = roleAuthMap.has(`${serviceId}-${actionId}`);
 
-        // Tạo checkbox cho mỗi action
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "action-service-checkbox";
-        checkbox.dataset.serviceId = service.serviceId;
-        checkbox.dataset.actionId = action.actionId;
+            // Nếu serviceId chưa có trong groupedAuths, tạo một mục mới
+            if (!groupedAuths[serviceId]) {
+                groupedAuths[serviceId] = {
+                    serviceName,
+                    actions: []
+                };
+            }
 
-        // Kiểm tra xem role có quyền cho action-service này không
-        const hasAuth = auths.some(
-          (auth) =>
-            auth.authInfo.serviceId === service.serviceId && // So sánh bằng serviceId
-            auth.authInfo.actionId === action.actionId // So sánh bằng actionId
-        );
-
-        checkbox.checked = hasAuth;
-
-        // Lưu trạng thái ban đầu vào data-initial-checked
-        checkbox.dataset.initialChecked = checkbox.checked;
-
-        // Tạo tên quyền (action)
-        const actionLabel = document.createElement("span");
-        actionLabel.textContent = action.actionName; // Tên quyền
-
-        // Thêm checkbox và tên quyền vào phần tử li
-        actionItem.appendChild(checkbox);
-        actionItem.appendChild(actionLabel);
-
-        // Thêm item vào danh sách
-        actionsList.appendChild(actionItem);
-      });
-
-      // Thêm danh sách actions vào section của dịch vụ
-      serviceSection.appendChild(actionsList);
-
-      // Thêm sự kiện click để toggle (thu/mở) danh sách quyền và thay đổi biểu tượng mũi tên
-      serviceTitle.addEventListener("click", () => {
-        actionsList.classList.toggle("hidden");
-        // Chuyển đổi mũi tên
-        if (actionsList.classList.contains("hidden")) {
-          arrowIcon.textContent = "▼"; // Mũi tên xuống khi ẩn
-        } else {
-          arrowIcon.textContent = "▲"; // Mũi tên lên khi hiển thị
+            // Thêm quyền vào nhóm tương ứng với serviceId
+            groupedAuths[serviceId].actions.push({
+                actionId,
+                actionName,
+                hasRoleAuth
+            });
         }
-      });
+    });
 
-      // Thêm section của dịch vụ vào container
-      authListContainer.appendChild(serviceSection);
+    // Lặp qua các dịch vụ trong groupedAuths để hiển thị
+    Object.values(groupedAuths).forEach(({ serviceName, actions, serviceId ,actionId}) => {
+        const serviceSection = document.createElement("div");
+        serviceSection.className = "service-section";
+
+        // Tạo tiêu đề cho dịch vụ với biểu tượng mũi tên
+        const serviceTitle = document.createElement("p");
+        serviceTitle.classList.add("service-title");
+
+        // Tạo mũi tên để mở/thu
+        const arrowIcon = document.createElement("span");
+        arrowIcon.classList.add("arrow-icon");
+        arrowIcon.textContent = "▼"; // Mũi tên xuống ban đầu
+        serviceTitle.appendChild(arrowIcon);
+
+        const serviceLabel = document.createElement("span");
+        serviceLabel.textContent = serviceName; // Hiển thị tên dịch vụ
+        serviceTitle.appendChild(serviceLabel);
+
+        serviceSection.appendChild(serviceTitle);
+
+        // Tạo danh sách quyền cho mỗi dịch vụ
+        const actionsList = document.createElement("ul");
+        actionsList.className = "list-group actions-list hidden"; // Danh sách quyền sẽ ẩn ban đầu
+
+        // Tạo item cho từng quyền trong dịch vụ
+        actions.forEach(({ actionId, actionName, hasRoleAuth }) => {
+            const actionItem = document.createElement("li");
+            actionItem.className = "list-group-item d-flex justify-content-between align-items-center";
+
+            // Tạo checkbox cho mỗi action
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "action-service-checkbox";
+            checkbox.dataset.serviceId = serviceId;
+            checkbox.dataset.actionId = actionId;
+
+            checkbox.checked = hasRoleAuth; // Nếu có quyền role thì checked = true
+
+            // Lưu trạng thái ban đầu vào data-initial-checked
+            checkbox.dataset.initialChecked = checkbox.checked;
+
+            // Tạo tên quyền (action)
+            const actionLabel = document.createElement("span");
+            actionLabel.textContent = actionName; // Ví dụ: "Thêm", "Sửa"
+
+            // Thêm checkbox và tên quyền vào phần tử li
+            actionItem.appendChild(checkbox);
+            actionItem.appendChild(actionLabel);
+
+            // Thêm item vào danh sách
+            actionsList.appendChild(actionItem);
+        });
+
+        // Thêm danh sách actions vào section của dịch vụ
+        serviceSection.appendChild(actionsList);
+
+        // Thêm sự kiện click để toggle (thu/mở) danh sách quyền và thay đổi biểu tượng mũi tên
+        serviceTitle.addEventListener("click", () => {
+            actionsList.classList.toggle("hidden");
+            // Chuyển đổi mũi tên
+            if (actionsList.classList.contains("hidden")) {
+                arrowIcon.textContent = "▼"; // Mũi tên xuống khi ẩn
+            } else {
+                arrowIcon.textContent = "▲"; // Mũi tên lên khi hiển thị
+            }
+        });
+
+        // Thêm section của dịch vụ vào container
+        authListContainer.appendChild(serviceSection);
     });
 
     // Chèn vào container chính trong modal
     const tableContainer = document.getElementById("authTableContainer");
     if (tableContainer) {
-      tableContainer.innerHTML = ""; // Xóa nội dung cũ của bảng
-      tableContainer.appendChild(authListContainer);
+        tableContainer.innerHTML = ""; // Xóa nội dung cũ của bảng
+        tableContainer.appendChild(authListContainer);
     }
-  }
+}
+    
+
 
   async function saveAuth() {
     const modal = document.getElementById("authModal");
@@ -483,9 +523,10 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Không thể xóa vai trò.");
     }
   }
+
   $(".modalclose").on("click", function () {
     $("#roleModal").modal("hide"); // Đóng tất cả các modal
     $("#authModal").modal("hide"); // Đóng tất cả các modal
     $("#addRoleModal").modal("hide"); // Đóng tất cả các modal
   });
-});
+

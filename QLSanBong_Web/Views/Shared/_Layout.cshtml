@@ -52,54 +52,47 @@
 <body>
 
     <script>
-            // Kiểm tra token ngay lập tức
-            const token = sessionStorage.getItem("Token");
+        // Kiểm tra token ngay lập tức khi trang được tải
+        const token = sessionStorage.getItem("Token");
 
-            // Lấy các phần tử DOM
-            const formAccount = document.querySelector(".formaccount");
-            const formUser = document.querySelector(".formuser");
+        // Lấy các phần tử DOM
+        const formAccount = document.querySelector(".formaccount");
+        const formUser = document.querySelector(".formuser");
 
-            if (!sessionStorage.getItem("Token")) {
-            // Nếu không có token, có thể thực hiện một số hành động nếu cần (ví dụ, thông báo lỗi hoặc chuyển hướng về trang login)
+        let url = "/"; 
+        // Kiểm tra xem có token trong sessionStorage không
+        if (!token) {
             console.log("Không tìm thấy token.");
         } else {
-            // Lấy currentRole từ sessionStorage
             const currentRole = sessionStorage.getItem("currentRole");
 
-            if (currentRole) {
-                // Chuyển hướng theo vai trò hiện tại
-                switch (currentRole) {
-                    case "Admin":
-                        window.location.href = "/Admin";
-                        break;
-                    case "NhanVienDS":
-                        window.location.href = "/Employee";
-                        break;
-                    case "KhachHang":
-                        window.location.href = "/Customer";
-                        break;
-                    default:
-                        console.log("Chưa có vai trò nào!");
-                }
+            if (currentRole === 'null') {
+                console.log("Role không xác định, giữ nguyên vị trí.");
             } else {
-                // Nếu không có currentRole, có thể xử lý lỗi hoặc không làm gì
-                console.log("Không tìm thấy currentRole trong sessionStorage.");
+
+                if (currentRole === "KhachHang") {
+                    url = "/Customer"; 
+                } else {
+                    url = "/Admin";  
+                }
+
+                if (window.location.pathname !== url) {
+                    window.location.href = url;
+                }
             }
-        }
 
-
-        function confirmLogout() {
-            // Thực hiện hành động đăng xuất ở đây
-            // Ví dụ: chuyển hướng hoặc xóa thông tin session
-            sessionStorage.removeItem('Token'); // Nếu cần
-            window.location.href = '/'; // Điều hướng sau khi đăng xuất
-        }
-
-        if (token) {
             // Gọi API để lấy thông tin người dùng từ token
             fetchUserInfo(token);
         }
 
+        // Hàm xác nhận đăng xuất
+        function confirmLogout() {
+            // Thực hiện hành động đăng xuất ở đây
+            sessionStorage.removeItem('Token'); // Xóa token nếu cần
+            window.location.href = '/'; // Điều hướng sau khi đăng xuất (về trang chủ hoặc trang đăng nhập)
+        }
+
+        // Hàm gọi API để lấy thông tin người dùng từ token
         function fetchUserInfo(token) {
             fetch('https://localhost:7182/api/Account/userinfo', {
                 method: 'GET',
@@ -111,13 +104,13 @@
                 .then(data => {
                     const tennguoidung = data.tennguoidung;
                     console.log(tennguoidung);
-                    // Cập nhật phần tử hiển thị Tennguoidung
+                    // Cập nhật phần tử hiển thị tên người dùng
                     document.getElementById('userNameDisplay').innerText = tennguoidung;
                 })
-                .catch(error => console.error('Error fetching userx info:', error));
+                .catch(error => console.error('Error fetching user info:', error));
         }
-
     </script>
+
     
     <!-- Navbar Start -->
     <div class="container-fluid bg-primary shadow-sm fixed-top">
@@ -169,7 +162,7 @@
                     <li class="nav-item dropdown chooserole">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: bold;">
-                            <span class="d-none d-lg-inline text-dark font-weight-medium">Chọn vai trò</span>
+                            <span class="d-none d-lg-inline text-dark font-weight-medium">Vai trò</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-role dropdown-menu-end shadow animated--grow-in"
                              aria-labelledby="userDropdown">

@@ -64,7 +64,7 @@ function getRoleDisplayName(role) {
     // Nếu không có currentRole trong sessionStorage, lấy từ token hoặc mặc định là Admin
     if (!currentRole && token) {
         const roles = getRolesFromToken(token);
-        currentRole = roles.length > 0 ? roles[0] : "Admin"; // Chọn vai trò đầu tiên nếu có
+        currentRole = roles.length > 0 ? roles[0] : ""; // Chọn vai trò đầu tiên nếu có
         sessionStorage.setItem("currentRole", currentRole); // Lưu vào sessionStorage
     }
 

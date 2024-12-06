@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QLSanBong_API.Helpers;
 using QLSanBong_API.Models;
+using QLSanBong_API.Services;
 using QLSanBong_API.Services.IService;
 
 namespace QLSanBong_API.Controllers
@@ -264,12 +265,16 @@ namespace QLSanBong_API.Controllers
                 // Gọi phương thức từ service hoặc trực tiếp từ DbContext
                 var users = _roleService.GetUserByRole(roleId);
 
-                if (users == null)
+
+                // Lọc bỏ nhân viên có MaNv là "NV00000"
+                var filteredList = users.Where(nv => nv.Username != "admin").ToList();
+
+                if (filteredList == null)
                 {
                     return NotFound($"Không tìm thấy người dùng nào với vai trò ID: {roleId}.");
                 }
 
-                return Ok(users);
+                return Ok(filteredList);
             }
             catch (Exception ex)
             {
@@ -334,7 +339,7 @@ namespace QLSanBong_API.Controllers
                 var errorResponse = new
                 {
                     success = false,
-                    message = "Bạn không có quyền xem danh sách nhân viên."
+                    message = "Bạn không có quyền xem danh sách quyền."
                 };
 
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
@@ -346,21 +351,6 @@ namespace QLSanBong_API.Controllers
         [HttpGet("getauthbyrole")]
         public ActionResult<List<Models.RoleAuth>> GetAuthByRole([FromQuery] string roleId)
         {
-            // Lấy role từ header
-            var role = Request.Headers["Role"].ToString();
-
-            // Kiểm tra quyền "nhanvien_read" trước khi thực hiện logic
-            if (!PermissionHelper.HasPermission(User, role, "phanquyen_read"))
-            {
-                // Tạo đối tượng thông báo dưới dạng JSON
-                var errorResponse = new
-                {
-                    success = false,
-                    message = "Bạn không có quyền xem danh sách nhân viên."
-                };
-
-                return StatusCode(StatusCodes.Status403Forbidden, errorResponse);
-            }
             // Kiểm tra roleId có null hoặc rỗng
             if (string.IsNullOrEmpty(roleId))
             {

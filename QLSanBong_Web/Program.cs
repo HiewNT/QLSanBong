@@ -85,10 +85,4 @@ app.MapControllerRoute(
     name: "Customer",
     pattern: "Customer/{controller=Home}/{action=Index}/{id?}",
     defaults: new { area = "Customer" });
-
-app.MapControllerRoute(
-    name: "Employee",
-    pattern: "Employee/{controller=Home}/{action=Index}/{id?}",
-    defaults: new { area = "Employee" });
-
 app.Run();

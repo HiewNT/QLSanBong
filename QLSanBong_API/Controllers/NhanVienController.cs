@@ -5,7 +5,7 @@ using QLSanBong_API.Models;
 
 namespace QLSanBong_API.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class NhanVienController : ControllerBase
@@ -19,7 +19,6 @@ namespace QLSanBong_API.Controllers
 
         // GET: api/nhanvien
         [HttpGet("getall")]
-        [Authorize(Roles = "Admin,NhanVien")]
         public ActionResult<IEnumerable<NhanVien>> GetAll()
         {
             try
@@ -58,9 +57,8 @@ namespace QLSanBong_API.Controllers
         }
 
 
-        // GET: api/nhanvien/{id}
+        // GET: api/nhanvien/{id
         [HttpGet("getbyid")]
-        [Authorize(Roles = "Admin,NhanVien")]
         public ActionResult<NhanVien> GetById([FromQuery] string id)
         {
 
@@ -110,7 +108,6 @@ namespace QLSanBong_API.Controllers
 
         // PUT: api/nhanvien/{id}
         [HttpPut("update")]
-        [Authorize(Policy = "RequireAdminRole")] // Chỉ cho phép admin thực hiện
         public IActionResult Update([FromQuery] string id, [FromBody] NhanVienVM nhanVienVM)
         {
             try
@@ -146,7 +143,6 @@ namespace QLSanBong_API.Controllers
 
         // DELETE: api/nhanvien/{id}
         [HttpDelete("delete")]
-        [Authorize(Policy = "RequireAdminRole")] // Chỉ cho phép admin thực hiện
         public IActionResult Delete([FromQuery] string id)
         {
             try
